@@ -6497,4 +6497,4 @@ async def delete_student_photo(user_id: str):
     
 if __name__ == "__main__":
     import uvicorn
-    uvicorn.run("ALS:app", host="0.0.0.0", port=8000, reload=True)
+    uvicorn.run("ALS:app", host="0.0.0.0", port=8000, reload=False)
