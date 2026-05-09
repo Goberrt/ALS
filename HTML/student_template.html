@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ALS Student Portal</title>
+    <link rel="stylesheet" href="../CSS/student_styles.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+</head>
+<body>
+    <!-- This is where the sidebar will be loaded -->
+    <div id="sidebarContainer"></div>
+    
+    <!-- This is where each page's specific content will go -->
+    <div class="main-content">
+        <div id="contentContainer">
+            <!-- Each page's unique content will replace this -->
+        </div>
+    </div>
+
+    <script>
+        // Load and initialize the sidebar when page loads
+        document.addEventListener('DOMContentLoaded', () => {
+            // Load sidebar content
+            fetch('../HTML/student_sidebar.html')
+                .then(response => response.text())
+                .then(html => {
+                    document.getElementById('sidebarContainer').innerHTML = html;
+                    initializeSidebar();
+                });
+        });
+
+        function initializeSidebar() {
+            // Get current page name from URL (e.g., "dashboard" from "student_dashboard.html")
+            const currentPage = window.location.pathname.split('/').pop().replace('student_', '').replace('.html', '');
+            
+            // Set active tab
+            document.querySelectorAll('.nav-tab').forEach(tab => {
+                if (tab.dataset.page === currentPage) {
+                    tab.classList.add('active');
+                }
+                
+                // Add click handlers for navigation
+                tab.addEventListener('click', () => {
+                    if (tab.dataset.page !== currentPage) {
+                        window.location.href = `student_${tab.dataset.page}.html`;
+                    }
+                });
+            });
+        }
+    </script>
+</body>
+</html>

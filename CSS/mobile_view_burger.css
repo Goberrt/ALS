@@ -1,0 +1,213 @@
+/* ============================================
+   SHARED RESPONSIVE STYLES FOR ALL PAGES
+   Include this file in all instructor pages
+   ============================================ */
+
+/* Mobile Menu Toggle Button */
+.menu-toggle {
+    display: none;
+    position: fixed;
+    top: 20px;
+    left: 20px;
+    z-index: 1001;
+    background: linear-gradient(135deg, #3498db 0%, #2980b9 100%);
+    color: white;
+    border: none;
+    width: 45px;
+    height: 45px;
+    border-radius: 8px;
+    cursor: pointer;
+    font-size: 20px;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.2);
+    transition: all 0.3s ease;
+}
+
+.menu-toggle:active {
+    transform: scale(0.95);
+}
+
+/* Overlay for mobile menu */
+.sidebar-overlay {
+    display: none;
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(0, 0, 0, 0.5);
+    z-index: 999;
+}
+
+/* Tablet Responsive - 1024px and below */
+@media (max-width: 1024px) {
+    /* Add page-specific tablet adjustments in individual CSS files */
+}
+
+/* Mobile Responsive - 768px and below */
+@media (max-width: 768px) {
+    /* Show mobile menu toggle */
+    .menu-toggle {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+    
+    /* Sidebar mobile behavior */
+    .sidebar {
+        transform: translateX(-100%);
+        width: 280px;
+    }
+    
+    .sidebar.active {
+        transform: translateX(0);
+    }
+    
+    .sidebar-overlay.active {
+        display: block;
+    }
+    
+    /* Main content adjustments */
+    .main-content {
+        margin-left: 0 !important;
+        padding: 80px 15px 15px 15px !important;
+        width: 100%;
+    }
+    
+    /* Header adjustments */
+    header {
+        padding: 20px !important;
+    }
+    
+    header h1 {
+        font-size: 20px !important;
+    }
+    
+    header p {
+        font-size: 12px !important;
+    }
+}
+
+/* Small Mobile Devices - 480px and below */
+@media (max-width: 480px) {
+    .main-content {
+        padding: 70px 10px 10px 10px !important;
+    }
+    
+    header {
+        padding: 15px !important;
+    }
+    
+    header h1 {
+        font-size: 18px !important;
+    }
+}
+
+/* ============================================
+   COMMON SIDEBAR RESPONSIVE STYLES
+   ============================================ */
+
+@media (max-width: 768px) {
+    .sidebar-header h1,
+    .sidebar-header p,
+    .sidebar-header .logo-container {
+        /* Keep visible on mobile for better UX */
+    }
+    
+    /* Sidebar header adjustments for mobile */
+    .sidebar-header {
+        padding: 15px !important;
+    }
+    
+    .sidebar-header .als-logo {
+        width: 50px !important;
+        height: 50px !important;
+    }
+    
+    .sidebar-header h1 {
+        font-size: 16px !important;
+    }
+    
+    .sidebar-header p {
+        font-size: 11px !important;
+    }
+    
+    /* Nav tab adjustments */
+    .nav-tab {
+        padding: 12px 15px !important;
+    }
+    
+    .nav-tab i {
+        font-size: 16px !important;
+    }
+    
+    .nav-tab span {
+        font-size: 14px !important;
+    }
+}
+
+@media (max-width: 480px) {
+    .sidebar {
+        width: 260px !important;
+    }
+    
+    .sidebar-header {
+        padding: 12px !important;
+    }
+    
+    .sidebar-header .als-logo {
+        width: 45px !important;
+        height: 45px !important;
+    }
+    
+    .sidebar-header h1 {
+        font-size: 15px !important;
+    }
+    
+    .nav-tab {
+        padding: 10px 12px !important;
+    }
+    
+    .nav-tab span {
+        font-size: 13px !important;
+    }
+}
+
+/* ============================================
+   UTILITY CLASSES
+   ============================================ */
+
+/* Hide on mobile */
+@media (max-width: 768px) {
+    .hide-mobile {
+        display: none !important;
+    }
+}
+
+/* Hide on desktop */
+@media (min-width: 769px) {
+    .hide-desktop {
+        display: none !important;
+    }
+}
+
+/* Responsive text sizing */
+@media (max-width: 768px) {
+    .responsive-text-sm {
+        font-size: 0.875rem !important;
+    }
+    
+    .responsive-text-xs {
+        font-size: 0.75rem !important;
+    }
+}
+
+/* Responsive spacing */
+@media (max-width: 768px) {
+    .responsive-p-sm {
+        padding: 0.75rem !important;
+    }
+    
+    .responsive-m-sm {
+        margin: 0.75rem !important;
+    }
+}

@@ -1,0 +1,109 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>ALS Learners Tracking Portal - Santa Cruz, Laguna</title>
+    <link rel="stylesheet" href="/CSS/als_portal_css.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.7.1/leaflet.css" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" />
+</head>
+<body>
+    <nav class="navbar">
+        <div class="nav-container">
+            <div class="nav-logo">
+                <img src="https://via.placeholder.com/40x40?text=LSPU" alt="LSPU Logo" class="logo" />
+                <span class="nav-title">ALS Tracking Portal</span>
+            </div>
+            <div class="nav-menu">
+                <a href="/ins_dashboard" class="nav-link "><i class="fas fa-home"></i> Dashboard</a>
+                <a href="/ins_mapping" class="nav-link "><i class="fas fa-map"></i> Geo Mapping</a>
+                <a href="/ins_learners" class="nav-link active"><i class="fas fa-users"></i> Learners</a>
+                <a href="/ins_analytics" class="nav-link "><i class="fas fa-chart-bar"></i> Analytics</a>
+                <a href="/ins_reports" class="nav-link "><i class="fas fa-file-alt"></i> Reports</a>
+            </div>
+            <div class="nav-user">
+                <span class="user-name">Admin User</span>
+                <i class="fas fa-user-circle"></i>
+            </div>
+        </div>
+    </nav>
+    <main class="main-container">
+
+<div class="page-header">
+    <h1>Learners Management</h1>
+    <p>Manage and track ALS learner information</p>
+</div>
+<div class="learners-controls">
+    <button id="add-learner" class="btn-primary"><i class="fas fa-plus"></i> Add New Learner</button>
+    <div class="search-box">
+        <i class="fas fa-search"></i>
+        <input type="text" id="learner-search" placeholder="Search learners..." />
+    </div>
+</div>
+<div class="learners-table-container">
+    <table class="learners-table">
+        <thead>
+            <tr>
+                <th>Name</th>
+                <th>Status</th>
+                <th>Barangay</th>
+                <th>Last Contact</th>
+                <th>Progress</th>
+                <th>Actions</th>
+            </tr>
+        </thead>
+        <tbody id="learners-tbody">
+
+        </tbody>
+    </table>
+</div>
+
+<!-- Modal for Adding New Learner -->
+<div id="add-learner-modal" class="modal">
+    <div class="modal-content">
+        <div class="modal-header">
+            <h3>Add New Learner</h3>
+            <span class="close">&times;</span>
+        </div>
+        <div class="modal-body">
+            <form id="add-learner-form">
+                <div class="form-group">
+                    <label for="learner-name">Full Name:</label>
+                    <input type="text" id="learner-name" required />
+                </div>
+                <div class="form-group">
+                    <label for="learner-status">Status:</label>
+                    <select id="learner-status" required>
+                        <option value="">Select Status</option>
+                        <option value="current">Current Learner</option>
+                        <option value="graduate">Graduate</option>
+                        <option value="at-risk">At-Risk</option>
+                        <option value="not-enrolled">Not Enrolled</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label for="learner-barangay">Barangay:</label>
+                    <select id="learner-barangay" required>
+                        <option value="">Select Barangay</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label for="learner-address">Complete Address:</label>
+                    <textarea id="learner-address" rows="3"></textarea>
+                </div>
+                <div class="form-actions">
+                    <button type="submit" class="btn-primary">Save Learner</button>
+                    <button type="button" class="btn-secondary" id="cancel-add">Cancel</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+    </main>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.7.1/leaflet.js"></script>
+    <script type="module" src="/JS/als_portal_js.js"></script>
+</body>
+</html>

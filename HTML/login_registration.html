@@ -1,0 +1,629 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ALS Portal - Register</title>
+    <link rel="stylesheet" href="../CSS/login_registration.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <style>
+        /* Additional styles for time picker */
+        .time-range {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+        
+        .time-range input[type="time"] {
+            flex: 1;
+            padding: 0.75rem;
+            border: 1px solid var(--border-color);
+            border-radius: 0.5rem;
+            font-size: 0.875rem;
+            transition: all 0.3s ease;
+        }
+        
+        .time-range input[type="time"]:disabled {
+            background: var(--bg-light);
+            cursor: not-allowed;
+            opacity: 0.6;
+        }
+        
+        .time-range input[type="time"]:enabled {
+            background: var(--white);
+        }
+        
+        .time-range input[type="time"]:focus {
+            outline: none;
+            border-color: var(--primary-color);
+            box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1);
+        }
+        
+        .time-separator {
+            color: var(--text-light);
+            font-weight: 500;
+            font-size: 0.875rem;
+        }
+        
+        .schedule-item.active .time-range {
+            opacity: 1;
+        }
+    </style>
+</head>
+<body>
+    <div class="background-pattern"></div>
+    
+    <div class="registration-container">
+        <!-- Header -->
+        <div class="registration-header">
+            <div class="header-content">
+                <i class="fas fa-graduation-cap header-icon"></i>
+                <h1>ALS Portal Registration</h1>
+                <p>Alternative Learning System Enrollment Form</p>
+            </div>
+            <a href="login.html" class="back-to-login">
+                <i class="fas fa-arrow-left"></i> Back to Login
+            </a>
+        </div>
+
+        <!-- Registration Form -->
+        <div class="form-wrapper">
+            <div class="form-progress">
+                <div class="progress-step active" data-step="1">
+                    <div class="step-number">1</div>
+                    <div class="step-label">Personal Info</div>
+                </div>
+                <div class="progress-line"></div>
+                <div class="progress-step" data-step="2">
+                    <div class="step-number">2</div>
+                    <div class="step-label">Address</div>
+                </div>
+                <div class="progress-line"></div>
+                <div class="progress-step" data-step="3">
+                    <div class="step-number">3</div>
+                    <div class="step-label">Education</div>
+                </div>
+                <div class="progress-line"></div>
+                <div class="progress-step" data-step="4">
+                    <div class="step-number">4</div>
+                    <div class="step-label">Family & Schedule</div>
+                </div>
+            </div>
+
+            <form id="registrationForm">
+                <!-- Step 1: Personal Information -->
+                <div class="form-step active" data-step="1">
+                    <h2 class="step-title">
+                        <i class="fas fa-user"></i> Personal Information
+                    </h2>
+
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="lrn">Learner Reference Number (LRN) <span class="required">*</span></label>
+                            <div class="lrn-input-group">
+                                <input type="text" id="lrn" required placeholder="e.g., 123456789012">
+                                <button type="button" id="generateLrnBtn" class="generate-lrn-btn" title="Generate LRN for students without one">
+                                    <i class="fas fa-dice"></i> Generate LRN
+                                </button>
+                            </div>
+                            <small>Enter your LRN as provided by DepEd, or click "Generate LRN" if you don't have one</small>
+                        </div>
+                        <div class="form-group">
+                            <label for="enrollment_date">Enrollment Date <span class="required">*</span></label>
+                            <input type="date" id="enrollment_date" required>
+                        </div>
+                    </div>
+
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="last_name">Last Name <span class="required">*</span></label>
+                            <input type="text" id="last_name" required placeholder="e.g., Dela Cruz">
+                        </div>
+                        <div class="form-group">
+                            <label for="first_name">First Name <span class="required">*</span></label>
+                            <input type="text" id="first_name" required placeholder="e.g., Juan">
+                        </div>
+                    </div>
+
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="middle_name">Middle Name</label>
+                            <input type="text" id="middle_name" placeholder="e.g., Santos">
+                        </div>
+                        <div class="form-group">
+                            <label for="name_extension">Name Extension</label>
+                            <select id="name_extension" onchange="toggleNameExtensionInput()">
+                                <option value="">None</option>
+                                <option value="Jr.">Jr.</option>
+                                <option value="Sr.">Sr.</option>
+                                <option value="I">I</option>
+                                <option value="II">II</option>
+                                <option value="III">III</option>
+                                <option value="IV">IV</option>
+                                <option value="V">V</option>
+                                <option value="others">Others (Please specify)</option>
+                            </select>
+                            <input type="text" id="name_extension_custom" placeholder="e.g., II, III, etc." style="display: none; margin-top: 8px;">
+                            <small id="extension_help" style="display: none;">Enter your custom name extension</small>
+                        </div>
+                    </div>
+
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="birthdate">Birthdate <span class="required">*</span></label>
+                            <input type="date" id="birthdate" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="place_of_birth">Place of Birth <span class="required">*</span></label>
+                            <input type="text" id="place_of_birth" required placeholder="e.g., Santa Cruz, Laguna">
+                        </div>
+                    </div>
+
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="sex">Sex <span class="required">*</span></label>
+                            <select id="sex" required>
+                                <option value="">Select Sex</option>
+                                <option value="Male">Male</option>
+                                <option value="Female">Female</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label for="civil_status">Civil Status <span class="required">*</span></label>
+                            <select id="civil_status" required>
+                                <option value="">Select Status</option>
+                                <option value="Single">Single</option>
+                                <option value="Married">Married</option>
+                                <option value="Widow/er">Widow/er</option>
+                                <option value="Separated">Separated</option>
+                                <option value="Solo Parent">Solo Parent</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="religion">Religion</label>
+                            <input type="text" id="religion" placeholder="e.g., Roman Catholic, Aglipayan, INC">
+                        </div>
+                        <div class="form-group">
+                            <label for="mother_tongue">Mother Tongue</label>
+                            <input type="text" id="mother_tongue" placeholder="e.g., Tagalog, Bisaya, Ilocano">
+                        </div>
+                    </div>
+
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="ip_ethnic_group">Indigenous People/Ethnic Group</label>
+                            <input type="text" id="ip_ethnic_group" placeholder="e.g., Aeta, Mangyan, N/A">
+                        </div>
+                        <div class="form-group">
+                            <label for="contact_numbers">Contact Number <span class="required">*</span></label>
+                            <input type="tel" id="contact_numbers" required placeholder="e.g., 09123456789">
+                        </div>
+                    </div>
+
+                    <div class="form-row">
+                        <div class="form-group checkbox-group">
+                            <label>
+                                <input type="checkbox" id="is_pwd">
+                                <span>Person with Disability (PWD)</span>
+                            </label>
+                        </div>
+                        <div class="form-group checkbox-group">
+                            <label>
+                                <input type="checkbox" id="is_4ps">
+                                <span>4Ps Beneficiary</span>
+                            </label>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Step 2: Address Information -->
+                <div class="form-step" data-step="2">
+                    <h2 class="step-title">
+                        <i class="fas fa-map-marker-alt"></i> Address Information
+                    </h2>
+
+                    <div class="form-group">
+                        <label for="house_no_street_sitio">House No./Street/Sitio <span class="required">*</span></label>
+                        <textarea id="house_no_street_sitio" rows="2" required placeholder="e.g., Block 5 Lot 12, Maharlika Street, Sitio Maligaya"></textarea>
+                    </div>
+
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="barangay">Barangay <span class="required">*</span></label>
+                            <select id="barangay" required>
+                                <option value="">Select Barangay</option>
+                                <option value="Alipit">Alipit</option>
+                                <option value="Bagumbayan">Bagumbayan</option>
+                                <option value="Barangay I">Barangay I (Poblacion)</option>
+                                <option value="Barangay II">Barangay II (Poblacion)</option>
+                                <option value="Barangay III">Barangay III (Poblacion)</option>
+                                <option value="Barangay IV">Barangay IV (Poblacion)</option>
+                                <option value="Barangay V">Barangay V (Poblacion)</option>
+                                <option value="Bubukal">Bubukal</option>
+                                <option value="Calios">Calios</option>
+                                <option value="Duhat">Duhat</option>
+                                <option value="Gatid">Gatid</option>
+                                <option value="Jasaan">Jasaan</option>
+                                <option value="Labuin">Labuin</option>
+                                <option value="Malinao">Malinao</option>
+                                <option value="Oogong">Oogong</option>
+                                <option value="Pagsawitan">Pagsawitan</option>
+                                <option value="Palasan">Palasan</option>
+                                <option value="Patimbao">Patimbao</option>
+                                <option value="San Jose">San Jose</option>
+                                <option value="San Juan">San Juan</option>
+                                <option value="San Pablo Norte">San Pablo Norte</option>
+                                <option value="San Pablo Sur">San Pablo Sur</option>
+                                <option value="Santisima Cruz">Santisima Cruz</option>
+                                <option value="Santo Angel Central">Santo Angel Central</option>
+                                <option value="Santo Angel Norte">Santo Angel Norte</option>
+                                <option value="Santo Angel Sur">Santo Angel Sur</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label for="municipality_city">Municipality/City <span class="required">*</span></label>
+                            <input type="text" id="municipality_city" value="Santa Cruz" required>
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="province">Province <span class="required">*</span></label>
+                        <input type="text" id="province" value="Laguna" required>
+                    </div>
+                </div>
+
+                <!-- Step 3: Educational Background -->
+                <div class="form-step" data-step="3">
+                    <h2 class="step-title">
+                        <i class="fas fa-book"></i> Educational Background
+                    </h2>
+
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="last_grade_level_completed">Last Grade Level Completed <span class="required">*</span></label>
+                            <select id="last_grade_level_completed" required>
+                                <option value="">Select Grade Level</option>
+                                <option value="K">Kindergarten</option>
+                                <option value="G-1">Grade 1</option>
+                                <option value="G-2">Grade 2</option>
+                                <option value="G-3">Grade 3</option>
+                                <option value="G-4">Grade 4</option>
+                                <option value="G-5">Grade 5</option>
+                                <option value="G-6">Grade 6</option>
+                                <option value="G-7">Grade 7</option>
+                                <option value="G-8">Grade 8</option>
+                                <option value="G-9">Grade 9</option>
+                                <option value="G-10">Grade 10</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label for="elementary_school">Elementary School</label>
+                            <input type="text" id="elementary_school" placeholder="e.g., Santa Cruz Elementary School">
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="junior_high_school">Junior High School</label>
+                        <input type="text" id="junior_high_school" placeholder="e.g., Santa Cruz National High School">
+                    </div>
+
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="dropout_reason">Reason for Dropping Out</label>
+                            <select id="dropout_reason">
+                                <option value="">Select Reason</option>
+                                <option value="No school in Barangay">No school in Barangay</option>
+                                <option value="School too far from home">School too far from home</option>
+                                <option value="Needed to help family">Needed to help family</option>
+                                <option value="Unable to pay for miscellaneous and other expenses">Unable to pay for expenses</option>
+                                <option value="Others">Others (Please specify)</option>
+                            </select>
+                        </div>
+                        <div class="form-group" id="dropout_reason_others_group" style="display: none;">
+                            <label for="dropout_reason_others">Please Specify</label>
+                            <input type="text" id="dropout_reason_others" placeholder="e.g., Health reasons, Family relocation">
+                        </div>
+                    </div>
+
+                    <div class="section-divider">
+                        <span>Previous ALS Experience</span>
+                    </div>
+
+                    <div class="form-group checkbox-group">
+                        <label>
+                            <input type="checkbox" id="attended_als_before">
+                            <span>Have you attended ALS before?</span>
+                        </label>
+                    </div>
+
+                    <div id="previous_als_section" style="display: none;">
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label for="previous_program_name">Program Name</label>
+                                <input type="text" id="previous_program_name" placeholder="e.g., ALS A&E Program">
+                            </div>
+                            <div class="form-group">
+                                <label for="previous_literacy_level">Literacy Level</label>
+                                <select id="previous_literacy_level">
+                                    <option value="">Select Level</option>
+                                    <option value="Basic">Basic</option>
+                                    <option value="Elem.">Elementary</option>
+                                    <option value="JHS">Junior High School</option>
+                                    <option value="InfEd">Informal Education</option>
+                                </select>
+                            </div>
+                        </div>
+
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label for="previous_year_attended">Year Attended</label>
+                                <input type="text" id="previous_year_attended" placeholder="e.g., 2023">
+                            </div>
+                            <div class="form-group checkbox-group">
+                                <label>
+                                    <input type="checkbox" id="previous_program_completed">
+                                    <span>Completed the program?</span>
+                                </label>
+                            </div>
+                        </div>
+
+                        <div class="form-group" id="not_completed_reason_group" style="display: none;">
+                            <label for="previous_not_completed_reason">Reason for not completing</label>
+                            <textarea id="previous_not_completed_reason" rows="2" placeholder="e.g., Had to work full-time, Moved to another location"></textarea>
+                        </div>
+                    </div>
+
+                    <div class="section-divider">
+                        <span>Distance to Learning Center</span>
+                    </div>
+
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="distance_to_learning_center_km">Distance (km)</label>
+                            <input type="number" id="distance_to_learning_center_km" step="0.01" min="0" placeholder="e.g., 2.5">
+                        </div>
+                        <div class="form-group">
+                            <label for="distance_to_learning_center_hours">Travel Time (hours)</label>
+                            <input type="number" id="distance_to_learning_center_hours" min="0" placeholder="e.g., 0">
+                        </div>
+                        <div class="form-group">
+                            <label for="distance_to_learning_center_mins">Travel Time (minutes)</label>
+                            <input type="number" id="distance_to_learning_center_mins" min="0" max="59" placeholder="e.g., 30">
+                        </div>
+                    </div>
+
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="transportation_mode">Mode of Transportation</label>
+                            <select id="transportation_mode">
+                                <option value="">Select Mode</option>
+                                <option value="Walking">Walking</option>
+                                <option value="Motorcycle">Motorcycle</option>
+                                <option value="Bicycle">Bicycle</option>
+                                <option value="Others">Others (Please specify)</option>
+                            </select>
+                        </div>
+                        <div class="form-group" id="transportation_mode_others_group" style="display: none;">
+                            <label for="transportation_mode_others">Please Specify</label>
+                            <input type="text" id="transportation_mode_others" placeholder="e.g., Tricycle, Jeepney">
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Step 4: Family Information & Schedule -->
+                <div class="form-step" data-step="4">
+                    <h2 class="step-title">
+                        <i class="fas fa-users"></i> Family Information
+                    </h2>
+
+                    <div class="subsection-title">Father/Guardian Information</div>
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="father_guardian_last_name">Last Name</label>
+                            <input type="text" id="father_guardian_last_name" placeholder="e.g., Dela Cruz">
+                        </div>
+                        <div class="form-group">
+                            <label for="father_guardian_first_name">First Name</label>
+                            <input type="text" id="father_guardian_first_name" placeholder="e.g., Pedro">
+                        </div>
+                    </div>
+
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="father_guardian_middle_name">Middle Name</label>
+                            <input type="text" id="father_guardian_middle_name" placeholder="e.g., Reyes">
+                        </div>
+                        <div class="form-group">
+                            <label for="father_guardian_occupation">Occupation</label>
+                            <input type="text" id="father_guardian_occupation" placeholder="e.g., Farmer, Driver, OFW">
+                        </div>
+                    </div>
+
+                    <div class="subsection-title">Mother's Maiden Name Information</div>
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="mother_maiden_last_name">Last Name</label>
+                            <input type="text" id="mother_maiden_last_name" placeholder="e.g., Santos">
+                        </div>
+                        <div class="form-group">
+                            <label for="mother_maiden_first_name">First Name</label>
+                            <input type="text" id="mother_maiden_first_name" placeholder="e.g., Maria">
+                        </div>
+                    </div>
+
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="mother_maiden_middle_name">Middle Name</label>
+                            <input type="text" id="mother_maiden_middle_name" placeholder="e.g., Cruz">
+                        </div>
+                        <div class="form-group">
+                            <label for="mother_maiden_occupation">Occupation</label>
+                            <input type="text" id="mother_maiden_occupation" placeholder="e.g., Housewife, Vendor, Teacher">
+                        </div>
+                    </div>
+
+                    <div class="section-divider">
+                        <span>Availability Schedule</span>
+                    </div>
+
+                    <div class="schedule-grid">
+                        <div class="schedule-item">
+                            <label class="day-checkbox">
+                                <input type="checkbox" id="monday_available" class="day-check">
+                                <span>Monday</span>
+                            </label>
+                            <div class="time-range">
+                                <input type="time" id="monday_start" min="07:00" max="17:00" disabled>
+                                <span class="time-separator">to</span>
+                                <input type="time" id="monday_end" min="07:00" max="17:00" disabled>
+                            </div>
+                        </div>
+
+                        <div class="schedule-item">
+                            <label class="day-checkbox">
+                                <input type="checkbox" id="tuesday_available" class="day-check">
+                                <span>Tuesday</span>
+                            </label>
+                            <div class="time-range">
+                                <input type="time" id="tuesday_start" min="07:00" max="17:00" disabled>
+                                <span class="time-separator">to</span>
+                                <input type="time" id="tuesday_end" min="07:00" max="17:00" disabled>
+                            </div>
+                        </div>
+
+                        <div class="schedule-item">
+                            <label class="day-checkbox">
+                                <input type="checkbox" id="wednesday_available" class="day-check">
+                                <span>Wednesday</span>
+                            </label>
+                            <div class="time-range">
+                                <input type="time" id="wednesday_start" min="07:00" max="17:00" disabled>
+                                <span class="time-separator">to</span>
+                                <input type="time" id="wednesday_end" min="07:00" max="17:00" disabled>
+                            </div>
+                        </div>
+
+                        <div class="schedule-item">
+                            <label class="day-checkbox">
+                                <input type="checkbox" id="thursday_available" class="day-check">
+                                <span>Thursday</span>
+                            </label>
+                            <div class="time-range">
+                                <input type="time" id="thursday_start" min="07:00" max="17:00" disabled>
+                                <span class="time-separator">to</span>
+                                <input type="time" id="thursday_end" min="07:00" max="17:00" disabled>
+                            </div>
+                        </div>
+
+                        <div class="schedule-item">
+                            <label class="day-checkbox">
+                                <input type="checkbox" id="friday_available" class="day-check">
+                                <span>Friday</span>
+                            </label>
+                            <div class="time-range">
+                                <input type="time" id="friday_start" min="07:00" max="17:00" disabled>
+                                <span class="time-separator">to</span>
+                                <input type="time" id="friday_end" min="07:00" max="17:00" disabled>
+                            </div>
+                        </div>
+
+                        <div class="schedule-item">
+                            <label class="day-checkbox">
+                                <input type="checkbox" id="saturday_available" class="day-check">
+                                <span>Saturday</span>
+                            </label>
+                            <div class="time-range">
+                                <input type="time" id="saturday_start" min="07:00" max="17:00" disabled>
+                                <span class="time-separator">to</span>
+                                <input type="time" id="saturday_end" min="07:00" max="17:00" disabled>
+                            </div>
+                        </div>
+
+                        <div class="schedule-item">
+                            <label class="day-checkbox">
+                                <input type="checkbox" id="sunday_available" class="day-check">
+                                <span>Sunday</span>
+                            </label>
+                            <div class="time-range">
+                                <input type="time" id="sunday_start" min="07:00" max="17:00" disabled>
+                                <span class="time-separator">to</span>
+                                <input type="time" id="sunday_end" min="07:00" max="17:00" disabled>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="section-divider">
+                        <span>Contact Information</span>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="email_address">Email Address <span class="required">*</span></label>
+                        <input type="email" id="email_address" required placeholder="e.g., juan.delacruz@gmail.com">
+                        <small>This will be used for your account login and notifications</small>
+                    </div>
+                    <div class="section-divider">
+                        <span>Additional Information</span>
+                    </div>
+
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="als_teacher_facilitator">ALS Teacher/Facilitator</label>
+                            <input type="text" id="als_teacher_facilitator" placeholder="e.g., Mrs. Ana Reyes">
+                        </div>
+                    </div>
+
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="teacher_signature_date">Teacher Signature Date</label>
+                            <input type="date" id="teacher_signature_date">
+                        </div>
+                        <div class="form-group">
+                            <label for="learner_signature_date">Learner Signature Date</label>
+                            <input type="date" id="learner_signature_date">
+                        </div>
+                    </div>
+
+                    <div class="terms-agreement">
+                        <label>
+                            <input type="checkbox" id="terms_agreement" required>
+                            <span>I hereby certify that the information provided above is true and correct. I understand that this registration is subject to admin approval. <span class="required">*</span></span>
+                        </label>
+                    </div>
+                </div>
+
+                <!-- Form Navigation -->
+                <div class="form-navigation">
+                    <button type="button" class="btn-secondary" id="prevBtn" style="display: none;">
+                        <i class="fas fa-arrow-left"></i> Previous
+                    </button>
+                    <button type="button" class="btn-primary" id="nextBtn">
+                        Next <i class="fas fa-arrow-right"></i>
+                    </button>
+                    <button type="submit" class="btn-success" id="submitBtn" style="display: none;">
+                        <i class="fas fa-check"></i> Submit Registration
+                    </button>
+                </div>
+            </form>
+        </div>
+
+        <!-- Success Modal -->
+        <div id="successModal" class="modal">
+            <div class="modal-content">
+                <div class="modal-icon success">
+                    <i class="fas fa-check-circle"></i>
+                </div>
+                <h2>Registration Successful!</h2>
+                <p>Your registration has been submitted and is pending admin approval.</p>
+                <p class="modal-subtext">You will receive a notification once your account has been approved.</p>
+                <button class="btn-primary" onclick="window.location.href='login.html'">
+                    <i class="fas fa-sign-in-alt"></i> Go to Login
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <script src="../JS/login_registration.js"></script>
+</body>
+</html>

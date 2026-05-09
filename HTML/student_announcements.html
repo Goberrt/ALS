@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ALS Student Portal - Announcements</title>
+    <link rel="stylesheet" href="../CSS/student_styles.css">
+    <link rel="stylesheet" href="../CSS/student_announcements.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
+</head>
+<body>
+        <!-- Burger Menu Button -->
+    <button class="burger-menu" id="burgerMenu">
+        <i class="fas fa-bars"></i>
+    </button>
+
+    <!-- Sidebar Overlay -->
+    <div class="sidebar-overlay" id="sidebarOverlay"></div>
+    <div id="sidebarContainer"></div>
+    
+    <div class="main-content">
+        <div class="announcements-container">
+            <!-- Header -->
+            <div class="announcements-header">
+                <div class="header-left">
+                    <h1>📢 Announcements</h1>
+                    <p>Stay updated with important information</p>
+                </div>
+                <div class="action-buttons">
+                    <button class="btn-mark-read" id="markAllReadBtn" disabled>
+                        <i class="fas fa-check-double"></i>
+                        Mark All as Read
+                    </button>
+                </div>
+            </div>
+
+            <!-- Search and Filter Bar -->
+            <div class="search-filter-bar">
+                <div class="search-box">
+                    <i class="fas fa-search"></i>
+                    <input 
+                        type="text" 
+                        id="searchInput" 
+                        placeholder="Search announcements..."
+                    >
+                </div>
+                <div class="filter-buttons">
+                    <button class="filter-btn active" data-filter="all">
+                        All
+                    </button>
+                    <button class="filter-btn" data-filter="unread">
+                        Unread <span class="badge" id="unreadBadge">0</span>
+                    </button>
+                    <button class="filter-btn" data-filter="read">
+                        Read
+                    </button>
+                </div>
+            </div>
+
+            <!-- Announcements List -->
+            <div id="announcementsContainer">
+                <div class="loading-state">
+                    <i class="fas fa-spinner"></i>
+                    <p>Loading announcements...</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="../JS/sidebar_utils.js"></script>
+    <script src="../JS/student_announcements.js"></script>
+    
+</body>
+</html>

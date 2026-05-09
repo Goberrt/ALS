@@ -1,0 +1,285 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <meta name="theme-color" content="#667eea">
+    <meta name="mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <title>ALS Subject View</title>
+    <link rel="stylesheet" href="../CSS/instructor_styles.css">
+    <link rel="stylesheet" href="../CSS/instructor_subject_view.css">
+    <link rel="stylesheet" href="../CSS/instructor_subject_view_mobile.css">
+    
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
+</head>
+<body>
+    <!-- Mobile Menu Toggle Button -->
+    <button class="menu-toggle" id="menuToggle">
+        <i class="fas fa-bars"></i>
+    </button>
+
+    <!-- Sidebar Overlay for Mobile -->
+    <div class="sidebar-overlay" id="sidebarOverlay"></div>
+    
+    <div class="sidebar">
+        <div class="sidebar-header">
+            <div class="logo-container">
+                <img src="../COMPONENTS/IMAGES/als logo.png" alt="ALS Logo" class="als-logo">
+            </div>
+            <h1>ALS Portal</h1>
+            <p id="instructorName">Welcome, Instructor</p>
+        </div>
+        <div class="nav-tabs">
+            <div class="nav-tab" data-page="dashboard">
+                <i class="fas fa-chart-line"></i>
+                <span>Dashboard</span>
+            </div>
+            <div class="nav-tab" data-page="learners">
+                <i class="fas fa-users"></i>
+                <span>Learners</span>
+            </div>
+            <div class="nav-tab active" data-page="subjects">
+                <i class="fas fa-book"></i>
+                <span>Subjects</span>
+            </div>
+            <div class="nav-tab" data-page="mapping">
+                <i class="fas fa-map-marked-alt"></i>
+                <span>Mapping</span>
+            </div>
+            <div class="nav-tab" data-page="messages">
+                <i class="fas fa-envelope"></i>
+                <span>Messages</span>
+            </div>
+            <div class="nav-tab" data-page="logout">
+                <i class="fas fa-sign-out-alt"></i>
+                <span>Logout</span>
+            </div>
+        </div>
+    </div>
+
+    <div class="main-content">
+        <div class="subject-banner" id="subjectBanner">
+            <h1 id="subjectName">Loading...</h1>
+            <p id="subjectCode">Loading...</p>
+        </div>
+
+        <div class="subject-nav">
+            <button class="subject-nav-item active" data-tab="stream">
+                <i class="fas fa-stream"></i> <span>Stream</span>
+            </button>
+            <button class="subject-nav-item" data-tab="classwork">
+                <i class="fas fa-tasks"></i> <span>Classwork</span>
+            </button>
+            <button class="subject-nav-item" data-tab="people">
+                <i class="fas fa-users"></i> <span>People</span>
+            </button>
+            <button class="subject-nav-item" data-tab="grades">
+                <i class="fas fa-chart-line"></i> <span>Grades</span>
+            </button>
+            <button class="subject-nav-item" data-tab="submissions">
+                <i class="fas fa-file-alt"></i> <span>Submissions</span>
+            </button>
+        </div>
+
+        <div class="content-grid">
+            <div class="main-content-area">
+                <button class="new-post-btn" id="newPostBtn">
+                    <i class="fas fa-plus"></i>
+                    <span>Create Post</span>
+                </button>
+
+                <!-- Stream/Classwork Posts Container -->
+                <div id="postsContainer">
+                    <!-- Posts will be loaded here -->
+                </div>
+
+                <!-- Submission List Container -->
+                <div id="submissionListContainer" style="display: none;">
+                    <div class="submission-list-view" id="submissionListContent">
+                        <!-- Detailed submission list will be loaded here -->
+                    </div>
+                </div>
+
+                <!-- Submissions Overview Container -->
+                <div id="submissionsOverviewContainer" style="display: none;">
+                    <div class="submissions-overview">
+                        <div class="submissions-header">
+                            <h2><i class="fas fa-file-alt"></i> Submissions Overview</h2>
+                            <select class="filter-dropdown" onchange="filterAssignments(this.value)">
+                                <option value="all">All Assignments</option>
+                                <option value="pending">Need Grading</option>
+                                <option value="graded">Fully Graded</option>
+                                <option value="overdue">Overdue</option>
+                            </select>
+                        </div>
+                        <div id="assignmentOverviewList">
+                            <!-- Assignment overview cards will be loaded here -->
+                        </div>
+                    </div>
+                </div>
+                
+
+                <div id="emptyState" class="empty-state" style="display: none;">
+                    <i class="fas fa-inbox"></i>
+                    <h3>No posts yet</h3>
+                    <p>Create your first announcement or assignment</p>
+                </div>
+            </div>
+
+            <div class="sidebar-area">
+                <!-- Desktop Sidebar Widgets -->
+                <div class="sidebar-widget desktop-only">
+                    <h3><i class="fas fa-clock"></i> Upcoming</h3>
+                    <div id="upcomingContainer">
+                        <p style="color: #999; text-align: center; padding: 1rem;">No upcoming deadlines</p>
+                    </div>
+                </div>
+
+                <div class="sidebar-widget desktop-only">
+                    <h3><i class="fas fa-users"></i> Class Info</h3>
+                    <div style="color: #666; font-size: 0.875rem;">
+                        <p style="margin: 0.5rem 0;"><strong>Students:</strong> <span id="studentCount">0</span></p>
+                        <p style="margin: 0.5rem 0;"><strong>Posts:</strong> <span id="postCount">0</span></p>
+                    </div>
+                </div>
+
+                <!-- Mobile Quick Action Buttons -->
+                <div class="mobile-quick-actions" id="mobileQuickActions" style="display: none;">
+                    <button class="mobile-action-btn" onclick="openUpcomingModal()">
+                        <i class="fas fa-clock"></i>
+                        <span>Upcoming</span>
+                    </button>
+                    <button class="mobile-action-btn" onclick="openClassInfoModal()">
+                        <i class="fas fa-users"></i>
+                        <span>Class Info</span>
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Create Post Modal -->
+    <div id="upcomingModal" class="mobile-modal">
+        <div class="mobile-modal-overlay" onclick="closeUpcomingModal()"></div>
+        <div class="mobile-modal-content">
+            <div class="mobile-modal-header">
+                <h3><i class="fas fa-clock"></i> Upcoming Deadlines</h3>
+                <button class="mobile-modal-close" onclick="closeUpcomingModal()">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+            <div class="mobile-modal-body">
+                <div id="upcomingContainerMobile">
+                    <p style="color: #999; text-align: center; padding: 1rem;">No upcoming deadlines</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div id="classInfoModal" class="mobile-modal">
+        <div class="mobile-modal-overlay" onclick="closeClassInfoModal()"></div>
+        <div class="mobile-modal-content">
+            <div class="mobile-modal-header">
+                <h3><i class="fas fa-users"></i> Class Information</h3>
+                <button class="mobile-modal-close" onclick="closeClassInfoModal()">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+            <div class="mobile-modal-body">
+                <div style="color: #666; font-size: 0.95rem;">
+                    <div style="margin: 1rem 0; padding: 1rem; background: #f5f5f5; border-radius: 8px;">
+                        <p style="margin: 0.5rem 0;"><i class="fas fa-graduation-cap" style="color: #667eea; margin-right: 0.5rem;"></i><strong>Students Enrolled:</strong> <span id="studentCountMobile">0</span></p>
+                    </div>
+                    <div style="margin: 1rem 0; padding: 1rem; background: #f5f5f5; border-radius: 8px;">
+                        <p style="margin: 0.5rem 0;"><i class="fas fa-file-alt" style="color: #667eea; margin-right: 0.5rem;"></i><strong>Total Posts:</strong> <span id="postCountMobile">0</span></p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div id="postModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3>Create Post</h3>
+                <button class="close">&times;</button>
+            </div>
+            <div class="modal-body">
+                <form id="postForm">
+                    <div class="form-group">
+                        <label for="post-type">Post Type *</label>
+                        <select id="post-type" required>
+                            <option value="">Select type...</option>
+                            <option value="announcement">Announcement</option>
+                            <option value="assignment">Assignment</option>
+                            <option value="material">Material</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label for="post-title">Title *</label>
+                        <input type="text" id="post-title" placeholder="Enter title" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="post-content">Content</label>
+                        <textarea id="post-content" placeholder="Add description or instructions"></textarea>
+                    </div>
+                    
+                    <div class="form-group" id="fileUploadGroup">
+                        <label for="post-file">Attach File (PDF, DOCX, DOC, PPTX, XLSX)</label>
+                        <input type="file" id="post-file" accept=".pdf,.docx,.doc,.pptx,.xlsx,.txt">
+                        <div id="fileInfo" style="margin-top: 0.5rem; font-size: 0.875rem; color: #666;"></div>
+                        <div id="uploadProgress" style="display: none; margin-top: 0.5rem;">
+                            <div style="background: #f0f0f0; border-radius: 4px; height: 8px; overflow: hidden;">
+                                <div id="progressBar" style="background: #667eea; height: 100%; width: 0%; transition: width 0.3s;"></div>
+                            </div>
+                            <div id="progressText" style="font-size: 0.875rem; color: #666; margin-top: 0.25rem;"></div>
+                        </div>
+                    </div>
+                    
+                    <div class="form-group" id="dueDateGroup" style="display: none;">
+                        <label for="post-due-date">Due Date</label>
+                        <input type="datetime-local" id="post-due-date">
+                    </div>
+                    <div class="form-group" id="pointsGroup" style="display: none;">
+                        <label for="post-points">Points</label>
+                        <input type="number" id="post-points" min="0" placeholder="100">
+                    </div>
+                    <div class="form-group">
+                        <label for="post-link">External Link</label>
+                        <input type="url" id="post-link" placeholder="https://...">
+                    </div>
+                    <div class="form-actions">
+                        <button type="button" class="btn-secondary" id="cancelPostBtn">Cancel</button>
+                        <button type="submit" class="btn-primary" id="submitPostBtn">Create Post</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- Grade Modal -->
+    <div id="gradeModal" class="modal">
+        <div class="modal-content" style="max-width: 900px;">
+            <div class="modal-header">
+                <h3><i class="fas fa-pencil-alt"></i> Grade Submission</h3>
+                <button class="close" onclick="closeGradeModal()">&times;</button>
+            </div>
+            <div class="modal-body">
+                <div id="gradeModalContent">
+                    <div class="grade-loading">
+                        <i class="fas fa-spinner fa-spin"></i>
+                        <span style="margin-left: 1rem;">Loading submission...</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Load Scripts -->
+    <script src="../JS/instructor_subject_view_grades_view.js"></script>
+    <script src="../JS/instructor_subject_view.js"></script>
+</body>
+</html>

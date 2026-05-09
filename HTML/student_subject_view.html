@@ -1,0 +1,229 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ALS Subject - Student View</title>
+    <link rel="stylesheet" href="../CSS/student_styles.css">
+    <link rel="stylesheet" href="../CSS/student_subject_view.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    
+</head>
+<body>
+    <!-- Burger Menu Button -->
+    <button class="burger-menu" id="burgerMenu">
+        <i class="fas fa-bars"></i>
+    </button>
+
+    <!-- Sidebar Overlay -->
+    <div class="sidebar-overlay" id="sidebarOverlay"></div>
+    <div id="sidebarContainer"></div>
+
+    <div class="main-content">
+        <div class="subject-banner" id="subjectBanner">
+            <h1 id="subjectName">Loading...</h1>
+            <p id="subjectCode">Loading...</p>
+        </div>
+
+        <div class="subject-nav">
+            <button class="subject-nav-item active" data-tab="stream">
+                <i class="fas fa-stream"></i> Stream
+            </button>
+            <button class="subject-nav-item" data-tab="classwork">
+                <i class="fas fa-tasks"></i> Classwork
+            </button>
+            <button class="subject-nav-item" data-tab="grades">
+                <i class="fas fa-chart-line"></i> My Grades
+            </button>
+        </div>
+
+        <div class="content-grid">
+            <div class="main-content-area">
+                <div id="postsContainer">
+                    <!-- Posts will be loaded here -->
+                </div>
+
+                <div id="emptyState" class="empty-state" style="display: none;">
+                    <i class="fas fa-inbox"></i>
+                    <h3>No posts yet</h3>
+                    <p>Your instructor hasn't posted anything yet</p>
+                </div>
+            </div>
+
+            <div class="sidebar-area">
+                <div class="sidebar-widget">
+                    <h3><i class="fas fa-user-tie"></i> Instructor</h3>
+                    <div id="instructorInfo" class="instructor-card">
+                        <!-- Instructor info will be loaded here -->
+                    </div>
+                    <button class="btn-message-instructor" id="messageInstructorBtn" style="width: 100%; margin-top: 12px;">
+                        <i class="fas fa-envelope"></i> Message Instructor
+                    </button>
+                </div>
+
+                <div class="sidebar-widget">
+                    <h3><i class="fas fa-clock"></i> Upcoming</h3>
+                    <div id="upcomingContainer">
+                        <p style="color: #999; text-align: center; padding: 1rem; margin: 0;">No upcoming deadlines</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div id="submissionModal" class="modal">
+    <div class="modal-content">
+        <div class="modal-header">
+            <h3>Turn In Assignment</h3>
+            <button class="close" onclick="closeSubmissionModal()">&times;</button>
+        </div>
+        <div class="modal-body">
+            <!-- Assignment Details -->
+            <div class="assignment-details" id="assignmentDetails">
+                <h4 id="modalAssignmentTitle">Loading...</h4>
+                <p id="modalAssignmentDue"></p>
+                <p id="modalAssignmentPoints"></p>
+            </div>
+
+            <!-- Upload Area -->
+            <div class="upload-area" id="uploadArea" onclick="document.getElementById('fileInput').click()">
+                <div class="upload-icon">
+                    <i class="fas fa-cloud-upload-alt"></i>
+                </div>
+                <p style="font-weight: 500; color: #333;">Click to upload or drag and drop</p>
+                <p class="file-types">PDF, DOCX, DOC, PPTX, XLSX, TXT (Max 10MB)</p>
+            </div>
+            <input type="file" id="fileInput" style="display: none;" 
+                   accept=".pdf,.docx,.doc,.pptx,.xlsx,.txt"
+                   onchange="handleFileSelect(event)">
+
+            <!-- File Preview -->
+            <div id="filePreview" style="display: none;">
+                <div class="file-preview">
+                    <div class="file-preview-icon" id="previewIcon">
+                        <i class="fas fa-file"></i>
+                    </div>
+                    <div class="file-preview-info">
+                        <h5 id="previewFileName">filename.pdf</h5>
+                        <p id="previewFileSize">1.2 MB</p>
+                    </div>
+                    <button class="remove-file-btn" onclick="removeFile()">
+                        <i class="fas fa-times"></i> Remove
+                    </button>
+                </div>
+            </div>
+
+            <!-- Upload Progress -->
+            <div id="uploadProgress" style="display: none;" class="upload-progress">
+                <div class="progress-bar-container">
+                    <div class="progress-bar" id="progressBar"></div>
+                </div>
+                <div class="progress-text" id="progressText">Uploading...</div>
+            </div>
+
+            <!-- Optional Comment -->
+            <div class="form-group">
+                <label for="submissionComment">Add a comment (optional)</label>
+                <textarea id="submissionComment" 
+                          placeholder="Any additional notes for your instructor..."></textarea>
+            </div>
+        </div>
+        <div class="modal-actions">
+            <button class="btn btn-secondary" onclick="closeSubmissionModal()">Cancel</button>
+            <button class="btn btn-primary" id="submitBtn" onclick="submitAssignment()" disabled>
+                <i class="fas fa-paper-plane"></i> Submit Assignment
+            </button>
+        </div>
+    </div>
+</div>
+
+<!-- Message Instructor Modal -->
+<div id="messageModal" class="modal">
+    <div class="modal-content" style="max-width: 500px;">
+        <div class="modal-header">
+            <h3><i class="fas fa-envelope"></i> Message Instructor</h3>
+            <button class="close" onclick="closeMessageModal()">&times;</button>
+        </div>
+        <div class="modal-body">
+            <div class="form-group">
+                <label for="messageText">Your Message:</label>
+                <textarea id="messageText" class="form-control" rows="6" placeholder="Type your message here..." style="width: 100%; padding: 10px; border: 1px solid #ddd; border-radius: 4px; font-family: inherit;"></textarea>
+            </div>
+        </div>
+        <div class="modal-actions">
+            <button class="btn btn-secondary" onclick="closeMessageModal()">Cancel</button>
+            <button class="btn btn-primary" onclick="sendInstructorMessage()">
+                <i class="fas fa-paper-plane"></i> Send Message
+            </button>
+        </div>
+    </div>
+</div>
+
+<script src="../JS/sidebar_utils.js"></script>
+<script src="../JS/messaging.js"></script>
+<script src="../JS/student_subject_view.js"></script>
+
+<script>
+// Messaging functions for student subject view
+
+function setupMessageButton() {
+    const messageBtn = document.getElementById('messageInstructorBtn');
+    if (messageBtn) {
+        messageBtn.addEventListener('click', openMessageModal);
+    }
+}
+
+function openMessageModal() {
+    document.getElementById('messageModal').style.display = 'block';
+    document.getElementById('messageText').focus();
+}
+
+function closeMessageModal() {
+    document.getElementById('messageModal').style.display = 'none';
+    document.getElementById('messageText').value = '';
+}
+
+async function sendInstructorMessage() {
+    const messageText = document.getElementById('messageText').value;
+    const subjectId = new URLSearchParams(window.location.search).get('id');
+    
+    if (!messageText.trim()) {
+        alert('Please enter a message');
+        return;
+    }
+
+    // Get instructor from window (set by student_subject_view.js)
+    const instructor = window.currentInstructor;
+    
+    if (!instructor || !instructor.id) {
+        alert('Unable to identify instructor. Please refresh the page.');
+        return;
+    }
+
+    const success = await window.messagingSystem.sendMessage(
+        instructor.id,
+        messageText,
+        subjectId
+    );
+
+    if (success) {
+        alert('Message sent successfully!');
+        closeMessageModal();
+    }
+}
+
+// Close modal when clicking outside
+window.addEventListener('click', function(event) {
+    const modal = document.getElementById('messageModal');
+    if (event.target === modal) {
+        closeMessageModal();
+    }
+});
+
+// Initialize messaging when page loads
+document.addEventListener('DOMContentLoaded', () => {
+    setupMessageButton();
+});
+</script>
+</body>
+</html>

@@ -1,0 +1,588 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ALS Instructor Portal - Mapping</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.7.1/leaflet.css" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <style>
+        /* Common styles */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: #f5f5f5;
+            min-height: 100vh;
+            display: flex;
+        }
+
+        .sidebar {
+            width: 250px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            padding: 30px 0;
+            position: fixed;
+            height: 100vh;
+            overflow-y: auto;
+            box-shadow: 2px 0 10px rgba(0, 0, 0, 0.1);
+            z-index: 1000;
+        }
+
+        .sidebar-header {
+            color: white;
+            padding: 0 20px;
+            margin-bottom: 30px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.2);
+            padding-bottom: 20px;
+        }
+
+        .sidebar-header .logo-container {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            margin-bottom: 10px;
+        }
+
+        .sidebar-header .als-logo {
+            width: 60px;
+            height: 60px;
+            border-radius: 50%;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+        }
+
+        .sidebar-header h1 {
+            font-size: 18px;
+            margin-bottom: 5px;
+        }
+
+        .sidebar-header p {
+            font-size: 12px;
+            opacity: 0.8;
+        }
+
+        .nav-tabs {
+            display: flex;
+            flex-direction: column;
+            gap: 0;
+        }
+
+        .nav-tab {
+            padding: 15px 20px;
+            color: rgba(255, 255, 255, 0.7);
+            cursor: pointer;
+            transition: all 0.3s ease;
+            border-left: 4px solid transparent;
+            font-weight: 500;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            text-decoration: none;
+        }
+
+        .nav-tab:hover {
+            background: rgba(255, 255, 255, 0.1);
+            color: white;
+        }
+
+        .nav-tab.active {
+            background: rgba(255, 255, 255, 0.15);
+            color: white;
+            border-left-color: white;
+        }
+
+        .nav-tab i {
+            font-size: 18px;
+            width: 20px;
+        }
+
+        .main-content {
+            margin-left: 250px;
+            flex: 1;
+            padding: 30px;
+        }
+
+        header {
+            background: white;
+            padding: 30px;
+            border-radius: 10px;
+            margin-bottom: 30px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+
+        header h1 {
+            color: #333;
+            margin-bottom: 10px;
+            font-size: 28px;
+        }
+
+        header p {
+            color: #666;
+            font-size: 14px;
+        }
+
+        .mapping-controls {
+            background: white;
+            padding: 20px;
+            border-radius: 10px;
+            margin-bottom: 20px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+
+        .filter-group {
+            display: flex;
+            gap: 15px;
+            margin-bottom: 15px;
+            align-items: center;
+        }
+
+        .filter-group select {
+            flex: 1;
+            padding: 10px 15px;
+            border: 1px solid #ddd;
+            border-radius: 6px;
+            font-size: 14px;
+            color: #333;
+            background: white;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+            appearance: none;
+            -webkit-appearance: none;
+            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' fill='%23666' viewBox='0 0 16 16'%3E%3Cpath d='M7.247 11.14L2.451 5.658C1.885 5.013 2.345 4 3.204 4h9.592a1 1 0 0 1 .753 1.659l-4.796 5.48a1 1 0 0 1-1.506 0z'/%3E%3C/svg%3E");
+            background-repeat: no-repeat;
+            background-position: calc(100% - 12px) center;
+            padding-right: 35px;
+        }
+
+        .filter-group select:hover {
+            border-color: #667eea;
+            box-shadow: 0 2px 8px rgba(102, 126, 234, 0.2);
+        }
+
+        .filter-group select:focus {
+            outline: none;
+            border-color: #667eea;
+            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.2);
+        }
+
+        .map-legend {
+            display: flex;
+            gap: 20px;
+            flex-wrap: wrap;
+            padding-top: 10px;
+            border-top: 1px solid #eee;
+        }
+
+        .legend-item {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            color: #333;
+            font-size: 14px;
+        }
+
+        .dot {
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            display: inline-block;
+        }
+
+        .dot.active {
+            background: #4CAF50;
+        }
+
+        .dot.enrolled {
+            background: #2196F3;
+        }
+
+        .dot.completed {
+            background: #FF9800;
+        }
+
+        .dot.inactive {
+            background: #9E9E9E;
+        }
+
+        .map-container {
+            display: flex;
+            gap: 20px;
+            height: calc(100vh - 350px);
+            min-height: 500px;
+        }
+
+        #map {
+            flex: 1;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            z-index: 1;
+        }
+
+        .map-sidebar {
+            width: 300px;
+            background: white;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            overflow-y: auto;
+        }
+
+        .map-sidebar h3 {
+            color: #333;
+            margin-bottom: 20px;
+            font-size: 18px;
+            border-bottom: 2px solid #667eea;
+            padding-bottom: 10px;
+        }
+
+        .stat-item {
+            display: flex;
+            justify-content: space-between;
+            padding: 12px 0;
+            border-bottom: 1px solid #eee;
+            color: #666;
+            font-size: 14px;
+        }
+
+        .stat-item strong {
+            color: #667eea;
+            font-weight: 600;
+        }
+
+        .loading {
+            text-align: center;
+            padding: 20px;
+            color: #666;
+        }
+
+        @media (max-width: 768px) {
+            .sidebar {
+                width: 80px;
+            }
+
+            .sidebar-header h1,
+            .sidebar-header p {
+                display: none;
+            }
+
+            .nav-tab span {
+                display: none;
+            }
+
+            .main-content {
+                margin-left: 80px;
+                padding: 15px;
+            }
+
+            .map-container {
+                flex-direction: column;
+                height: auto;
+            }
+
+            .map-sidebar {
+                width: 100%;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="sidebar">
+        <div class="sidebar-header">
+            <div class="logo-container">
+                <img src="../COMPONENTS/IMAGES/als logo.png" alt="ALS Logo" class="als-logo">
+            </div>
+            <h1>ALS Portal</h1>
+            <p id="instructorName">Welcome, Instructor</p>
+        </div>
+        <div class="nav-tabs">
+            <div class="nav-tab" data-page="dashboard">
+                <i class="fas fa-chart-line"></i>
+                <span>Dashboard</span>
+            </div>
+            <div class="nav-tab" data-page="learners">
+                <i class="fas fa-users"></i>
+                <span>Learners</span>
+            </div>
+            <div class="nav-tab" data-page="subjects">
+                <i class="fas fa-book"></i>
+                <span>Subjects</span>
+            </div>
+            <div class="nav-tab active" data-page="mapping">
+                <i class="fas fa-map-marked-alt"></i>
+                <span>Mapping</span>
+            </div>
+            <div class="nav-tab" data-page="analytics">
+                <i class="fas fa-chart-bar"></i>
+                <span>Analytics</span>
+            </div>
+            <div class="nav-tab" data-page="reports">
+                <i class="fas fa-file-alt"></i>
+                <span>Reports</span>
+            </div>
+            <div class="nav-tab" data-page="logout">
+                <i class="fas fa-sign-out-alt"></i>
+                <span>Logout</span>
+            </div>
+        </div>
+    </div>
+
+    <div class="main-content">
+        <header>
+            <h1>Learner Location Mapping</h1>
+            <p>Geographic distribution of ALS AF1 learners</p>
+        </header>
+
+        <div class="mapping-controls">
+            <div class="filter-group">
+                <select id="barangayFilter">
+                    <option value="all">All Barangays</option>
+                </select>
+                <select id="statusFilter">
+                    <option value="all">All Status</option>
+                    <option value="Active">Active</option>
+                    <option value="Enrolled">Enrolled</option>
+                    <option value="Completed">Completed</option>
+                    <option value="Dropped">Dropped</option>
+                </select>
+                <select id="learnerTypeFilter">
+                    <option value="all">All Types</option>
+                    <option value="Elementary">Elementary</option>
+                    <option value="Junior High School">Junior High School</option>
+                </select>
+            </div>
+            <div class="map-legend">
+                <div class="legend-item">
+                    <span class="dot active"></span>
+                    <span>Active Learners</span>
+                </div>
+                <div class="legend-item">
+                    <span class="dot enrolled"></span>
+                    <span>Enrolled</span>
+                </div>
+                <div class="legend-item">
+                    <span class="dot completed"></span>
+                    <span>Completed</span>
+                </div>
+                <div class="legend-item">
+                    <span class="dot inactive"></span>
+                    <span>Inactive/Dropped</span>
+                </div>
+            </div>
+        </div>
+
+        <div class="map-container">
+            <div id="map"></div>
+            <div class="map-sidebar">
+                <h3>Area Statistics</h3>
+                <div id="statistics">
+                    <div class="loading">Loading statistics...</div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.7.1/leaflet.js"></script>
+    <script>
+        const santaCruzBarangays = [
+            { name: "Alipit", lat: 14.2299, lng: 121.4102 },
+            { name: "Bagumbayan", lat: 14.2696, lng: 121.3974 },
+            { name: "Barangay I (Poblacion)", lat: 14.2789, lng: 121.3974 },
+            { name: "Barangay II (Poblacion)", lat: 14.2795, lng: 121.4178 },
+            { name: "Barangay III (Poblacion)", lat: 14.2801, lng: 121.4189 },
+            { name: "Barangay IV (Poblacion)", lat: 14.2807, lng: 121.4156 },
+            { name: "Barangay V (Poblacion)", lat: 14.2813, lng: 121.4145 },
+            { name: "Bubukal", lat: 14.2456, lng: 121.4523 },
+            { name: "Calios", lat: 14.2746, lng: 121.4068 },
+            { name: "Duhat", lat: 14.3012, lng: 121.4312 },
+            { name: "Gatid", lat: 14.2606, lng: 121.3852 },
+            { name: "Jasaan", lat: 14.2567, lng: 121.4245 },
+            { name: "Labuin", lat: 14.3089, lng: 121.4456 },
+            { name: "Malinao", lat: 14.2678, lng: 121.4567 },
+            { name: "Oogong", lat: 14.2890, lng: 121.4623 },
+            { name: "Pagsawitan", lat: 14.2456, lng: 121.3912 },
+            { name: "Palasan", lat: 14.2345, lng: 121.4234 },
+            { name: "Patimbao", lat: 14.2534, lng: 121.4678 },
+            { name: "San Jose", lat: 14.2967, lng: 121.4089 },
+            { name: "San Juan", lat: 14.3123, lng: 121.3978 },
+            { name: "San Pablo Norte", lat: 14.2712, lng: 121.3845 },
+            { name: "San Pablo Sur", lat: 14.2634, lng: 121.3823 },
+            { name: "Santisima Cruz", lat: 14.2845, lng: 121.4512 },
+            { name: "Santo Angel Central", lat: 14.2589, lng: 121.4345 },
+            { name: "Santo Angel Norte", lat: 14.2612, lng: 121.4367 },
+            { name: "Santo Angel Sur", lat: 14.2556, lng: 121.4323 }
+        ];
+
+        let map;
+        let markersLayer;
+
+        function initMap() {
+            map = L.map('map').setView([14.2818099, 121.414977], 13);
+            
+            L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+                attribution: '© OpenStreetMap contributors',
+                maxZoom: 18
+            }).addTo(map);
+
+            markersLayer = L.layerGroup().addTo(map);
+        }
+
+        function populateBarangayFilter() {
+            const select = document.getElementById('barangayFilter');
+            santaCruzBarangays.forEach(b => {
+                const option = document.createElement('option');
+                option.value = b.name;
+                option.textContent = b.name;
+                select.appendChild(option);
+            });
+        }
+
+        function getMarkerColor(status) {
+            const colors = {
+                'Active': '#4CAF50',
+                'Enrolled': '#2196F3',
+                'Completed': '#FF9800',
+                'Dropped': '#9E9E9E',
+                'Inactive': '#9E9E9E'
+            };
+            return colors[status] || '#757575';
+        }
+
+        function addMarkers(learners) {
+            markersLayer.clearLayers();
+
+            learners.forEach(learner => {
+                const color = getMarkerColor(learner.als_status);
+                const latOffset = (Math.random() - 0.5) * 0.002;
+                const lngOffset = (Math.random() - 0.5) * 0.002;
+
+                L.circleMarker([learner.lat + latOffset, learner.lng + lngOffset], {
+                    radius: 8,
+                    fillColor: color,
+                    color: '#fff',
+                    weight: 2,
+                    opacity: 1,
+                    fillOpacity: 0.8
+                }).bindPopup(`
+                    <strong>${learner.full_name}</strong><br>
+                    Status: ${learner.als_status || 'N/A'}<br>
+                    Barangay: ${learner.barangay || 'N/A'}<br>
+                    Type: ${learner.learner_type || 'N/A'}<br>
+                    Age: ${learner.age || 'N/A'}<br>
+                    Sex: ${learner.sex || 'N/A'}
+                `).addTo(markersLayer);
+            });
+        }
+
+        async function fetchLearners() {
+            try {
+                const barangay = document.getElementById('barangayFilter').value;
+                const status = document.getElementById('statusFilter').value;
+                const learnerType = document.getElementById('learnerTypeFilter').value;
+
+                const params = new URLSearchParams();
+                if (barangay !== 'all') params.append('barangay', barangay);
+                if (status !== 'all') params.append('status', status);
+                if (learnerType !== 'all') params.append('learner_type', learnerType);
+
+                const response = await fetch(`/api/af1-learners?${params}`);
+                const data = await response.json();
+                
+                addMarkers(data);
+                updateStatistics(data);
+            } catch (error) {
+                console.error('Error fetching learners:', error);
+                document.getElementById('statistics').innerHTML = 
+                    '<div class="loading" style="color: red;">Error loading data</div>';
+            }
+        }
+
+        function updateStatistics(learners) {
+            const stats = {
+                total: learners.length,
+                active: 0,
+                enrolled: 0,
+                completed: 0,
+                dropped: 0,
+                male: 0,
+                female: 0
+            };
+
+            learners.forEach(l => {
+                const status = l.als_status || '';
+                if (status === 'Active') stats.active++;
+                if (status === 'Enrolled') stats.enrolled++;
+                if (status === 'Completed') stats.completed++;
+                if (status === 'Dropped') stats.dropped++;
+                
+                if (l.sex === 'Male') stats.male++;
+                if (l.sex === 'Female') stats.female++;
+            });
+
+            document.getElementById('statistics').innerHTML = `
+                <div class="stat-item">
+                    <span>Total Learners</span>
+                    <strong>${stats.total}</strong>
+                </div>
+                <div class="stat-item">
+                    <span>Active</span>
+                    <strong>${stats.active}</strong>
+                </div>
+                <div class="stat-item">
+                    <span>Enrolled</span>
+                    <strong>${stats.enrolled}</strong>
+                </div>
+                <div class="stat-item">
+                    <span>Completed</span>
+                    <strong>${stats.completed}</strong>
+                </div>
+                <div class="stat-item">
+                    <span>Dropped</span>
+                    <strong>${stats.dropped}</strong>
+                </div>
+                <div class="stat-item">
+                    <span>Male</span>
+                    <strong>${stats.male}</strong>
+                </div>
+                <div class="stat-item">
+                    <span>Female</span>
+                    <strong>${stats.female}</strong>
+                </div>
+            `;
+        }
+
+        document.addEventListener('DOMContentLoaded', () => {
+            const user = JSON.parse(localStorage.getItem('user'));
+            if (!user) {
+                window.location.href = '/';
+                return;
+            }
+
+            document.getElementById('instructorName').textContent = `Welcome, ${user.username}`;
+
+            initMap();
+            populateBarangayFilter();
+            fetchLearners();
+
+            document.getElementById('barangayFilter').addEventListener('change', fetchLearners);
+            document.getElementById('statusFilter').addEventListener('change', fetchLearners);
+            document.getElementById('learnerTypeFilter').addEventListener('change', fetchLearners);
+
+            document.querySelectorAll('.nav-tab').forEach(tab => {
+                tab.addEventListener('click', () => {
+                    const page = tab.dataset.page;
+                    if (page === 'logout') {
+                        localStorage.removeItem('user');
+                        window.location.href = '/';
+                        return;
+                    }
+                    window.location.href = `/instructor_${page}`;
+                });
+            });
+        });
+    </script>
+</body>
+</html>

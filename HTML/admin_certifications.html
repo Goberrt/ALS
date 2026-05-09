@@ -1,0 +1,1058 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ALS Admin - Certifications</title>
+    <link rel="stylesheet" href="../CSS/admin_dashboard.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
+    <style>
+        .certifications-container {
+            padding: 20px;
+        }
+
+        .controls-section {
+            display: flex;
+            gap: 15px;
+            margin-bottom: 25px;
+            flex-wrap: wrap;
+            align-items: center;
+        }
+
+        .search-box {
+            flex: 1;
+            min-width: 200px;
+        }
+
+        .search-box input {
+            width: 100%;
+            padding: 10px 15px;
+            border: 1px solid #bdc3c7;
+            border-radius: 6px;
+            font-size: 14px;
+        }
+
+        .filter-group {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+        }
+
+        .filter-select {
+            padding: 10px 12px;
+            border: 1px solid #bdc3c7;
+            border-radius: 6px;
+            background: white;
+            cursor: pointer;
+            font-size: 14px;
+            min-width: 150px;
+        }
+
+        .btn-action {
+            background: #3498db;
+            color: white;
+            border: none;
+            padding: 10px 15px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            white-space: nowrap;
+        }
+
+        .btn-action:hover {
+            background: #2980b9;
+        }
+
+        .certificates-table {
+            width: 100%;
+            border-collapse: collapse;
+            background: white;
+            border-radius: 8px;
+            overflow: hidden;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+        }
+
+        .certificates-table thead {
+            background: #34495e;
+            color: white;
+        }
+
+        .certificates-table th {
+            padding: 15px;
+            text-align: left;
+            font-weight: 600;
+            font-size: 14px;
+            cursor: pointer;
+            user-select: none;
+        }
+
+        .certificates-table th:hover {
+            background: #2c3e50;
+        }
+
+        .certificates-table td {
+            padding: 12px 15px;
+            border-top: 1px solid #ecf0f1;
+            font-size: 14px;
+        }
+
+        .certificates-table tbody tr:hover {
+            background: #f8f9fa;
+        }
+
+        .student-name {
+            font-weight: 600;
+            color: #2c3e50;
+        }
+
+        .badge {
+            display: inline-block;
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 600;
+        }
+
+        .badge-active {
+            background: #d4edda;
+            color: #155724;
+        }
+
+        .badge-revoked {
+            background: #f8d7da;
+            color: #721c24;
+        }
+
+        .action-buttons {
+            display: flex;
+            gap: 8px;
+        }
+
+        .btn-small {
+            padding: 6px 10px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 12px;
+            font-weight: 600;
+            transition: all 0.3s ease;
+        }
+
+        .btn-issue {
+            background: #27ae60;
+            color: white;
+        }
+
+        .btn-issue:hover {
+            background: #229954;
+        }
+
+        .btn-edit {
+            background: #e3f2fd;
+            color: #1976d2;
+        }
+
+        .btn-edit:hover {
+            background: #bbdefb;
+        }
+
+        .btn-view {
+            background: #e8f5e9;
+            color: #388e3c;
+        }
+
+        .btn-view:hover {
+            background: #c8e6c9;
+        }
+
+        .btn-revoke {
+            background: #ffebee;
+            color: #c62828;
+        }
+
+        .btn-revoke:hover {
+            background: #ffcdd2;
+        }
+
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 1000;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.5);
+            animation: fadeIn 0.3s ease;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+
+        .modal-content {
+            background: white;
+            margin: 5% auto;
+            padding: 30px;
+            border-radius: 8px;
+            width: 90%;
+            max-width: 800px;
+            max-height: 90vh;
+            overflow-y: auto;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.2);
+        }
+
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 25px;
+            border-bottom: 2px solid #ecf0f1;
+            padding-bottom: 15px;
+        }
+
+        .modal-header h2 {
+            color: #2c3e50;
+            font-size: 20px;
+            margin: 0;
+        }
+
+        .close-modal {
+            background: none;
+            border: none;
+            font-size: 28px;
+            cursor: pointer;
+            color: #7f8c8d;
+            transition: color 0.3s ease;
+        }
+
+        .close-modal:hover {
+            color: #2c3e50;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 8px;
+            color: #2c3e50;
+            font-weight: 600;
+            font-size: 14px;
+        }
+
+        .form-group input,
+        .form-group select,
+        .form-group textarea {
+            width: 100%;
+            padding: 10px 12px;
+            border: 1px solid #bdc3c7;
+            border-radius: 6px;
+            font-size: 14px;
+            font-family: inherit;
+            transition: border-color 0.3s ease;
+        }
+
+        .form-group input:focus,
+        .form-group select:focus,
+        .form-group textarea:focus {
+            outline: none;
+            border-color: #3498db;
+            box-shadow: 0 0 0 3px rgba(52, 152, 219, 0.1);
+        }
+
+        .form-actions {
+            display: flex;
+            gap: 10px;
+            margin-top: 25px;
+            border-top: 1px solid #ecf0f1;
+            padding-top: 20px;
+        }
+
+        .btn-cancel {
+            flex: 1;
+            padding: 12px;
+            background: #ecf0f1;
+            color: #2c3e50;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            font-weight: 600;
+            transition: all 0.3s ease;
+        }
+
+        .btn-cancel:hover {
+            background: #bdc3c7;
+        }
+
+        .btn-submit {
+            flex: 1;
+            padding: 12px;
+            background: #27ae60;
+            color: white;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            font-weight: 600;
+            transition: all 0.3s ease;
+        }
+
+        .btn-submit:hover {
+            background: #229954;
+        }
+
+        .btn-submit:disabled {
+            background: #bdc3c7;
+            cursor: not-allowed;
+        }
+
+        .pdf-viewer-modal .modal-content {
+            max-width: 900px;
+            padding: 0;
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .pdf-viewer-header {
+            padding: 20px 30px;
+            border-bottom: 1px solid #ecf0f1;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background: #f8f9fa;
+        }
+
+        .pdf-viewer-header h2 {
+            margin: 0;
+            color: #2c3e50;
+            font-size: 18px;
+        }
+
+        .pdf-viewer-actions {
+            display: flex;
+            gap: 10px;
+            align-items: center;
+        }
+
+        .pdf-viewer-container {
+            flex: 1;
+            overflow: auto;
+            padding: 20px;
+            background: #e8e8e8;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        #pdfCanvas {
+            max-width: 100%;
+            border: 1px solid #bdc3c7;
+            background: white;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+        }
+
+        .no-data {
+            text-align: center;
+            padding: 40px;
+            color: #7f8c8d;
+            font-size: 16px;
+        }
+
+        .no-data i {
+            font-size: 48px;
+            margin-bottom: 15px;
+            color: #bdc3c7;
+        }
+
+        @media (max-width: 768px) {
+            .controls-section {
+                flex-direction: column;
+            }
+
+            .search-box {
+                min-width: auto;
+            }
+
+            .certificates-table {
+                font-size: 12px;
+            }
+
+            .certificates-table th,
+            .certificates-table td {
+                padding: 8px;
+            }
+
+            .action-buttons {
+                flex-direction: column;
+            }
+
+            .btn-small {
+                width: 100%;
+            }
+
+            .modal-content {
+                width: 95%;
+                margin: 20% auto;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="sidebar">
+        <div class="sidebar-header">
+            <div class="logo-container">
+                <div class="als-logo">
+                    <i class="fas fa-graduation-cap"></i>
+                </div>
+                <h1>ALS Admin Portal</h1>
+            </div>
+            <p id="adminName">Welcome, Administrator</p>
+        </div>
+        <div class="nav-tabs">
+            <a href="/admin_dashboard" class="nav-tab">
+                <i class="fas fa-chart-line"></i>
+                <span>Dashboard</span>
+            </a>
+            <a href="/admin_users" class="nav-tab">
+                <i class="fas fa-users"></i>
+                <span>User Management</span>
+            </a>
+            <a href="/admin_instructors" class="nav-tab">
+                <i class="fas fa-chalkboard-teacher"></i>
+                <span>Instructors</span>
+            </a>
+            <a href="/admin_students" class="nav-tab">
+                <i class="fas fa-user-graduate"></i>
+                <span>Students</span>
+            </a>
+            <a href="/admin_registration" class="nav-tab">
+                <i class="fas fa-user-plus"></i>
+                <span>Registrations</span>
+            </a>
+            <a href="/admin_af1" class="nav-tab">
+                <i class="fas fa-map-marked-alt"></i>
+                <span>Mapped Learners</span>
+            </a>
+            <a href="/admin_certifications" class="nav-tab active">
+                <i class="fas fa-certificate"></i>
+                <span>Certifications</span>
+            </a>
+            <a href="#" class="nav-tab" onclick="return confirmLogout()">
+                <i class="fas fa-sign-out-alt"></i>
+                <span>Logout</span>
+            </a>
+        </div>
+    </div>
+
+    <div class="main-content">
+        <header>
+            <h1>Student Certifications</h1>
+            <p>Manage student certificates and certifications</p>
+        </header>
+
+    <div class="certifications-container">
+        <h1 style="margin-bottom: 25px; color: #2c3e50;">
+            <i class="fas fa-certificate"></i> Student Certifications
+        </h1>
+
+        <!-- Controls Section -->
+        <div class="controls-section">
+            <div class="search-box">
+                <input type="text" id="searchInput" placeholder="Search by student name or LRN...">
+            </div>
+            <div class="filter-group">
+                <select id="programFilter" class="filter-select">
+                    <option value="">All Programs</option>
+                    <option value="A&E">A&E</option>
+                    <option value="Elementary">Elementary</option>
+                    <option value="JHS">JHS</option>
+                    <option value="SHS">SHS</option>
+                </select>
+                <select id="statusFilter" class="filter-select">
+                    <option value="">All Status</option>
+                    <option value="active">Active</option>
+                    <option value="revoked">Revoked</option>
+                </select>
+                <select id="sortBy" class="filter-select">
+                    <option value="issued_date_desc">Newest First</option>
+                    <option value="issued_date_asc">Oldest First</option>
+                    <option value="student_asc">Student Name A-Z</option>
+                    <option value="student_desc">Student Name Z-A</option>
+                </select>
+            </div>
+        </div>
+
+        <!-- Students Available for Certification -->
+        <div style="margin-bottom: 40px;">
+            <h2 style="color: #2c3e50; margin-bottom: 15px;">
+                <i class="fas fa-user-graduate"></i> Students Available for Certification
+            </h2>
+            <div style="overflow-x: auto;">
+                <table class="certificates-table" id="studentsTable">
+                    <thead>
+                        <tr>
+                            <th>Student Name</th>
+                            <th>LRN</th>
+                            <th>Email</th>
+                            <th>Program</th>
+                            <th>Action</th>
+                        </tr>
+                    </thead>
+                    <tbody id="studentsTableBody">
+                        <tr>
+                            <td colspan="5" class="no-data">
+                                <i class="fas fa-spinner"></i>
+                                <p>Loading students...</p>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <!-- Certificates Table -->
+        <div style="overflow-x: auto;">
+            <h2 style="color: #2c3e50; margin-bottom: 15px;">
+                <i class="fas fa-certificate"></i> Issued Certificates
+            </h2>
+            <table class="certificates-table" id="certificatesTable">
+                <thead>
+                    <tr>
+                        <th>Student Name</th>
+                        <th>LRN</th>
+                        <th>Program</th>
+                        <th>Issued Date</th>
+                        <th>Status</th>
+                        <th>Remarks</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody id="certificatesTableBody">
+                    <tr>
+                        <td colspan="7" class="no-data">
+                            <i class="fas fa-folder-open"></i>
+                            <p>No certificates yet</p>
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <!-- Issue Certificate Modal -->
+    <div id="issueCertificateModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2>Issue Certificate</h2>
+                <button class="close-modal" onclick="closeIssueCertificateModal()">&times;</button>
+            </div>
+            <form id="issueCertificateForm" onsubmit="handleIssueCertificate(event)">
+                <div class="form-group">
+                    <label for="issueStudentName">Student Name</label>
+                    <input type="text" id="issueStudentName" readonly style="background: #f8f9fa;">
+                </div>
+
+                <div class="form-group">
+                    <label for="issueProgram">Program</label>
+                    <select id="issueProgram" required>
+                        <option value="">Select Program</option>
+                        <option value="A&E">A&E (Arts & Education)</option>
+                        <option value="Elementary">Elementary</option>
+                        <option value="JHS">Junior High School</option>
+                        <option value="SHS">Senior High School</option>
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label for="certificateFile">Upload Certificate PDF</label>
+                    <input type="file" id="certificateFile" accept=".pdf" required>
+                    <small>Maximum file size: 10MB</small>
+                </div>
+
+                <div class="form-group">
+                    <label for="issueRemarks">Remarks (Optional)</label>
+                    <textarea id="issueRemarks" rows="3" placeholder="e.g., Exceptional Performance, Completion with Honors"></textarea>
+                </div>
+
+                <div class="form-actions">
+                    <button type="button" class="btn-cancel" onclick="closeIssueCertificateModal()">Cancel</button>
+                    <button type="submit" class="btn-submit">Issue Certificate</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Edit Certificate Modal -->
+    <div id="editCertificateModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2>Edit Certificate</h2>
+                <button class="close-modal" onclick="closeEditCertificateModal()">&times;</button>
+            </div>
+            <form id="editCertificateForm" onsubmit="handleEditCertificate(event)">
+                <div class="form-group">
+                    <label for="editStudentName">Student Name</label>
+                    <input type="text" id="editStudentName" readonly style="background: #f8f9fa;">
+                </div>
+
+                <div class="form-group">
+                    <label for="editProgram">Program</label>
+                    <input type="text" id="editProgram" readonly style="background: #f8f9fa;">
+                </div>
+
+                <div class="form-group">
+                    <label for="editIssuedDate">Issued Date</label>
+                    <input type="text" id="editIssuedDate" readonly style="background: #f8f9fa;">
+                </div>
+
+                <div class="form-group">
+                    <label for="editRemarks">Remarks</label>
+                    <textarea id="editRemarks" rows="3" placeholder="Update remarks if needed"></textarea>
+                </div>
+
+                <div class="form-group">
+                    <label for="editCertificateFile">Replace Certificate PDF (Optional)</label>
+                    <input type="file" id="editCertificateFile" accept=".pdf">
+                    <small>Leave empty to keep the current certificate</small>
+                </div>
+
+                <div class="form-actions">
+                    <button type="button" class="btn-cancel" onclick="closeEditCertificateModal()">Cancel</button>
+                    <button type="submit" class="btn-submit">Save Changes</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- PDF Viewer Modal -->
+    <div id="pdfViewerModal" class="modal pdf-viewer-modal">
+        <div class="modal-content">
+            <div class="pdf-viewer-header">
+                <h2 id="pdfViewerTitle">Certificate</h2>
+                <div class="pdf-viewer-actions">
+                    <button class="btn-small btn-view" onclick="downloadPDF()">
+                        <i class="fas fa-download"></i> Download
+                    </button>
+                    <button class="close-modal" onclick="closePDFViewer()" style="background: none; border: none; font-size: 24px; color: #7f8c8d;">&times;</button>
+                </div>
+            </div>
+            <div class="pdf-viewer-container">
+                <canvas id="pdfCanvas"></canvas>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let currentStudentId = null;
+        let currentCertificateId = null;
+        let currentPdfData = null;
+        let allCertificates = [];
+        let allStudents = [];
+
+        async function loadStudents() {
+            try {
+                const response = await fetch('/api/students');
+                const result = await response.json();
+                allStudents = result.students || result.data || [];
+                displayStudents();
+            } catch (error) {
+                console.error('Error loading students:', error);
+                document.getElementById('studentsTableBody').innerHTML = '<tr><td colspan="5" class="no-data"><p>Error loading students</p></td></tr>';
+            }
+        }
+
+        function displayStudents() {
+            const tbody = document.getElementById('studentsTableBody');
+            
+            if (allStudents.length === 0) {
+                tbody.innerHTML = '<tr><td colspan="5" class="no-data"><i class="fas fa-folder-open"></i><p>No students found</p></td></tr>';
+                return;
+            }
+
+            // Get list of students who already have certificates
+            const certifiedStudentIds = new Set(allCertificates.map(c => c.student_id));
+            
+            // Filter out students who already have certificates
+            const pendingStudents = allStudents.filter(s => !certifiedStudentIds.has(s.id));
+
+            if (pendingStudents.length === 0) {
+                tbody.innerHTML = '<tr><td colspan="5" class="no-data"><i class="fas fa-check-circle"></i><p>All students have been certified</p></td></tr>';
+                return;
+            }
+
+            tbody.innerHTML = pendingStudents.map(student => `
+                <tr>
+                    <td class="student-name">${student.first_name} ${student.last_name}</td>
+                    <td>${student.username}</td>
+                    <td>${student.email || '-'}</td>
+                    <td>${student.program || '-'}</td>
+                    <td>
+                        <button class="btn-small btn-issue" onclick="openIssueCertificateModal('${student.id}', '${student.first_name} ${student.last_name}')">
+                            <i class="fas fa-certificate"></i> Issue Certificate
+                        </button>
+                    </td>
+                </tr>
+            `).join('');
+        }
+
+        function openIssueCertificateModal(studentId, studentName) {
+            currentStudentId = studentId;
+            document.getElementById('issueStudentName').value = studentName;
+            document.getElementById('issueCertificateForm').reset();
+            document.getElementById('issueCertificateModal').style.display = 'block';
+        }
+
+        function closeIssueCertificateModal() {
+            document.getElementById('issueCertificateModal').style.display = 'none';
+        }
+
+        function openEditCertificateModal(certId, studentName, program, issuedDate, remarks) {
+            currentCertificateId = certId;
+            document.getElementById('editStudentName').value = studentName;
+            document.getElementById('editProgram').value = program;
+            document.getElementById('editIssuedDate').value = new Date(issuedDate).toLocaleDateString();
+            document.getElementById('editRemarks').value = remarks || '';
+            document.getElementById('editCertificateForm').reset();
+            document.getElementById('editCertificateModal').style.display = 'block';
+        }
+
+        function closeEditCertificateModal() {
+            document.getElementById('editCertificateModal').style.display = 'none';
+        }
+
+        async function handleIssueCertificate(event) {
+            event.preventDefault();
+            
+            const program = document.getElementById('issueProgram').value;
+            const certificateFile = document.getElementById('certificateFile').files[0];
+            const remarks = document.getElementById('issueRemarks').value;
+            const submitBtn = event.target.querySelector('.btn-submit');
+
+            if (!program || !certificateFile) {
+                alert('Please fill in all required fields');
+                return;
+            }
+
+            if (certificateFile.size > 10 * 1024 * 1024) {
+                alert('File size exceeds 10MB limit');
+                return;
+            }
+
+            submitBtn.disabled = true;
+            submitBtn.textContent = 'Issuing...';
+
+            const formData = new FormData();
+            formData.append('student_id', currentStudentId);
+            formData.append('program', program);
+            formData.append('issued_by', 'admin');
+            formData.append('remarks', remarks);
+            formData.append('certificate_file', certificateFile);
+
+            try {
+                const response = await fetch('/api/admin/certificates', {
+                    method: 'POST',
+                    body: formData
+                });
+
+                const result = await response.json();
+
+                if (response.ok) {
+                    alert('Certificate issued successfully!');
+                    closeIssueCertificateModal();
+                    loadCertificates();
+                } else {
+                    alert(result.detail || 'Failed to issue certificate');
+                }
+            } catch (error) {
+                console.error('Error:', error);
+                alert('An error occurred');
+            } finally {
+                submitBtn.disabled = false;
+                submitBtn.textContent = 'Issue Certificate';
+            }
+        }
+
+        async function handleEditCertificate(event) {
+            event.preventDefault();
+
+            const remarks = document.getElementById('editRemarks').value;
+            const certificateFile = document.getElementById('editCertificateFile').files[0];
+            const submitBtn = event.target.querySelector('.btn-submit');
+
+            if (certificateFile && certificateFile.size > 10 * 1024 * 1024) {
+                alert('File size exceeds 10MB limit');
+                return;
+            }
+
+            submitBtn.disabled = true;
+            submitBtn.textContent = 'Saving...';
+
+            const formData = new FormData();
+            formData.append('remarks', remarks);
+            if (certificateFile) {
+                formData.append('certificate_file', certificateFile);
+            }
+
+            try {
+                const response = await fetch(`/api/admin/certificates/${currentCertificateId}`, {
+                    method: 'PUT',
+                    body: formData
+                });
+
+                const result = await response.json();
+
+                if (response.ok) {
+                    alert('Certificate updated successfully!');
+                    closeEditCertificateModal();
+                    loadCertificates();
+                } else {
+                    alert(result.detail || 'Failed to update certificate');
+                }
+            } catch (error) {
+                console.error('Error:', error);
+                alert('An error occurred');
+            } finally {
+                submitBtn.disabled = false;
+                submitBtn.textContent = 'Save Changes';
+            }
+        }
+
+        async function revokeCertificate(certId) {
+            if (!confirm('Are you sure you want to revoke this certificate?')) {
+                return;
+            }
+
+            try {
+                const response = await fetch(`/api/admin/certificates/${certId}`, {
+                    method: 'DELETE'
+                });
+
+                const result = await response.json();
+
+                if (response.ok) {
+                    alert('Certificate revoked successfully!');
+                    loadCertificates();
+                } else {
+                    alert(result.detail || 'Failed to revoke certificate');
+                }
+            } catch (error) {
+                console.error('Error:', error);
+                alert('An error occurred');
+            }
+        }
+
+        async function viewCertificate(certId) {
+            try {
+                console.log('Fetching certificate:', certId);
+                const response = await fetch(`/api/certificates/${certId}`);
+                console.log('Response status:', response.status);
+
+                if (!response.ok) {
+                    const errorText = await response.text();
+                    console.error('Error response:', errorText);
+                    
+                    let errorMessage = `Failed to retrieve certificate: ${response.status} ${response.statusText}`;
+                    try {
+                        const errorData = JSON.parse(errorText);
+                        if (errorData.detail) {
+                            errorMessage = errorData.detail;
+                        }
+                    } catch (e) {
+                        // Not JSON, use text
+                    }
+                    
+                    alert(errorMessage);
+                    return;
+                }
+
+                const result = await response.json();
+                console.log('Certificate data:', result);
+                currentPdfData = result;
+                
+                if (!result.file_data) {
+                    alert('Certificate file is empty or missing');
+                    return;
+                }
+                
+                // Display filename without .pdf extension
+                const cleanFilename = result.file_name.replace('.pdf', '').replace(/\.pdf$/i, '');
+                document.getElementById('pdfViewerTitle').textContent = cleanFilename;
+                
+                // Render PDF
+                const binaryString = atob(result.file_data);
+                const bytes = new Uint8Array(binaryString.length);
+                for (let i = 0; i < binaryString.length; i++) {
+                    bytes[i] = binaryString.charCodeAt(i);
+                }
+                
+                const pdfData = bytes.buffer;
+                const pdf = pdfjsLib.getDocument(pdfData);
+                
+                pdf.promise.then(function(pdfDoc) {
+                    pdfDoc.getPage(1).then(function(page) {
+                        const canvas = document.getElementById('pdfCanvas');
+                        const context = canvas.getContext('2d');
+                        const viewport = page.getViewport({ scale: 1.5 });
+                        
+                        canvas.width = viewport.width;
+                        canvas.height = viewport.height;
+                        
+                        page.render({ canvasContext: context, viewport: viewport });
+                    });
+                });
+                
+                document.getElementById('pdfViewerModal').style.display = 'block';
+            } catch (error) {
+                console.error('Error loading certificate:', error);
+                alert('Failed to load certificate: ' + error.message);
+            }
+        }
+
+        function closePDFViewer() {
+            document.getElementById('pdfViewerModal').style.display = 'none';
+        }
+
+        function downloadPDF() {
+            if (!currentPdfData) return;
+
+            const binaryString = atob(currentPdfData.file_data);
+            const bytes = new Uint8Array(binaryString.length);
+            for (let i = 0; i < binaryString.length; i++) {
+                bytes[i] = binaryString.charCodeAt(i);
+            }
+
+            const blob = new Blob([bytes], { type: 'application/pdf' });
+            const url = window.URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = currentPdfData.file_name;
+            document.body.appendChild(a);
+            a.click();
+            window.URL.revokeObjectURL(url);
+            document.body.removeChild(a);
+        }
+
+        async function loadCertificates() {
+            try {
+                const program = document.getElementById('programFilter').value;
+                const status = document.getElementById('statusFilter').value;
+                
+                let url = '/api/admin/certificates?sort_by=issued_date&order=desc';
+                if (program) url += `&program=${program}`;
+                if (status) url += `&status=${status}`;
+
+                const response = await fetch(url);
+                const result = await response.json();
+
+                allCertificates = result.certificates || [];
+                filterAndDisplayCertificates();
+                displayStudents(); // Update students list when certificates change
+            } catch (error) {
+                console.error('Error loading certificates:', error);
+            }
+        }
+
+        function filterAndDisplayCertificates() {
+            const searchTerm = document.getElementById('searchInput').value.toLowerCase();
+            
+            let filtered = allCertificates.filter(cert => {
+                const studentName = (cert.users?.first_name + ' ' + cert.users?.last_name).toLowerCase();
+                const username = cert.users?.username?.toLowerCase() || '';
+                return studentName.includes(searchTerm) || username.includes(searchTerm);
+            });
+
+            // Apply sorting
+            const sortBy = document.getElementById('sortBy').value;
+            if (sortBy === 'issued_date_asc') {
+                filtered.sort((a, b) => new Date(a.issued_date) - new Date(b.issued_date));
+            } else if (sortBy === 'issued_date_desc') {
+                filtered.sort((a, b) => new Date(b.issued_date) - new Date(a.issued_date));
+            } else if (sortBy === 'student_asc') {
+                filtered.sort((a, b) => {
+                    const nameA = (a.users?.first_name + ' ' + a.users?.last_name).toLowerCase();
+                    const nameB = (b.users?.first_name + ' ' + b.users?.last_name).toLowerCase();
+                    return nameA.localeCompare(nameB);
+                });
+            } else if (sortBy === 'student_desc') {
+                filtered.sort((a, b) => {
+                    const nameA = (a.users?.first_name + ' ' + a.users?.last_name).toLowerCase();
+                    const nameB = (b.users?.first_name + ' ' + b.users?.last_name).toLowerCase();
+                    return nameB.localeCompare(nameA);
+                });
+            }
+
+            displayCertificates(filtered);
+        }
+
+        function displayCertificates(certificates) {
+            const tbody = document.getElementById('certificatesTableBody');
+            
+            if (certificates.length === 0) {
+                tbody.innerHTML = '<tr><td colspan="7" class="no-data"><i class="fas fa-folder-open"></i><p>No certificates found</p></td></tr>';
+                return;
+            }
+
+            tbody.innerHTML = certificates.map(cert => `
+                <tr>
+                    <td class="student-name">${cert.users?.first_name} ${cert.users?.last_name}</td>
+                    <td>${cert.users?.username}</td>
+                    <td>${cert.program}</td>
+                    <td>${new Date(cert.issued_date).toLocaleDateString()}</td>
+                    <td>
+                        <span class="badge ${cert.status === 'active' ? 'badge-active' : 'badge-revoked'}">
+                            ${cert.status === 'active' ? 'Active' : 'Revoked'}
+                        </span>
+                    </td>
+                    <td>${cert.remarks ? cert.remarks.substring(0, 20) + '...' : '-'}</td>
+                    <td>
+                        <div class="action-buttons">
+                            <button class="btn-small btn-view" onclick="viewCertificate('${cert.id}')" title="View Certificate">
+                                <i class="fas fa-eye"></i> View
+                            </button>
+                            ${cert.status === 'active' ? `
+                                <button class="btn-small btn-edit" onclick="openEditCertificateModal('${cert.id}', '${cert.users?.first_name} ${cert.users?.last_name}', '${cert.program}', '${cert.issued_date}', '${cert.remarks || ''}')" title="Edit Certificate">
+                                    <i class="fas fa-edit"></i> Edit
+                                </button>
+                                <button class="btn-small btn-revoke" onclick="revokeCertificate('${cert.id}')" title="Revoke Certificate">
+                                    <i class="fas fa-trash"></i> Revoke
+                                </button>
+                            ` : ''}
+                        </div>
+                    </td>
+                </tr>
+            `).join('');
+        }
+
+        // Event listeners
+        document.getElementById('searchInput').addEventListener('input', filterAndDisplayCertificates);
+        document.getElementById('programFilter').addEventListener('change', loadCertificates);
+        document.getElementById('statusFilter').addEventListener('change', loadCertificates);
+        document.getElementById('sortBy').addEventListener('change', filterAndDisplayCertificates);
+
+        // Close modals when clicking outside
+        window.onclick = function(event) {
+            if (event.target.classList.contains('modal')) {
+                event.target.style.display = 'none';
+            }
+        };
+
+        // Load certificates and students on page load
+        loadCertificates();
+        loadStudents();
+
+        // Confirm logout
+        function confirmLogout() {
+            if (confirm('Are you sure you want to logout?')) {
+                window.location.href = '/login';
+            }
+            return false;
+        }
+    </script>
+    </div>
+</body>
+</html>

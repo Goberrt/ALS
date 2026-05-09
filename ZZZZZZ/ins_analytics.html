@@ -1,0 +1,99 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>ALS Learners Tracking Portal - Santa Cruz, Laguna</title>
+    <link rel="stylesheet" href="/CSS/als_portal_css.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.7.1/leaflet.css" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" />
+</head>
+<body>
+    <nav class="navbar">
+        <div class="nav-container">
+            <div class="nav-logo">
+                <img src="https://via.placeholder.com/40x40?text=LSPU" alt="LSPU Logo" class="logo" />
+                <span class="nav-title">ALS Tracking Portal</span>
+            </div>
+            <div class="nav-menu">
+                <a href="/ins_dashboard" class="nav-link "><i class="fas fa-home"></i> Dashboard</a>
+                <a href="/ins_mapping" class="nav-link "><i class="fas fa-map"></i> Geo Mapping</a>
+                <a href="/ins_learners" class="nav-link "><i class="fas fa-users"></i> Learners</a>
+                <a href="/ins_analytics" class="nav-link active"><i class="fas fa-chart-bar"></i> Analytics</a>
+                <a href="/ins_reports" class="nav-link "><i class="fas fa-file-alt"></i> Reports</a>
+            </div>
+            <div class="nav-user">
+                <span class="user-name">Admin User</span>
+                <i class="fas fa-user-circle"></i>
+            </div>
+        </div>
+    </nav>
+    <main class="main-container">
+
+<div class="page-header">
+    <h1>Analytics & Insights</h1>
+    <p>Data-driven insights for decision support</p>
+</div>
+<div class="analytics-grid">
+    <div class="analytics-card">
+        <h3>Enrollment Trends</h3>
+        <div id="enrollment-chart" class="chart-container">Chart placeholder</div>
+    </div>
+    <div class="analytics-card">
+        <h3>Geographic Distribution</h3>
+        <div id="distribution-chart" class="chart-container">Chart placeholder</div>
+    </div>
+    <div class="analytics-card">
+        <h3>Completion Rates by Barangay</h3>
+        <div class="completion-rates">
+            <div class="rate-item">
+                <span class="barangay-name">Poblacion</span>
+                <div class="rate-bar"><div class="rate-fill" style="width:85%"></div></div>
+                <span class="rate-percent">85%</span>
+            </div>
+            <div class="rate-item">
+                <span class="barangay-name">San Jose</span>
+                <div class="rate-bar"><div class="rate-fill" style="width:72%"></div></div>
+                <span class="rate-percent">72%</span>
+            </div>
+            <div class="rate-item">
+                <span class="barangay-name">Bagumbayan</span>
+                <div class="rate-bar"><div class="rate-fill" style="width:68%"></div></div>
+                <span class="rate-percent">68%</span>
+            </div>
+        </div>
+    </div>
+    <div class="analytics-card">
+        <h3>Risk Assessment</h3>
+        <div class="risk-indicators">
+            <div class="risk-item high">
+                <i class="fas fa-exclamation-triangle"></i>
+                <div class="risk-content">
+                    <h4>High Risk Areas</h4>
+                    <p>3 barangays need immediate attention</p>
+                </div>
+            </div>
+            <div class="risk-item medium">
+                <i class="fas fa-exclamation-circle"></i>
+                <div class="risk-content">
+                    <h4>Medium Risk</h4>
+                    <p>5 barangays require monitoring</p>
+                </div>
+            </div>
+            <div class="risk-item low">
+                <i class="fas fa-check-circle"></i>
+                <div class="risk-content">
+                    <h4>Low Risk</h4>
+                    <p>10 barangays performing well</p>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+    </main>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.7.1/leaflet.js"></script>
+    <script src="/JS/als_portal_js.js"></script>
+</body>
+</html>

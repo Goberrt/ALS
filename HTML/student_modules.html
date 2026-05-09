@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ALS Student Portal - My Subjects</title>
+    <link rel="stylesheet" href="../CSS/student_styles.css">
+    <link rel="stylesheet" href="../CSS/student_modules.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+</head>
+<body>
+    <!-- Burger Menu Button -->
+    <button class="burger-menu" id="burgerMenu">
+        <i class="fas fa-bars"></i>
+    </button>
+
+    <!-- Sidebar Overlay -->
+    <div class="sidebar-overlay" id="sidebarOverlay"></div>
+
+    <!-- Sidebar -->
+    <div id="sidebarContainer"></div>
+    
+    <div class="main-content">
+        <header>
+            <div class="subjects-header">
+                <div>
+                    <h1>My Subjects</h1>
+                    <p>View your enrolled subjects and access materials</p>
+                </div>
+                <button class="enroll-btn" id="enrollBtn">
+                    <i class="fas fa-plus"></i>
+                    Enroll in Subject
+                </button>
+            </div>
+        </header>
+
+        <div id="subjectsContainer" class="subjects-grid">
+            <!-- Subjects will be loaded here -->
+        </div>
+
+        <div id="emptyState" class="empty-state" style="display: none;">
+            <i class="fas fa-book-open"></i>
+            <h3>No subjects yet</h3>
+            <p>Enroll in a subject using a class code from your instructor</p>
+        </div>
+    </div>
+
+    <!-- Enrollment Modal -->
+    <div id="enrollModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3>Enroll in Subject</h3>
+                <button class="close">&times;</button>
+            </div>
+            <div class="modal-body">
+                <form id="enrollForm">
+                    <div class="form-group">
+                        <label for="class-code">Class Code</label>
+                        <input 
+                            type="text" 
+                            id="class-code" 
+                            placeholder="Enter 8-character code"
+                            maxlength="8"
+                            required
+                            autocomplete="off"
+                        >
+                        <small style="color: #666; margin-top: 0.5rem; display: block;">
+                            Ask your instructor for the class code
+                        </small>
+                    </div>
+                    <div class="form-actions">
+                        <button type="button" class="btn-secondary" id="cancelEnrollBtn">Cancel</button>
+                        <button type="submit" class="btn-primary">Enroll</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <script src="../JS/sidebar_utils.js"></script>
+    <script src="../JS/student_modules.js"></script>
+</body>
+</html>

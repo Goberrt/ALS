@@ -1,0 +1,481 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <meta name="theme-color" content="#2980b9">
+    <meta name="mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <title>ALS Instructor Portal - Messages</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <link rel="stylesheet" href="../CSS/instructor_dashboard.css">
+    <link rel="stylesheet" href="../CSS/instructor_messages.css">
+</head>
+<body>
+    <button class="menu-toggle" id="menuToggle">
+        <i class="fas fa-bars"></i>
+    </button>
+    <div class="sidebar-overlay" id="sidebarOverlay"></div>
+    <div class="sidebar">
+        <div class="sidebar-header">
+            <div class="logo-container">
+                <img src="../COMPONENTS/IMAGES/als logo.png" alt="ALS Logo" class="als-logo">
+            </div>
+            <h1>ALS Portal</h1>
+            <p id="instructorName">Welcome, Instructor</p>
+        </div>
+        <div class="nav-tabs">
+            <div class="nav-tab" data-page="dashboard">
+                <i class="fas fa-chart-line"></i>
+                <span>Dashboard</span>
+            </div>
+            <div class="nav-tab" data-page="learners">
+                <i class="fas fa-users"></i>
+                <span>Learners</span>
+            </div>
+            <div class="nav-tab" data-page="subjects">
+                <i class="fas fa-book"></i>
+                <span>Subjects</span>
+            </div>
+            <div class="nav-tab" data-page="mapping">
+                <i class="fas fa-map-marked-alt"></i>
+                <span>Mapping</span>
+            </div>
+            <div class="nav-tab active" data-page="messages">
+                <i class="fas fa-envelope"></i>
+                <span>Messages</span>
+            </div>
+            <!-- <div class="nav-tab" data-page="analytics">
+                <i class="fas fa-chart-bar"></i>
+                <span>Analytics</span>
+            </div>
+            <div class="nav-tab" data-page="reports">
+                <i class="fas fa-file-alt"></i>
+                <span>Reports</span>
+            </div> -->
+            <div class="nav-tab" data-page="logout">
+                <i class="fas fa-sign-out-alt"></i>
+                <span>Logout</span>
+            </div>
+        </div>
+    </div>
+
+    <div class="main-content">
+        <header>
+            <h1><i class="fas fa-envelope"></i> Messages</h1>
+            <p>Communicate with your learners and provide support</p>
+        </header>
+
+        <div class="messaging-container">
+            <!-- Left Sidebar: Threads List -->
+            <div class="message-threads-panel">
+                <div class="threads-header">
+                    <h3><i class="fas fa-comments"></i> Conversations</h3>
+                    <button class="new-message-btn" id="newMessageBtn" title="New Message">
+                        <i class="fas fa-plus"></i>
+                    </button>
+                </div>
+                <div id="messageThreadList" class="message-threads-list">
+                </div>
+            </div>
+
+            <!-- Right Panel: Conversation View -->
+            <div id="conversationArea" class="conversation-area">
+                <div class="empty-conversation">
+                    <i class="fas fa-comment-dots"></i>
+                    <h3>Select a conversation</h3>
+                    <p>Choose a conversation from the list to start messaging</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- New Message Modal -->
+    <div id="newMessageModal" class="modal">
+        <div class="modal-content" style="width: 500px; max-width: 90vw;">
+            <div class="modal-header">
+                <h3>New Message</h3>
+                <button class="modal-close" onclick="closeNewMessageModal()">&times;</button>
+            </div>
+            <div class="modal-body">
+                <div class="form-group">
+                    <label for="recipientSelect">Send message to:</label>
+                    <select id="recipientSelect" class="form-control" onchange="updateLearnerSubjectsDisplay()">
+                        <option value="">Select a learner...</option>
+                    </select>
+                </div>
+                <div id="learnerSubjectsDisplay" style="display: none; margin: 15px 0; padding: 12px; background: #f0f4f8; border-radius: 5px; border-left: 4px solid #3498db;">
+                    <strong style="color: #2c3e50;">Enrolled Subjects:</strong>
+                    <div id="subjectsList" style="margin-top: 8px; font-size: 14px;"></div>
+                </div>
+                <div class="form-group">
+                    <label for="newMessageText">Message:</label>
+                    <textarea id="newMessageText" class="form-control" rows="5" placeholder="Type your message..."></textarea>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button class="btn-secondary" onclick="closeNewMessageModal()">Cancel</button>
+                <button class="btn-primary" onclick="sendNewMessage()">Send Message</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            // Check authentication
+            const user = JSON.parse(localStorage.getItem('user'));
+            if (!user) {
+                window.location.href = '/';
+                return;
+            }
+            if (user.role !== 'instructor') {
+                window.location.href = '/';
+                return;
+            }
+
+            // Set instructor name
+            const name = user.first_name || 'Instructor';
+            document.getElementById('instructorName').textContent = `Welcome, ${name}`;
+
+            // Load and display message threads
+            loadMessageThreads();
+
+            // Setup navigation
+            setupNavigation();
+
+            // Setup new message modal
+            setupNewMessageModal();
+
+            // Auto-refresh threads every 5 seconds
+            setInterval(loadMessageThreads, 5000);
+        });
+
+        function loadMessageThreads() {
+            const user = JSON.parse(localStorage.getItem('user'));
+            fetch(`/api/messages/threads/${user.id}`)
+                .then(response => {
+                    if (!response.ok) throw new Error('Failed to load threads');
+                    return response.json();
+                })
+                .then(data => {
+                    const threads = data.threads || data;
+                    const listContainer = document.getElementById('messageThreadList');
+                    
+                    // Only show "no conversations" if container is empty AND there are no threads
+                    if ((!threads || threads.length === 0) && listContainer.children.length === 0) {
+                        listContainer.innerHTML = '<p style="padding: 20px; color: #999; text-align: center;">No conversations yet</p>';
+                        return;
+                    }
+
+                    // Get current thread IDs in DOM
+                    const currentThreadIds = new Set();
+                    listContainer.querySelectorAll('.message-thread-item').forEach(el => {
+                        const threadId = el.getAttribute('data-thread-id');
+                        if (threadId) currentThreadIds.add(threadId);
+                    });
+
+                    // Only add threads that aren't already displayed
+                    threads.forEach(thread => {
+                        if (currentThreadIds.has(thread.other_user_id)) {
+                            return; // Skip if already exists
+                        }
+
+                        const threadEl = document.createElement('div');
+                        threadEl.className = 'message-thread-item';
+                        threadEl.setAttribute('data-thread-id', thread.other_user_id);
+                        if (thread.unread_count > 0) {
+                            threadEl.classList.add('unread');
+                        }
+
+                        const otherName = thread.other_user_name || 'Unknown User';
+                        const timestamp = new Date(thread.last_message_at).toLocaleDateString();
+
+                        threadEl.innerHTML = `
+                            <div class="thread-avatar">
+                                <i class="fas fa-user-circle"></i>
+                            </div>
+                            <div class="thread-info">
+                                <div class="thread-name">${otherName}</div>
+                                <div class="thread-preview">${thread.last_message.substring(0, 50)}${thread.last_message.length > 50 ? '...' : ''}</div>
+                            </div>
+                            <div class="thread-meta">
+                                <div class="thread-time">${timestamp}</div>
+                                ${thread.unread_count > 0 ? `<div class="unread-badge">${thread.unread_count}</div>` : ''}
+                            </div>
+                        `;
+
+                        threadEl.addEventListener('click', () => {
+                            openConversation(thread.other_user_id, otherName);
+                        });
+
+                        listContainer.appendChild(threadEl);
+                    });
+                })
+                .catch(error => {
+                    console.error('Error loading threads:', error);
+                });
+        }
+
+        function openConversation(otherId, otherName) {
+            const user = JSON.parse(localStorage.getItem('user'));
+            
+            fetch(`/api/messages/conversation/${user.id}/${otherId}`)
+                .then(response => {
+                    if (!response.ok) throw new Error('Failed to load conversation');
+                    return response.json();
+                })
+                .then(messages => {
+                    const conversationArea = document.getElementById('conversationArea');
+                    conversationArea.innerHTML = `
+                        <div class="conversation-header">
+                            <h3>${otherName}</h3>
+                            <button class="close-conversation" onclick="closeConversation()">
+                                <i class="fas fa-arrow-left"></i> Back
+                            </button>
+                        </div>
+                        <div class="messages-container" id="messagesContainer">
+                        </div>
+                        <div class="message-input-area">
+                            <textarea id="messageInput" placeholder="Type your message..." class="message-input"></textarea>
+                            <button class="send-message-btn" onclick="sendMessage('${otherId}', '${otherName}')">
+                                <i class="fas fa-paper-plane"></i> Send
+                            </button>
+                        </div>
+                    `;
+
+                    const messagesContainer = document.getElementById('messagesContainer');
+                    if (messages.length === 0) {
+                        messagesContainer.innerHTML = '<p style="text-align: center; color: #999; padding: 20px;">No messages yet</p>';
+                    } else {
+                        messages.forEach(msg => {
+                            const isOwn = msg.sender_id === user.id;
+                            const msgEl = document.createElement('div');
+                            msgEl.className = `message-bubble ${isOwn ? 'own' : 'other'}`;
+                            msgEl.innerHTML = `
+                                <div class="message-content">${msg.message_text}</div>
+                                <div class="message-time">${new Date(msg.created_at).toLocaleTimeString()}</div>
+                            `;
+                            messagesContainer.appendChild(msgEl);
+                        });
+                        messagesContainer.scrollTop = messagesContainer.scrollHeight;
+                    }
+
+                    // Mark as read
+                    fetch(`/api/messages/mark-read/${user.id}/${otherId}`, { method: 'PUT' }).catch(e => console.error('Error marking as read:', e));
+                })
+                .catch(error => {
+                    console.error('Error loading conversation:', error);
+                    alert('Failed to load conversation');
+                });
+        }
+
+        function closeConversation() {
+            const conversationArea = document.getElementById('conversationArea');
+            conversationArea.innerHTML = `
+                <div class="empty-conversation">
+                    <i class="fas fa-comment-dots"></i>
+                    <h3>Select a conversation</h3>
+                    <p>Choose a conversation from the list to start messaging</p>
+                </div>
+            `;
+        }
+
+        function sendMessage(recipientId, recipientName) {
+            const user = JSON.parse(localStorage.getItem('user'));
+            const messageInput = document.getElementById('messageInput');
+            const messageText = messageInput.value.trim();
+
+            if (!messageText) {
+                alert('Please type a message');
+                return;
+            }
+
+            fetch('/api/messages/send', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    sender_id: user.id,
+                    receiver_id: recipientId,
+                    message_text: messageText,
+                    subject_id: null
+                })
+            })
+                .then(response => {
+                    if (!response.ok) throw new Error('Failed to send message');
+                    return response.json();
+                })
+                .then(data => {
+                    messageInput.value = '';
+                    openConversation(recipientId, recipientName);
+                })
+                .catch(error => {
+                    console.error('Error sending message:', error);
+                    alert('Failed to send message');
+                });
+        }
+
+        function setupNewMessageModal() {
+            const user = JSON.parse(localStorage.getItem('user'));
+            const newMessageBtn = document.getElementById('newMessageBtn');
+            const modal = document.getElementById('newMessageModal');
+
+            newMessageBtn.addEventListener('click', () => {
+                // Load learners for this instructor
+                fetch(`/api/instructor-learners/${user.id}`)
+                    .then(response => {
+                        if (!response.ok) throw new Error('Failed to load learners');
+                        return response.json();
+                    })
+                    .then(data => {
+                        const learners = data.learners;
+                        const select = document.getElementById('recipientSelect');
+                        select.innerHTML = '<option value="">Select a learner...</option>';
+                        
+                        learners.forEach(learner => {
+                            const option = document.createElement('option');
+                            option.value = learner.id;
+                            
+                            // Format subject list for display
+                            let subjectText = '';
+                            if (learner.subjects && learner.subjects.length > 0) {
+                                subjectText = ' (' + learner.subjects.map(s => s.title).join(', ') + ')';
+                            } else {
+                                subjectText = ' (No subjects enrolled)';
+                            }
+                            
+                            option.textContent = `${learner.name}${subjectText}`;
+                            
+                            // Store subjects data in a data attribute for reference
+                            option.dataset.subjects = JSON.stringify(learner.subjects || []);
+                            
+                            select.appendChild(option);
+                        });
+                    })
+                    .catch(error => {
+                        console.error('Error loading learners:', error);
+                        alert('Failed to load learners');
+                    });
+
+                modal.style.display = 'flex';
+            });
+        }
+
+        function closeNewMessageModal() {
+            document.getElementById('newMessageModal').style.display = 'none';
+            document.getElementById('recipientSelect').value = '';
+            document.getElementById('newMessageText').value = '';
+            document.getElementById('learnerSubjectsDisplay').style.display = 'none';
+            document.getElementById('subjectsList').innerHTML = '';
+        }
+
+        function updateLearnerSubjectsDisplay() {
+            const select = document.getElementById('recipientSelect');
+            const selectedOption = select.options[select.selectedIndex];
+            const subjectsDisplay = document.getElementById('learnerSubjectsDisplay');
+            const subjectsList = document.getElementById('subjectsList');
+            
+            if (!select.value) {
+                subjectsDisplay.style.display = 'none';
+                subjectsList.innerHTML = '';
+                return;
+            }
+            
+            const subjects = JSON.parse(selectedOption.dataset.subjects || '[]');
+            
+            if (subjects.length === 0) {
+                subjectsDisplay.style.display = 'block';
+                subjectsList.innerHTML = '<span style="color: #e74c3c; font-style: italic;">No subjects enrolled</span>';
+            } else {
+                subjectsDisplay.style.display = 'block';
+                subjectsList.innerHTML = subjects
+                    .map(s => `<div style="padding: 6px 0; color: #2c3e50;">• ${s.title}</div>`)
+                    .join('');
+            }
+        }
+
+        function sendNewMessage() {
+            const user = JSON.parse(localStorage.getItem('user'));
+            const recipientId = document.getElementById('recipientSelect').value;
+            const messageText = document.getElementById('newMessageText').value.trim();
+
+            if (!recipientId) {
+                alert('Please select a recipient');
+                return;
+            }
+
+            if (!messageText) {
+                alert('Please type a message');
+                return;
+            }
+
+            fetch('/api/messages/send', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    sender_id: user.id,
+                    receiver_id: recipientId,
+                    message_text: messageText,
+                    subject_id: null
+                })
+            })
+                .then(response => {
+                    if (!response.ok) throw new Error('Failed to send message');
+                    return response.json();
+                })
+                .then(data => {
+                    closeNewMessageModal();
+                    loadMessageThreads();
+                    alert('Message sent successfully!');
+                })
+                .catch(error => {
+                    console.error('Error sending message:', error);
+                    alert('Failed to send message');
+                });
+        }
+
+        function setupNavigation() {
+            const navTabs = document.querySelectorAll('.nav-tab');
+            const user = JSON.parse(localStorage.getItem('user'));
+
+            navTabs.forEach(tab => {
+                tab.addEventListener('click', () => {
+                    const page = tab.getAttribute('data-page');
+                    
+                    if (page === 'logout') {
+                        localStorage.removeItem('user');
+                        window.location.href = '/';
+                    } else {
+                        const pages = {
+                            'dashboard': '/instructor_dashboard',
+                            'learners': '/instructor_learners',
+                            'subjects': '/instructor_subjects',
+                            'mapping': '/instructor_mapping',
+                            'messages': '/instructor_messages',
+                            'analytics': '/instructor_analytics',
+                            'reports': '/instructor_reports'
+                        };
+                        if (pages[page]) {
+                            window.location.href = pages[page];
+                        }
+                    }
+                });
+            });
+
+            // Toggle sidebar on mobile
+            const menuToggle = document.getElementById('menuToggle');
+            const sidebar = document.querySelector('.sidebar');
+            const overlay = document.getElementById('sidebarOverlay');
+
+            menuToggle.addEventListener('click', () => {
+                sidebar.classList.toggle('active');
+                overlay.classList.toggle('active');
+            });
+
+            overlay.addEventListener('click', () => {
+                sidebar.classList.remove('active');
+                overlay.classList.remove('active');
+            });
+        }
+    </script>
+</body>
+</html>

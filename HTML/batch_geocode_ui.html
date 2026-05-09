@@ -1,0 +1,362 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Batch Geocode Learners</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <link rel="stylesheet" href="../CSS/batch_geocode_ui.css">
+
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
+        
+        .container {
+            background: white;
+            padding: 40px;
+            border-radius: 12px;
+            box-shadow: 0 8px 32px rgba(0,0,0,0.1);
+            max-width: 600px;
+            width: 100%;
+        }
+        
+        h1 {
+            color: #333;
+            margin-bottom: 10px;
+        }
+        
+        .subtitle {
+            color: #666;
+            margin-bottom: 30px;
+        }
+        
+        .info-card {
+            background: #f8f9fa;
+            padding: 20px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+        }
+        
+        .info-card h3 {
+            color: #667eea;
+            margin-bottom: 15px;
+        }
+        
+        .info-item {
+            display: flex;
+            justify-content: space-between;
+            padding: 10px 0;
+            border-bottom: 1px solid #e0e0e0;
+        }
+        
+        .info-item:last-child {
+            border-bottom: none;
+        }
+        
+        .btn {
+            width: 100%;
+            padding: 15px;
+            border: none;
+            border-radius: 8px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+        }
+        
+        .btn-primary {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+        }
+        
+        .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 24px rgba(0,0,0,0.15);
+        }
+        
+        .btn:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+            transform: none;
+        }
+        
+        .progress-section {
+            display: none;
+            margin-top: 20px;
+        }
+        
+        .progress-section.active {
+            display: block;
+        }
+        
+        .progress-bar {
+            width: 100%;
+            height: 30px;
+            background: #e0e0e0;
+            border-radius: 15px;
+            overflow: hidden;
+            margin: 10px 0;
+        }
+        
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, #667eea, #764ba2);
+            transition: width 0.5s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: bold;
+        }
+        
+        .log {
+            background: #f8f9fa;
+            padding: 15px;
+            border-radius: 8px;
+            max-height: 200px;
+            overflow-y: auto;
+            font-family: monospace;
+            font-size: 12px;
+            margin-top: 10px;
+        }
+        
+        .log-entry {
+            padding: 5px 0;
+            border-bottom: 1px solid #e0e0e0;
+        }
+        
+        .log-entry.success {
+            color: #28a745;
+        }
+        
+        .log-entry.error {
+            color: #dc3545;
+        }
+        
+        .log-entry.info {
+            color: #17a2b8;
+        }
+        
+        .stats {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 15px;
+            margin-top: 20px;
+        }
+        
+        .stat-card {
+            background: white;
+            padding: 20px;
+            border-radius: 8px;
+            text-align: center;
+            border: 2px solid #e0e0e0;
+        }
+        
+        .stat-value {
+            font-size: 32px;
+            font-weight: bold;
+            color: #667eea;
+        }
+        
+        .stat-label {
+            color: #666;
+            margin-top: 5px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1><i class="fas fa-map-marked-alt"></i> Batch Geocode Learners</h1>
+        <p class="subtitle">Automatically add precise coordinates to learner addresses</p>
+        
+        <div class="info-card">
+            <h3>How it works</h3>
+            <p style="color: #666; line-height: 1.6;">
+                This tool will automatically find the exact coordinates (latitude and longitude) 
+                for each learner based on their address. This enables:
+            </p>
+            <ul style="color: #666; margin-top: 10px; line-height: 1.8;">
+                <li>Precise pins on the map instead of approximate barangay centers</li>
+                <li>Sitio-level visualization</li>
+                <li>Better enrollment planning and outreach</li>
+            </ul>
+            <p style="color: #e65100; margin-top: 15px; font-size: 14px;">
+                <i class="fas fa-exclamation-triangle"></i> 
+                <strong>Note:</strong> This process takes about 1 second per learner 
+                to respect the geocoding service rate limits.
+            </p>
+        </div>
+        
+        <div class="info-card" id="statsCard">
+            <div class="info-item">
+                <span>Total Learners:</span>
+                <strong id="totalCount">-</strong>
+            </div>
+            <div class="info-item">
+                <span>Already Geocoded:</span>
+                <strong id="geocodedCount">-</strong>
+            </div>
+            <div class="info-item">
+                <span>Need Geocoding:</span>
+                <strong id="needGeocodingCount" style="color: #667eea;">-</strong>
+            </div>
+            <div class="info-item">
+                <span>Estimated Time:</span>
+                <strong id="estimatedTime">-</strong>
+            </div>
+        </div>
+        
+        <button id="startBtn" class="btn btn-primary">
+            <i class="fas fa-play"></i> Start Batch Geocoding
+        </button>
+        
+        <div id="progressSection" class="progress-section">
+            <h3>Progress</h3>
+            <div class="progress-bar">
+                <div id="progressFill" class="progress-fill">0%</div>
+            </div>
+            
+            <div class="stats">
+                <div class="stat-card">
+                    <div class="stat-value" id="successCount">0</div>
+                    <div class="stat-label">Successful</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-value" id="failedCount">0</div>
+                    <div class="stat-label">Failed</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-value" id="remainingCount">0</div>
+                    <div class="stat-label">Remaining</div>
+                </div>
+            </div>
+            
+            <div class="log" id="log"></div>
+        </div>
+    </div>
+    
+    <script>
+        let totalLearners = 0;
+        let geocodedLearners = 0;
+        let needGeocoding = 0;
+        
+        async function fetchStats() {
+            try {
+                const response = await fetch('/api/af1-learners');
+                const learners = await response.json();
+                
+                totalLearners = learners.length;
+                geocodedLearners = learners.filter(l => l.geocoded === true).length;
+                needGeocoding = learners.filter(l => !l.lat || l.geocoded !== true).length;
+                
+                document.getElementById('totalCount').textContent = totalLearners;
+                document.getElementById('geocodedCount').textContent = geocodedLearners;
+                document.getElementById('needGeocodingCount').textContent = needGeocoding;
+                
+                const estimatedMinutes = Math.ceil(needGeocoding / 60);
+                document.getElementById('estimatedTime').textContent = 
+                    estimatedMinutes > 1 ? `~${estimatedMinutes} minutes` : '~1 minute';
+                
+                if (needGeocoding === 0) {
+                    document.getElementById('startBtn').textContent = 'All learners are geocoded!';
+                    document.getElementById('startBtn').disabled = true;
+                }
+            } catch (error) {
+                console.error('Error fetching stats:', error);
+                addLog('Failed to fetch learner statistics', 'error');
+            }
+        }
+        
+        function addLog(message, type = 'info') {
+            const log = document.getElementById('log');
+            const entry = document.createElement('div');
+            entry.className = `log-entry ${type}`;
+            entry.textContent = `[${new Date().toLocaleTimeString()}] ${message}`;
+            log.appendChild(entry);
+            log.scrollTop = log.scrollHeight;
+        }
+        
+        async function startGeocoding() {
+            const btn = document.getElementById('startBtn');
+            btn.disabled = true;
+            btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Geocoding in progress...';
+            
+            const progressSection = document.getElementById('progressSection');
+            progressSection.classList.add('active');
+            
+            let successCount = 0;
+            let failedCount = 0;
+            let remaining = needGeocoding;
+            
+            addLog(`Starting batch geocoding for ${needGeocoding} learners...`, 'info');
+            
+            // Process in batches of 50
+            const batchSize = 50;
+            let processed = 0;
+            
+            while (remaining > 0) {
+                try {
+                    const response = await fetch('/api/af1-learners/batch-geocode', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json'
+                        },
+                        body: JSON.stringify({ limit: batchSize })
+                    });
+                    
+                    const result = await response.json();
+                    
+                    if (result.success) {
+                        successCount += result.updated;
+                        failedCount += (result.processed - result.updated);
+                        processed += result.processed;
+                        remaining = Math.max(0, needGeocoding - processed);
+                        
+                        const progress = Math.round((processed / needGeocoding) * 100);
+                        
+                        document.getElementById('progressFill').style.width = `${progress}%`;
+                        document.getElementById('progressFill').textContent = `${progress}%`;
+                        document.getElementById('successCount').textContent = successCount;
+                        document.getElementById('failedCount').textContent = failedCount;
+                        document.getElementById('remainingCount').textContent = remaining;
+                        
+                        addLog(`Batch completed: ${result.updated}/${result.processed} geocoded`, 'success');
+                        
+                        if (remaining === 0 || result.processed === 0) {
+                            addLog('Geocoding completed!', 'success');
+                            btn.innerHTML = '<i class="fas fa-check"></i> Geocoding Complete!';
+                            btn.style.background = 'linear-gradient(135deg, #28a745 0%, #20c997 100%)';
+                            break;
+                        }
+                    } else {
+                        addLog('Batch failed', 'error');
+                    }
+                    
+                } catch (error) {
+                    addLog(`Error: ${error.message}`, 'error');
+                    break;
+                }
+            }
+            
+            // Refresh stats
+            await fetchStats();
+        }
+        
+        document.getElementById('startBtn').addEventListener('click', startGeocoding);
+        
+        // Load stats on page load
+        fetchStats();
+    </script>
+</body>
+</html>

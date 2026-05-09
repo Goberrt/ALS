@@ -1,0 +1,602 @@
+/* ======================== OVERALL CARD ======================== */
+
+.overall-card {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: white;
+    border-radius: 16px;
+    padding: 2.5rem;
+    margin-bottom: 3rem;
+    box-shadow: 0 10px 40px rgba(102, 126, 234, 0.2);
+    position: relative;
+    overflow: hidden;
+}
+
+.overall-card::before {
+    content: '';
+    position: absolute;
+    top: -50%;
+    right: -10%;
+    width: 400px;
+    height: 400px;
+    background: radial-gradient(circle, rgba(255,255,255,0.1) 0%, transparent 70%);
+    border-radius: 50%;
+    pointer-events: none;
+}
+
+.overall-header {
+    margin-bottom: 2rem;
+    position: relative;
+    z-index: 1;
+}
+
+.overall-header h2 {
+    font-size: 1.25rem;
+    margin: 0;
+    font-weight: 600;
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+}
+
+.overall-header i {
+    opacity: 0.9;
+}
+
+.overall-stats {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 2rem;
+    margin-bottom: 2.5rem;
+    position: relative;
+    z-index: 1;
+}
+
+.overall-stat {
+    text-align: center;
+}
+
+.overall-value {
+    display: block;
+    font-size: 2.5rem;
+    font-weight: 700;
+    margin-bottom: 0.5rem;
+}
+
+.overall-label {
+    display: block;
+    font-size: 0.9rem;
+    opacity: 0.95;
+    font-weight: 500;
+}
+
+.progress-container {
+    margin-top: 1rem;
+    position: relative;
+    z-index: 1;
+}
+
+.progress-bar {
+    width: 100%;
+    height: 10px;
+    background: rgba(255, 255, 255, 0.25);
+    border-radius: 10px;
+    overflow: hidden;
+}
+
+.progress-fill {
+    height: 100%;
+    background: linear-gradient(90deg, rgba(255,255,255,0.8), white);
+    border-radius: 10px;
+    transition: width 0.8s cubic-bezier(0.4, 0, 0.2, 1);
+    box-shadow: 0 0 10px rgba(255,255,255,0.4);
+}
+
+/* ======================== SECTIONS ======================== */
+
+.grades-container {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 0;
+}
+
+.section {
+    margin-bottom: 3rem;
+}
+
+.section-title {
+    font-size: 1.35rem;
+    font-weight: 700;
+    color: #333;
+    margin-bottom: 2rem;
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+}
+
+.section-title i {
+    color: #667eea;
+    font-size: 1.25rem;
+}
+
+/* ======================== SUBJECT CARDS ======================== */
+
+.subject-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+    gap: 1.5rem;
+}
+
+.subject-grade-card {
+    background: white;
+    border-radius: 16px;
+    padding: 1.75rem;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.08);
+    border: 1px solid #f0f0f0;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    cursor: pointer;
+    position: relative;
+    overflow: hidden;
+}
+
+.subject-grade-card::before {
+    content: '';
+    position: absolute;
+    left: 0;
+    top: 0;
+    bottom: 0;
+    width: 4px;
+    background: linear-gradient(180deg, #667eea, #764ba2);
+    transition: width 0.3s ease;
+}
+
+.subject-grade-card:nth-child(2n)::before {
+    background: linear-gradient(180deg, #f093fb, #f5576c);
+}
+
+.subject-grade-card:nth-child(3n)::before {
+    background: linear-gradient(180deg, #4facfe, #00f2fe);
+}
+
+.subject-grade-card:nth-child(4n)::before {
+    background: linear-gradient(180deg, #43e97b, #38f9d7);
+}
+
+.subject-grade-card:hover {
+    transform: translateY(-6px);
+    box-shadow: 0 12px 30px rgba(0, 0, 0, 0.12);
+}
+
+.subject-grade-card:hover::before {
+    width: 6px;
+}
+
+.subject-name {
+    font-size: 1.1rem;
+    font-weight: 700;
+    color: #333;
+    margin-bottom: 0.35rem;
+}
+
+.subject-code {
+    font-size: 0.8rem;
+    color: #999;
+    margin-bottom: 1.25rem;
+}
+
+.subject-grade-display {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 1.25rem;
+    background: linear-gradient(135deg, #f5f7ff, #f9f9ff);
+    border-radius: 12px;
+    margin-bottom: 1.25rem;
+}
+
+.subject-percentage {
+    font-size: 2rem;
+    font-weight: 700;
+    color: #667eea;
+}
+
+.subject-status {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.6rem 1.2rem;
+    border-radius: 20px;
+    font-size: 0.85rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+.subject-status.pass {
+    background: linear-gradient(135deg, #e8f5e9, #c8e6c9);
+    color: #1b5e20;
+}
+
+.subject-status.fail {
+    background: linear-gradient(135deg, #ffebee, #ffcdd2);
+    color: #b71c1c;
+}
+
+.subject-meta {
+    display: flex;
+    gap: 1rem;
+    font-size: 0.85rem;
+    color: #666;
+}
+
+.subject-meta-item {
+    display: flex;
+    align-items: center;
+    gap: 0.4rem;
+}
+
+.subject-meta-item i {
+    color: #999;
+    width: 14px;
+}
+
+/* ======================== RECENT GRADES ======================== */
+
+.recent-grades-list {
+    background: white;
+    border-radius: 16px;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.08);
+    border: 1px solid #f0f0f0;
+    overflow: hidden;
+}
+
+.grade-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 1.5rem 2rem;
+    border-bottom: 1px solid #f5f5f5;
+    transition: background 0.2s;
+}
+
+.grade-item:hover {
+    background: #fafafa;
+}
+
+.grade-item:last-child {
+    border-bottom: none;
+}
+
+.grade-item-left {
+    flex: 1;
+    min-width: 0;
+}
+
+.grade-item-assignment {
+    font-weight: 600;
+    color: #333;
+    font-size: 1rem;
+    margin-bottom: 0.5rem;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.grade-item-meta {
+    display: flex;
+    align-items: center;
+    gap: 1.5rem;
+    font-size: 0.85rem;
+    color: #999;
+}
+
+.grade-item-date {
+    display: flex;
+    align-items: center;
+    gap: 0.4rem;
+}
+
+.grade-item-right {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-end;
+    gap: 0.4rem;
+    padding-left: 2rem;
+}
+
+.grade-item-score {
+    font-size: 1.35rem;
+    font-weight: 700;
+    background: linear-gradient(135deg, #667eea, #764ba2);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+}
+
+.grade-item-percentage {
+    font-size: 0.85rem;
+    color: #999;
+}
+
+/* ======================== EMPTY & LOADING STATES ======================== */
+
+.empty-state {
+    text-align: center;
+    padding: 4rem 2rem;
+    color: #999;
+}
+
+.empty-state i {
+    font-size: 3.5rem;
+    color: #ddd;
+    margin-bottom: 1rem;
+    display: block;
+}
+
+.empty-state p {
+    margin: 0;
+    font-size: 1rem;
+}
+
+.loading {
+    text-align: center;
+    padding: 2rem;
+    color: #999;
+    font-size: 0.95rem;
+}
+
+.loading i {
+    margin-right: 0.5rem;
+    color: #667eea;
+}
+
+/* ======================== RESPONSIVE ======================== */
+
+@media (max-width: 768px) {
+    .overall-card {
+        padding: 1.75rem;
+    }
+
+    .overall-stats {
+        grid-template-columns: repeat(2, 1fr);
+        gap: 1.5rem;
+    }
+
+    .overall-value {
+        font-size: 2rem;
+    }
+
+    .section-title {
+        font-size: 1.15rem;
+        margin-bottom: 1.5rem;
+    }
+
+    .subject-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .grade-item {
+        flex-direction: column;
+        align-items: flex-start;
+        padding: 1.25rem 1.5rem;
+    }
+
+    .grade-item-right {
+        align-items: flex-start;
+        padding-left: 0;
+        padding-top: 1rem;
+        border-top: 1px solid #f5f5f5;
+        margin-top: 1rem;
+        width: 100%;
+    }
+}
+
+/* ======================== ANIMATIONS ======================== */
+
+@keyframes spin {
+    to {
+        transform: rotate(360deg);
+    }
+}
+}
+
+@keyframes spin {
+    from { transform: rotate(0deg); }
+    to { transform: rotate(360deg); }
+}
+
+/* Mobile Responsive Styles */
+@media (max-width: 1024px) {
+    .subject-grid {
+        grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+        gap: 1rem;
+    }
+}
+
+@media (max-width: 768px) {
+    .grades-container {
+        padding: 0;
+    }
+
+    .overall-card {
+        border-radius: 0;
+        padding: 1.5rem;
+        margin-bottom: 1.5rem;
+    }
+
+    .overall-header {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 1rem;
+        margin-bottom: 1rem;
+    }
+
+    .overall-header h2 {
+        font-size: 1.25rem;
+    }
+
+    .overall-grade {
+        font-size: 2.5rem;
+    }
+
+    .stats-row {
+        grid-template-columns: repeat(2, 1fr);
+        gap: 0.75rem;
+        margin-bottom: 1rem;
+    }
+
+    .stat-box {
+        padding: 0.75rem;
+    }
+
+    .stat-value {
+        font-size: 1.5rem;
+    }
+
+    .stat-label {
+        font-size: 0.75rem;
+    }
+
+    .section-title {
+        font-size: 1.25rem;
+        margin-bottom: 1rem;
+    }
+
+    .subject-grid {
+        grid-template-columns: 1fr;
+        gap: 1rem;
+        margin-bottom: 1rem;
+    }
+
+    .subject-grade-card {
+        padding: 1.25rem;
+        border-radius: 8px;
+    }
+
+    .subject-name {
+        font-size: 1rem;
+    }
+
+    .grade-display {
+        padding: 0.75rem;
+    }
+
+    .grade-percentage {
+        font-size: 1.5rem;
+    }
+
+    .grade-letter {
+        font-size: 1.25rem;
+        padding: 0.25rem 0.5rem;
+    }
+
+    .recent-grades {
+        padding: 1rem;
+        border-radius: 0;
+        margin-bottom: 1rem;
+    }
+
+    .grade-item {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 0.75rem;
+        padding: 0.75rem;
+    }
+
+    .grade-item-score {
+        text-align: left;
+        width: 100%;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+    }
+
+    .grade-score-large {
+        font-size: 1.25rem;
+    }
+
+    .empty-state {
+        padding: 2rem 1rem;
+    }
+
+    .empty-state i {
+        font-size: 3rem;
+    }
+
+    .loading {
+        padding: 2rem 1rem;
+    }
+}
+
+@media (max-width: 480px) {
+    .overall-card {
+        padding: 1rem;
+    }
+
+    .overall-header h2 {
+        font-size: 1.125rem;
+    }
+
+    .overall-grade {
+        font-size: 2rem;
+    }
+
+    .stats-row {
+        grid-template-columns: 1fr;
+        gap: 0.5rem;
+    }
+
+    .stat-box {
+        padding: 0.75rem;
+    }
+
+    .stat-value {
+        font-size: 1.25rem;
+    }
+
+    .stat-label {
+        font-size: 0.75rem;
+    }
+
+    .section-title {
+        font-size: 1.125rem;
+    }
+
+    .subject-grade-card {
+        padding: 1rem;
+    }
+
+    .grade-display {
+        flex-direction: column;
+        gap: 0.5rem;
+        align-items: flex-start;
+    }
+
+    .grade-letter {
+        font-size: 1rem;
+    }
+
+    .assignment-count {
+        flex-direction: column;
+        gap: 0.25rem;
+        align-items: flex-start;
+    }
+
+    .recent-grades {
+        padding: 0.75rem;
+    }
+
+    .grade-item {
+        padding: 0.75rem;
+    }
+
+    .grade-item-title {
+        font-size: 0.9rem;
+    }
+
+    .grade-item-meta {
+        font-size: 0.75rem;
+        display: flex;
+        flex-direction: column;
+        gap: 0.25rem;
+    }
+}

@@ -1,0 +1,197 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ALS Student Portal - Messages</title>
+    <link rel="stylesheet" href="../CSS/student_styles.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <link rel="stylesheet" href="../CSS/student_messages.css">
+</head>
+<body>
+    <div id="sidebarContainer"></div>
+    
+    <div class="main-content">
+        <header>
+            <h1><i class="fas fa-envelope"></i> Messages</h1>
+            <p>Communicate with your instructors and get support</p>
+        </header>
+
+        <div class="messaging-container">
+            <!-- Left Sidebar: Threads List -->
+            <div class="message-threads-panel">
+                <div class="threads-header">
+                    <h3><i class="fas fa-comments"></i> Conversations</h3>
+                    <button class="new-message-btn" id="newMessageBtn" title="New Message">
+                        <i class="fas fa-plus"></i>
+                    </button>
+                </div>
+                <div id="messageThreadList" class="message-threads-list">
+                    <p style="padding: 20px; color: #999; text-align: center;">Loading conversations...</p>
+                </div>
+            </div>
+
+            <!-- Right Panel: Conversation View -->
+            <div id="conversationArea" class="conversation-area">
+                <div class="empty-conversation">
+                    <i class="fas fa-comment-dots"></i>
+                    <h3>Select a conversation</h3>
+                    <p>Choose a conversation from the list to start messaging</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- New Message Modal -->
+    <div id="newMessageModal" class="modal">
+        <div class="modal-content" style="width: 500px; max-width: 90vw;">
+            <div class="modal-header">
+                <h3>New Message</h3>
+                <button class="modal-close" onclick="closeNewMessageModal()">&times;</button>
+            </div>
+            <div class="modal-body">
+                <div class="form-group">
+                    <label for="recipientSelect">Send message to:</label>
+                    <select id="recipientSelect" class="form-control">
+                        <option value="">Select an instructor...</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label for="newMessageText">Message:</label>
+                    <textarea id="newMessageText" class="form-control" rows="5" placeholder="Type your message..."></textarea>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button class="btn-secondary" onclick="closeNewMessageModal()">Cancel</button>
+                <button class="btn-primary" onclick="sendNewMessage()">Send Message</button>
+            </div>
+        </div>
+    </div>
+
+    <script src="../JS/sidebar_utils.js"></script>
+    <script src="../JS/messaging.js"></script>
+    <script>
+// Common script for all student pages
+document.addEventListener('DOMContentLoaded', () => {
+    // Check authentication
+    const user = JSON.parse(localStorage.getItem('user'));
+    if (!user) {
+        window.location.href = '/';
+        return;
+    }
+    if (user.role !== 'student') {
+        window.location.href = '/';
+        return;
+    }
+
+    // Load sidebar
+    fetch('../COMPONENTS/student_sidebar.html')
+        .then(response => {
+            if (!response.ok) throw new Error('Failed to load sidebar');
+            return response.text();
+        })
+        .then(html => {
+            document.getElementById('sidebarContainer').innerHTML = html;
+            initializeSidebar();
+            loadSidebarProfile();
+        })
+        .catch(error => {
+            console.error('Error:', error);
+        });
+
+    // Setup messaging UI
+    setupMessagingUI();
+    loadInstructorsList();
+});
+
+function initializeSidebar() {
+    const currentPage = 'messages';
+    const currentTab = document.querySelector(`[data-page="${currentPage}"]`);
+    if (currentTab) {
+        currentTab.classList.add('active');
+    }
+
+    document.querySelectorAll('.nav-tab').forEach(tab => {
+        tab.addEventListener('click', () => {
+            const page = tab.dataset.page;
+            if (page === 'logout') {
+                handleLogout();
+                return;
+            }
+            window.location.href = `/student_${page}`;
+        });
+    });
+}
+
+function handleLogout() {
+    localStorage.removeItem('user');
+    window.location.href = '/';
+}
+
+function setupMessagingUI() {
+    document.getElementById('newMessageBtn').onclick = openNewMessageModal;
+}
+
+function openNewMessageModal() {
+    document.getElementById('newMessageModal').style.display = 'block';
+}
+
+function closeNewMessageModal() {
+    document.getElementById('newMessageModal').style.display = 'none';
+    document.getElementById('newMessageText').value = '';
+    document.getElementById('recipientSelect').value = '';
+}
+
+async function loadInstructorsList() {
+    try {
+        // For new messages on the messages page, users typically reply to existing conversations
+        // The select should only show instructors they've already messaged
+        const select = document.getElementById('recipientSelect');
+        
+        // Get current message threads to find recent instructors
+        const threads = window.messagingSystem.threads || [];
+        if (threads.length === 0) {
+            // If no threads, disable the send feature until they have at least one conversation
+            select.innerHTML = '<option value="">No previous conversations. Message instructor from their subject page first.</option>';
+            return;
+        }
+        
+        // Populate with recent instructors from threads
+        threads.forEach(thread => {
+            const option = document.createElement('option');
+            option.value = thread.other_user_id;
+            const instructorName = thread.other_user_name || thread.receiver || thread.sender || `Instructor ${thread.other_user_id.substring(0, 8)}...`;
+            option.textContent = instructorName;
+            select.appendChild(option);
+        });
+    } catch (error) {
+        console.error('Error loading instructors:', error);
+    }
+}
+
+async function sendNewMessage() {
+    const recipientId = document.getElementById('recipientSelect').value;
+    const messageText = document.getElementById('newMessageText').value;
+
+    if (!recipientId) {
+        alert('Please select an instructor');
+        return;
+    }
+
+    const success = await window.messagingSystem.sendMessage(recipientId, messageText);
+    if (success) {
+        closeNewMessageModal();
+        await window.messagingSystem.loadMessageThreads();
+    }
+}
+
+// Close modal when clicking outside
+window.onclick = function(event) {
+    const modal = document.getElementById('newMessageModal');
+    if (event.target == modal) {
+        modal.style.display = 'none';
+    }
+}
+    </script>
+</body>
+</html>

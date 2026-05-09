@@ -1,0 +1,71 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>ALS Learners Tracking Portal - Santa Cruz, Laguna</title>
+    <link rel="stylesheet" href="/CSS/als_portal_css.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.7.1/leaflet.css" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" />
+</head>
+<body>
+    <nav class="navbar">
+        <div class="nav-container">
+            <div class="nav-logo">
+                <img src="https://via.placeholder.com/40x40?text=LSPU" alt="LSPU Logo" class="logo" />
+                <span class="nav-title">ALS Tracking Portal</span>
+            </div>
+            <div class="nav-menu">
+                <a href="/ins_dashboard" class="nav-link "><i class="fas fa-home"></i> Dashboard</a>
+                <a href="/ins_mapping" class="nav-link active"><i class="fas fa-map"></i> Geo Mapping</a>
+                <a href="/ins_learners" class="nav-link "><i class="fas fa-users"></i> Learners</a>
+                <a href="/ins_analytics" class="nav-link "><i class="fas fa-chart-bar"></i> Analytics</a>
+                <a href="/ins_reports" class="nav-link "><i class="fas fa-file-alt"></i> Reports</a>
+            </div>
+            <div class="nav-user">
+                <span class="user-name">Admin User</span>
+                <i class="fas fa-user-circle"></i>
+            </div>
+        </div>
+    </nav>
+    <main class="main-container">
+
+<div class="page-header">
+    <h1>Geo Mapping - Santa Cruz, Laguna</h1>
+    <p>Interactive mapping of ALS learners and graduates</p>
+</div>
+<div class="mapping-controls">
+    <div class="filter-controls">
+        <label for="learner-type">Filter by Type:</label>
+        <select id="learner-type">
+            <option value="all">All Learners</option>
+            <option value="graduates">ALS Graduates</option>
+            <option value="current">Current Learners</option>
+            <option value="at-risk">At-Risk Learners</option>
+            <option value="not-enrolled">Not Enrolled</option>
+        </select>
+        <label for="barangay-filter">Barangay:</label>
+        <select id="barangay-filter">
+            <option value="all">All Barangays</option>
+
+        </select>
+        <button id="refresh-map" class="btn-primary"><i class="fas fa-sync-alt"></i> Refresh Map</button>
+    </div>
+</div>
+<div class="map-container">
+    <div id="main-map" class="main-map"></div>
+    <div class="map-legend">
+        <h4>Legend</h4>
+        <div class="legend-item"><span class="legend-marker graduate"></span><span>ALS Graduate</span></div>
+        <div class="legend-item"><span class="legend-marker current"></span><span>Current Learner</span></div>
+        <div class="legend-item"><span class="legend-marker at-risk"></span><span>At-Risk Learner</span></div>
+        <div class="legend-item"><span class="legend-marker not-enrolled"></span><span>Not Enrolled</span></div>
+    </div>
+</div>
+
+    </main>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.7.1/leaflet.js"></script>
+        <script type="module" src="/JS/als_portal_js.js"></script>
+</body>
+</html>

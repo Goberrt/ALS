@@ -1,0 +1,135 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ALS Student Portal - Dashboard</title>
+    <link rel="stylesheet" href="../CSS/student_styles.css">
+    <link rel="stylesheet" href="../CSS/student_dashboard.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+</head>
+<body>
+    <!-- Burger Menu Button -->
+    <button class="burger-menu" id="burgerMenu">
+        <i class="fas fa-bars"></i>
+    </button>
+
+    <!-- Sidebar Overlay -->
+    <div class="sidebar-overlay" id="sidebarOverlay"></div>
+    
+    <!-- Sidebar -->
+    <div id="sidebarContainer"></div>
+    
+    <div class="main-content">
+        <div class="dashboard-container">
+            <!-- Welcome Section -->
+            <div class="welcome-section">
+                <h1>Welcome back, <span id="studentName">Student</span>! 👋</h1>
+                <p class="date" id="currentDate"></p>
+            </div>
+
+            <!-- Stats Grid -->
+            <div class="stats-grid">
+                <div class="stat-card">
+                    <h3>Completion Rate</h3>
+                    <div class="stat-card-value" id="completionRate">0%</div>
+                </div>
+
+                <div class="stat-card">
+                    <h3>Average Grade</h3>
+                    <div class="stat-card-value" id="averageGrade">0/100</div>
+                </div>
+
+                <div class="stat-card">
+                    <h3>Assignments Done</h3>
+                    <div class="stat-card-value" id="assignmentsDone">0/0</div>
+                </div>
+
+                <div class="stat-card">
+                    <h3>Active Subjects</h3>
+                    <div class="stat-card-value" id="activeSubjects">0</div>
+                </div>
+            </div>
+
+            <!-- Content Grid -->
+            <div class="content-grid">
+                <!-- Left Column -->
+                <div>
+                    <!-- Upcoming Deadlines -->
+                    <div class="section-card">
+                        <div class="section-header">
+                            <h2><i class="fas fa-clock"></i> Upcoming Deadlines</h2>
+                            <a href="/student_modules" class="view-all-link">View All →</a>
+                        </div>
+                        <div id="deadlinesContainer">
+                            <div class="empty-state">
+                                <i class="fas fa-calendar-check"></i>
+                                <p>No upcoming deadlines</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Recent Activity -->
+                    <div class="section-card" style="margin-top: 2rem;">
+                        <div class="section-header">
+                            <h2><i class="fas fa-history"></i> Recent Activity</h2>
+                        </div>
+                        <div id="activityContainer">
+                            <div class="empty-state">
+                                <i class="fas fa-inbox"></i>
+                                <p>No recent activity</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Right Column -->
+                <div>
+                    <!-- Quick Actions -->
+                    <div class="section-card">
+                        <div class="section-header">
+                            <h2><i class="fas fa-bolt"></i> Quick Actions</h2>
+                        </div>
+                        <div class="quick-actions">
+                            <a href="/student_modules" class="action-btn">
+                                <i class="fas fa-plus-circle"></i>
+                                <span>Enroll in Subject</span>
+                            </a>
+                            <a href="/student_modules" class="action-btn">
+                                <i class="fas fa-tasks"></i>
+                                <span>View Assignments</span>
+                            </a>
+                            <a href="/student_grades" class="action-btn">
+                                <i class="fas fa-chart-line"></i>
+                                <span>Check My Grades</span>
+                            </a>
+                            <a href="/student_announcements" class="action-btn">
+                                <i class="fas fa-bullhorn"></i>
+                                <span>Announcements</span>
+                            </a>
+                        </div>
+                    </div>
+
+                    <!-- My Active Subjects -->
+                    <div class="section-card" style="margin-top: 2rem;">
+                        <div class="section-header">
+                            <h2><i class="fas fa-book"></i> My Subjects</h2>
+                            <a href="/student_modules" class="view-all-link">View All →</a>
+                        </div>
+                        <div id="subjectsContainer">
+                            <div class="empty-state">
+                                <i class="fas fa-book-open"></i>
+                                <p>No subjects yet</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <script src="../JS/sidebar_utils.js"></script>
+    <script src="../JS/student_dashboard.js"></script>
+</body>
+</html>

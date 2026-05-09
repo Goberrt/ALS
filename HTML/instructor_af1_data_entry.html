@@ -1,0 +1,956 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AF1 Data Entry - ALS Portal</title>
+    <link rel="stylesheet" href="../CSS/instructor_styles.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <style>
+        .form-container {
+            background: white;
+            border-radius: 12px;
+            padding: 2rem;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        .form-header {
+            text-align: center;
+            margin-bottom: 2rem;
+            padding-bottom: 1rem;
+            border-bottom: 3px solid #667eea;
+        }
+
+        .form-header h2 {
+            color: #333;
+            margin-bottom: 0.5rem;
+        }
+
+        .form-header p {
+            color: #666;
+            font-size: 0.9rem;
+        }
+
+        .form-section {
+            margin-bottom: 2rem;
+            padding: 1.5rem;
+            background: #f9f9f9;
+            border-radius: 8px;
+            border-left: 4px solid #667eea;
+        }
+
+        .form-section h3 {
+            color: #667eea;
+            margin-bottom: 1rem;
+            font-size: 1.1rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .form-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 1rem;
+        }
+
+        .form-grid-2 {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 1rem;
+        }
+
+        .form-grid-3 {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 1rem;
+        }
+
+        .form-group {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .form-group label {
+            font-weight: 500;
+            color: #333;
+            margin-bottom: 0.5rem;
+            font-size: 0.9rem;
+        }
+
+        .form-group label.required::after {
+            content: " *";
+            color: #f44336;
+        }
+
+        .form-group input,
+        .form-group select,
+        .form-group textarea {
+            padding: 0.75rem;
+            border: 1px solid #ddd;
+            border-radius: 6px;
+            font-size: 0.95rem;
+            transition: all 0.2s;
+        }
+
+        .form-group input:focus,
+        .form-group select:focus,
+        .form-group textarea:focus {
+            outline: none;
+            border-color: #667eea;
+            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+        }
+
+        .form-group textarea {
+            min-height: 80px;
+            resize: vertical;
+        }
+
+        .checkbox-group {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .checkbox-group input[type="checkbox"] {
+            width: 20px;
+            height: 20px;
+            cursor: pointer;
+        }
+
+        .form-actions {
+            display: flex;
+            gap: 1rem;
+            justify-content: flex-end;
+            margin-top: 2rem;
+            padding-top: 1rem;
+            border-top: 1px solid #eee;
+        }
+
+        .btn {
+            padding: 0.75rem 2rem;
+            border-radius: 8px;
+            font-size: 1rem;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.2s;
+            border: none;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .btn-primary {
+            background: #667eea;
+            color: white;
+        }
+
+        .btn-primary:hover {
+            background: #5568d3;
+            transform: translateY(-1px);
+            box-shadow: 0 4px 12px rgba(102,126,234,0.3);
+        }
+
+        .btn-secondary {
+            background: #f0f0f0;
+            color: #333;
+        }
+
+        .btn-secondary:hover {
+            background: #e0e0e0;
+        }
+
+        .btn-success {
+            background: #4CAF50;
+            color: white;
+        }
+
+        .btn-success:hover {
+            background: #45a049;
+        }
+
+        .alert {
+            padding: 1rem;
+            border-radius: 8px;
+            margin-bottom: 1rem;
+            display: none;
+        }
+
+        .alert-success {
+            background: #d4edda;
+            color: #155724;
+            border: 1px solid #c3e6cb;
+        }
+
+        .alert-error {
+            background: #f8d7da;
+            color: #721c24;
+            border: 1px solid #f5c6cb;
+        }
+
+        .records-section {
+            margin-top: 3rem;
+            background: white;
+            border-radius: 12px;
+            padding: 2rem;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+        }
+
+        .records-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1.5rem;
+        }
+
+        .search-box {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            padding: 0.75rem 1rem;
+            border: 1px solid #ddd;
+            border-radius: 6px;
+            flex: 1;
+            max-width: 400px;
+        }
+
+        .search-box input {
+            border: none;
+            outline: none;
+            flex: 1;
+        }
+
+        .table-container {
+            overflow-x: auto;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        table thead {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+        }
+
+        table th {
+            padding: 1rem;
+            text-align: left;
+            font-weight: 500;
+            font-size: 0.9rem;
+        }
+
+        table td {
+            padding: 1rem;
+            border-bottom: 1px solid #eee;
+            font-size: 0.9rem;
+        }
+
+        table tbody tr:hover {
+            background: #f9f9f9;
+        }
+
+        .action-btns {
+            display: flex;
+            gap: 0.5rem;
+        }
+
+        .btn-small {
+            padding: 0.5rem;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .btn-edit {
+            background: #2196F3;
+            color: white;
+        }
+
+        .btn-delete {
+            background: #f44336;
+            color: white;
+        }
+
+        .btn-small:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 2px 8px rgba(0,0,0,0.2);
+        }
+
+        @media (max-width: 768px) {
+            .form-grid,
+            .form-grid-2,
+            .form-grid-3 {
+                grid-template-columns: 1fr;
+            }
+
+            .form-actions {
+                flex-direction: column;
+            }
+
+            .btn {
+                width: 100%;
+                justify-content: center;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="sidebar">
+        <div class="sidebar-header">
+            <div class="logo-container">
+                <img src="../COMPONENTS/IMAGES/als logo.png" alt="ALS Logo" class="als-logo" style="width:60px; height:60px; border-radius:50%; box-shadow:0 2px 8px rgba(0,0,0,0.1); margin-bottom:10px;">
+                <h1>ALS Portal</h1>
+            </div>
+            <p id="instructorName">Welcome, Instructor</p>
+        </div>
+        <div class="nav-tabs">
+            <div class="nav-tab" data-page="dashboard">
+                <i class="fas fa-chart-line"></i>
+                <span>Dashboard</span>
+            </div>
+            <div class="nav-tab" data-page="learners">
+                <i class="fas fa-users"></i>
+                <span>Learners</span>
+            </div>
+            <div class="nav-tab" data-page="subjects">
+                <i class="fas fa-book"></i>
+                <span>Subjects</span>
+            </div>
+            <div class="nav-tab active" data-page="mapping">
+                <i class="fas fa-map-marked-alt"></i>
+                <span>Mapping</span>
+            </div>
+            <div class="nav-tab" data-page="messages">
+                <i class="fas fa-envelope"></i>
+                <span>Messages</span>
+            </div>
+            <!-- <div class="nav-tab" data-page="analytics">
+                <i class="fas fa-chart-bar"></i>
+                <span>Analytics</span>
+            </div>
+            <div class="nav-tab" data-page="reports">
+                <i class="fas fa-file-alt"></i>
+                <span>Reports</span>
+            </div> -->
+            <div class="nav-tab" data-page="logout">
+                <i class="fas fa-sign-out-alt"></i>
+                <span>Logout</span>
+            </div>
+        </div>
+    </div>
+
+    <div class="main-content">
+        <header>
+            <h1><i class="fas fa-clipboard-list"></i> AF1 Data Entry</h1>
+            <p>Masterlist of Mapped and Potential Learners</p>
+        </header>
+
+        <div id="alertBox" class="alert"></div>
+
+        <div class="form-container">
+            <div class="form-header">
+                <h2>Alternative Learning System - AF1 Form</h2>
+                <p>Complete all required fields marked with *</p>
+            </div>
+
+            <form id="af1Form">
+                <!-- Personal Information -->
+                <div class="form-section">
+                    <h3><i class="fas fa-user"></i> Personal Information</h3>
+                    <div class="form-grid-3">
+                        <div class="form-group">
+                            <label class="required">Last Name</label>
+                            <input type="text" id="last_name" name="last_name" required>
+                        </div>
+                        <div class="form-group">
+                            <label class="required">First Name</label>
+                            <input type="text" id="first_name" name="first_name" required>
+                        </div>
+                        <div class="form-group">
+                            <label>Middle Name</label>
+                            <input type="text" id="middle_name" name="middle_name">
+                        </div>
+                    </div>
+                    <div class="form-grid" style="margin-top: 1rem;">
+                        <div class="form-group">
+                            <label>Name Extension (Jr., Sr., III)</label>
+                            <input type="text" id="name_extension" name="name_extension" placeholder="e.g., Jr.">
+                        </div>
+                        <div class="form-group">
+                            <label>Sex</label>
+                            <select id="sex" name="sex">
+                                <option value="">Select...</option>
+                                <option value="Male">Male</option>
+                                <option value="Female">Female</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label>Date of Birth</label>
+                            <input type="date" id="date_of_birth" name="date_of_birth" onchange="calculateAge()">
+                        </div>
+                        <div class="form-group">
+                            <label>Age</label>
+                            <input type="number" id="age" name="age" min="6" max="100" readonly>
+                        </div>
+                    </div>
+                    <div class="form-grid-2" style="margin-top: 1rem;">
+                        <div class="form-group">
+                            <label>Indigenous People (IP)</label>
+                            <input type="text" id="ip" name="ip" placeholder="e.g., Tagalog, Bisaya">
+                        </div>
+                        <div class="form-group">
+                            <label>Religion</label>
+                            <input type="text" id="religion" name="religion">
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Address -->
+                <div class="form-section">
+                    <h3><i class="fas fa-map-marker-alt"></i> Complete Home Address</h3>
+                    <div class="form-grid">
+                        <div class="form-group">
+                            <label>House Number</label>
+                            <input type="text" id="house_number" name="house_number">
+                        </div>
+                        <div class="form-group">
+                            <label>Street</label>
+                            <input type="text" id="street" name="street">
+                        </div>
+                        <div class="form-group">
+                            <label>Sitio/Purok</label>
+                            <input type="text" id="sitio_purok" name="sitio_purok">
+                        </div>
+                        <div class="form-group">
+                            <label>Barangay</label>
+                            <select id="barangay" name="barangay">
+                                <option value="">Select Barangay...</option>
+                                <option value="Alipit">Alipit</option>
+                                <option value="Bagumbayan">Bagumbayan</option>
+                                <option value="Barangay I (Poblacion)">Barangay I (Poblacion)</option>
+                                <option value="Barangay II (Poblacion)">Barangay II (Poblacion)</option>
+                                <option value="Barangay III (Poblacion)">Barangay III (Poblacion)</option>
+                                <option value="Barangay IV (Poblacion)">Barangay IV (Poblacion)</option>
+                                <option value="Barangay V (Poblacion)">Barangay V (Poblacion)</option>
+                                <option value="Bubukal">Bubukal</option>
+                                <option value="Calios">Calios</option>
+                                <option value="Duhat">Duhat</option>
+                                <option value="Gatid">Gatid</option>
+                                <option value="Jasaan">Jasaan</option>
+                                <option value="Labuin">Labuin</option>
+                                <option value="Malinao">Malinao</option>
+                                <option value="Oogong">Oogong</option>
+                                <option value="Pagsawitan">Pagsawitan</option>
+                                <option value="Palasan">Palasan</option>
+                                <option value="Patimbao">Patimbao</option>
+                                <option value="San Jose">San Jose</option>
+                                <option value="San Juan">San Juan</option>
+                                <option value="San Pablo Norte">San Pablo Norte</option>
+                                <option value="San Pablo Sur">San Pablo Sur</option>
+                                <option value="Santisima Cruz">Santisima Cruz</option>
+                                <option value="Santo Angel Central">Santo Angel Central</option>
+                                <option value="Santo Angel Norte">Santo Angel Norte</option>
+                                <option value="Santo Angel Sur">Santo Angel Sur</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="form-grid-3" style="margin-top: 1rem;">
+                        <div class="form-group">
+                            <label>Municipality/City</label>
+                            <input type="text" id="municipality_city" name="municipality_city" value="Santa Cruz">
+                        </div>
+                        <div class="form-group">
+                            <label>Province</label>
+                            <input type="text" id="province" name="province" value="Laguna">
+                        </div>
+                        <div class="form-group">
+                            <label>Contact Number</label>
+                            <input type="tel" id="contact_number" name="contact_number" placeholder="09XX-XXX-XXXX">
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Parents/Guardian -->
+                <div class="form-section">
+                    <h3><i class="fas fa-users"></i> Parents/Guardian Information</h3>
+                    <div class="form-grid-3">
+                        <div class="form-group">
+                            <label>Father's Name</label>
+                            <input type="text" id="father_name" name="father_name" placeholder="Full Name">
+                        </div>
+                        <div class="form-group">
+                            <label>Mother's Name</label>
+                            <input type="text" id="mother_name" name="mother_name" placeholder="Full Name">
+                        </div>
+                        <div class="form-group">
+                            <label>Guardian's Name</label>
+                            <input type="text" id="guardian_name" name="guardian_name" placeholder="Full Name">
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Educational Background -->
+                <div class="form-section">
+                    <h3><i class="fas fa-graduation-cap"></i> Educational Background</h3>
+                    <div class="form-grid-2">
+                        <div class="form-group">
+                            <label>Last Grade Completed</label>
+                            <select id="last_grade_completed" name="last_grade_completed">
+                                <option value="">Select...</option>
+                                <option value="Elementary">Elementary</option>
+                                <option value="Grade 1">Grade 1</option>
+                                <option value="Grade 2">Grade 2</option>
+                                <option value="Grade 3">Grade 3</option>
+                                <option value="Grade 4">Grade 4</option>
+                                <option value="Grade 5">Grade 5</option>
+                                <option value="Grade 6">Grade 6</option>
+                                <option value="Grade 7">Grade 7</option>
+                                <option value="Grade 8">Grade 8</option>
+                                <option value="Grade 9">Grade 9</option>
+                                <option value="Grade 10">Grade 10</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label>Learner Type</label>
+                            <select id="learner_type" name="learner_type">
+                                <option value="">Select...</option>
+                                <option value="Elementary">Elementary</option>
+                                <option value="Junior High School">Junior High School</option>
+                                <option value="Senior High School">Senior High School</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="form-grid-2" style="margin-top: 1rem;">
+                        <div class="form-group">
+                            <label>Last School Attended</label>
+                            <input type="text" id="last_school_attended" name="last_school_attended">
+                        </div>
+                        <div class="form-group">
+                            <label>Year Last Attended</label>
+                            <input type="number" id="year_last_attended" name="year_last_attended" min="1900" max="2025">
+                        </div>
+                    </div>
+                    <div class="form-group" style="margin-top: 1rem;">
+                        <label>Dropout Reason</label>
+                        <textarea id="dropout_reason" name="dropout_reason" placeholder="Explain reason for dropping out..."></textarea>
+                    </div>
+                </div>
+
+                <!-- ALS Status -->
+                <div class="form-section">
+                    <h3><i class="fas fa-clipboard-check"></i> ALS Status & Interest</h3>
+                    <div class="form-grid-2">
+                        <div class="form-group">
+                            <label>ALS Status</label>
+                            <select id="als_status" name="als_status">
+                                <option value="">Select...</option>
+                                <option value="Active">Active</option>
+                                <option value="Enrolled">Enrolled</option>
+                                <option value="Dropped">Dropped</option>
+                                <option value="Completed">Completed</option>
+                                <option value="Not Enrolled">Not Enrolled</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label>Learner Type Class</label>
+                            <input type="text" id="learner_type_class" name="learner_type_class">
+                        </div>
+                    </div>
+                    <div class="form-group checkbox-group" style="margin-top: 1rem;">
+                        <input type="checkbox" id="interested_in_als" name="interested_in_als">
+                        <label for="interested_in_als">Interested in ALS?</label>
+                    </div>
+                    <div class="form-grid-2" style="margin-top: 1rem;">
+                        <div class="form-group">
+                            <label>Preferred Program</label>
+                            <select id="preferred_program" name="preferred_program">
+                                <option value="">Select...</option>
+                                <option value="Basic Literacy Program">Basic Literacy Program</option>
+                                <option value="Continuing Education Program">Continuing Education Program</option>
+                                <option value="Accreditation and Equivalency">Accreditation and Equivalency</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label>Preferred Learning Site</label>
+                            <input type="text" id="preferred_learning_site" name="preferred_learning_site">
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Administrative Information -->
+                <div class="form-section">
+                    <h3><i class="fas fa-cog"></i> Administrative Information</h3>
+                    <div class="form-grid">
+                        <div class="form-group">
+                            <label>Region</label>
+                            <input type="text" id="region" name="region" value="Region IV-A (CALABARZON)">
+                        </div>
+                        <div class="form-group">
+                            <label>Division</label>
+                            <input type="text" id="division" name="division" value="Laguna">
+                        </div>
+                        <div class="form-group">
+                            <label>District</label>
+                            <input type="text" id="district" name="district">
+                        </div>
+                        <div class="form-group">
+                            <label>Calendar Year</label>
+                            <input type="number" id="calendar_year" name="calendar_year" value="2024" min="2020" max="2030">
+                        </div>
+                    </div>
+                    <div class="form-group" style="margin-top: 1rem;">
+                        <label>Remarks</label>
+                        <textarea id="remarks" name="remarks" placeholder="Additional notes or comments..."></textarea>
+                    </div>
+                </div>
+
+                <div class="form-actions">
+                    <button type="button" class="btn btn-secondary" onclick="resetForm()">
+                        <i class="fas fa-redo"></i> Reset Form
+                    </button>
+                    <button type="button" class="btn btn-success" onclick="saveAndNew()">
+                        <i class="fas fa-plus"></i> Save & Add New
+                    </button>
+                    <button type="submit" class="btn btn-primary">
+                        <i class="fas fa-save"></i> Save Entry
+                    </button>
+                </div>
+            </form>
+        </div>
+
+        <!-- Records Table -->
+        <div class="records-section">
+            <div class="records-header">
+                <h2><i class="fas fa-table"></i> Recent AF1 Entries</h2>
+                <div class="search-box">
+                    <i class="fas fa-search"></i>
+                    <input type="text" id="searchInput" placeholder="Search by name..." onkeyup="searchRecords()">
+                </div>
+            </div>
+            <div class="table-container">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Name</th>
+                            <th>Age</th>
+                            <th>Sex</th>
+                            <th>Barangay</th>
+                            <th>Learner Type</th>
+                            <th>ALS Status</th>
+                            <th>Contact</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody id="recordsTableBody">
+                        <tr>
+                            <td colspan="8" style="text-align: center; color: #999;">Loading records...</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const SUPABASE_URL = 'https://bbinymljjtjxkeclqamt.supabase.co';
+        const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImJiaW55bWxqanRqeGtlY2xxYW10Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTY3MzQ1OTQsImV4cCI6MjA3MjMxMDU5NH0.bOIwdxUiLd-63V6-_XZxER1PLqohtd1cnwipF6YZjn4';
+        
+        const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+        let currentEditId = null;
+        let allRecords = [];
+
+        document.addEventListener('DOMContentLoaded', () => {
+            // Auth check
+            const user = JSON.parse(localStorage.getItem('user') || '{}');
+            if (!user || !user.username) {
+                window.location.href = '/';
+                return;
+            }
+
+            document.getElementById('instructorName').textContent = `Welcome, ${user.username}`;
+
+            // Navigation
+            document.querySelectorAll('.nav-tab').forEach(tab => {
+                tab.addEventListener('click', (e) => {
+                    const page = tab.dataset.page;
+                    if (page === 'logout') {
+                        if (confirm('Are you sure you want to logout?')) {
+                            localStorage.removeItem('user');
+                            window.location.href = '/';
+                        }
+                        return false;
+                    }
+                    window.location.href = `/instructor_${page}`;
+                });
+            });
+
+            // Load records
+            loadRecords();
+
+            // Form submit
+            document.getElementById('af1Form').addEventListener('submit', async (e) => {
+                e.preventDefault();
+                await saveRecord();
+            });
+        });
+
+        function calculateAge() {
+            const dob = document.getElementById('date_of_birth').value;
+            if (dob) {
+                const birthDate = new Date(dob);
+                const today = new Date();
+                let age = today.getFullYear() - birthDate.getFullYear();
+                const monthDiff = today.getMonth() - birthDate.getMonth();
+                if (monthDiff < 0 || (monthDiff === 0 && today.getDate() < birthDate.getDate())) {
+                    age--;
+                }
+                document.getElementById('age').value = age;
+            }
+        }
+
+        async function saveRecord() {
+            const formData = {
+                last_name: document.getElementById('last_name').value,
+                first_name: document.getElementById('first_name').value,
+                middle_name: document.getElementById('middle_name').value || null,
+                name_extension: document.getElementById('name_extension').value || null,
+                sex: document.getElementById('sex').value || null,
+                date_of_birth: document.getElementById('date_of_birth').value || null,
+                age: parseInt(document.getElementById('age').value) || null,
+                learner_type: document.getElementById('learner_type').value || null,
+                ip: document.getElementById('ip').value || null,
+                religion: document.getElementById('religion').value || null,
+                house_number: document.getElementById('house_number').value || null,
+                street: document.getElementById('street').value || null,
+                sitio_purok: document.getElementById('sitio_purok').value || null,
+                barangay: document.getElementById('barangay').value || null,
+                municipality_city: document.getElementById('municipality_city').value || null,
+                province: document.getElementById('province').value || null,
+                father_name: document.getElementById('father_name').value || null,
+                mother_name: document.getElementById('mother_name').value || null,
+                guardian_name: document.getElementById('guardian_name').value || null,
+                contact_number: document.getElementById('contact_number').value || null,
+                last_grade_completed: document.getElementById('last_grade_completed').value || null,
+                last_school_attended: document.getElementById('last_school_attended').value || null,
+                year_last_attended: parseInt(document.getElementById('year_last_attended').value) || null,
+                dropout_reason: document.getElementById('dropout_reason').value || null,
+                als_status: document.getElementById('als_status').value || null,
+                interested_in_als: document.getElementById('interested_in_als').checked,
+                preferred_program: document.getElementById('preferred_program').value || null,
+                preferred_learning_site: document.getElementById('preferred_learning_site').value || null,
+                region: document.getElementById('region').value || null,
+                division: document.getElementById('division').value || null,
+                district: document.getElementById('district').value || null,
+                calendar_year: parseInt(document.getElementById('calendar_year').value) || null,
+                learner_type_class: document.getElementById('learner_type_class').value || null,
+                remarks: document.getElementById('remarks').value || null
+            };
+
+            try {
+                let result;
+                if (currentEditId) {
+                    // Update existing record
+                    result = await supabase
+                        .from('als_af1')
+                        .update(formData)
+                        .eq('id', currentEditId)
+                        .select();
+                    
+                    showAlert('Record updated successfully!', 'success');
+                    currentEditId = null;
+                } else {
+                    // Insert new record
+                    result = await supabase
+                        .from('als_af1')
+                        .insert([formData])
+                        .select();
+                    
+                    showAlert('Record saved successfully!', 'success');
+                }
+
+                if (result.error) {
+                    throw result.error;
+                }
+
+                resetForm();
+                loadRecords();
+            } catch (error) {
+                console.error('Error saving record:', error);
+                showAlert('Error saving record: ' + error.message, 'error');
+            }
+        }
+
+        async function saveAndNew() {
+            await saveRecord();
+            // Form is already reset in saveRecord()
+        }
+
+        function resetForm() {
+            document.getElementById('af1Form').reset();
+            document.getElementById('age').value = '';
+            currentEditId = null;
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        }
+
+        async function loadRecords() {
+            try {
+                const { data, error } = await supabase
+                    .from('als_af1')
+                    .select('*')
+                    .order('created_at', { ascending: false })
+                    .limit(50);
+
+                if (error) throw error;
+
+                allRecords = data || [];
+                displayRecords(allRecords);
+            } catch (error) {
+                console.error('Error loading records:', error);
+                document.getElementById('recordsTableBody').innerHTML = 
+                    '<tr><td colspan="8" style="text-align: center; color: #f44336;">Error loading records</td></tr>';
+            }
+        }
+
+        function displayRecords(records) {
+            const tbody = document.getElementById('recordsTableBody');
+            
+            if (records.length === 0) {
+                tbody.innerHTML = '<tr><td colspan="8" style="text-align: center; color: #999;">No records found</td></tr>';
+                return;
+            }
+
+            tbody.innerHTML = records.map(record => `
+                <tr>
+                    <td><strong>${record.first_name} ${record.middle_name || ''} ${record.last_name}</strong></td>
+                    <td>${record.age || '-'}</td>
+                    <td>${record.sex || '-'}</td>
+                    <td>${record.barangay || '-'}</td>
+                    <td>${record.learner_type || '-'}</td>
+                    <td>
+                        <span style="padding: 4px 8px; border-radius: 4px; font-size: 0.85rem; 
+                            background: ${getStatusColor(record.als_status)}; color: white;">
+                            ${record.als_status || '-'}
+                        </span>
+                    </td>
+                    <td>${record.contact_number || '-'}</td>
+                    <td>
+                        <div class="action-btns">
+                            <button class="btn-small btn-edit" onclick="editRecord(${record.id})" title="Edit">
+                                <i class="fas fa-edit"></i>
+                            </button>
+                            <button class="btn-small btn-delete" onclick="deleteRecord(${record.id})" title="Delete">
+                                <i class="fas fa-trash"></i>
+                            </button>
+                        </div>
+                    </td>
+                </tr>
+            `).join('');
+        }
+
+        function getStatusColor(status) {
+            const colors = {
+                'Active': '#4CAF50',
+                'Enrolled': '#2196F3',
+                'Dropped': '#f44336',
+                'Completed': '#9C27B0',
+                'Not Enrolled': '#9E9E9E'
+            };
+            return colors[status] || '#666';
+        }
+
+        async function editRecord(id) {
+            try {
+                const { data, error } = await supabase
+                    .from('als_af1')
+                    .select('*')
+                    .eq('id', id)
+                    .single();
+
+                if (error) throw error;
+
+                // Populate form with record data
+                currentEditId = id;
+                Object.keys(data).forEach(key => {
+                    const field = document.getElementById(key);
+                    if (field) {
+                        if (field.type === 'checkbox') {
+                            field.checked = data[key];
+                        } else {
+                            field.value = data[key] || '';
+                        }
+                    }
+                });
+
+                // Scroll to form
+                window.scrollTo({ top: 0, behavior: 'smooth' });
+                showAlert('Editing record. Make changes and click Save.', 'success');
+            } catch (error) {
+                console.error('Error loading record:', error);
+                showAlert('Error loading record for editing', 'error');
+            }
+        }
+
+        async function deleteRecord(id) {
+            if (!confirm('Are you sure you want to delete this record? This action cannot be undone.')) {
+                return;
+            }
+
+            try {
+                const { error } = await supabase
+                    .from('als_af1')
+                    .delete()
+                    .eq('id', id);
+
+                if (error) throw error;
+
+                showAlert('Record deleted successfully!', 'success');
+                loadRecords();
+            } catch (error) {
+                console.error('Error deleting record:', error);
+                showAlert('Error deleting record: ' + error.message, 'error');
+            }
+        }
+
+        function searchRecords() {
+            const searchTerm = document.getElementById('searchInput').value.toLowerCase();
+            
+            const filtered = allRecords.filter(record => {
+                const fullName = `${record.first_name} ${record.middle_name || ''} ${record.last_name}`.toLowerCase();
+                const barangay = (record.barangay || '').toLowerCase();
+                const contact = (record.contact_number || '').toLowerCase();
+                
+                return fullName.includes(searchTerm) || 
+                       barangay.includes(searchTerm) || 
+                       contact.includes(searchTerm);
+            });
+
+            displayRecords(filtered);
+        }
+
+        function showAlert(message, type) {
+            const alertBox = document.getElementById('alertBox');
+            alertBox.className = `alert alert-${type}`;
+            alertBox.textContent = message;
+            alertBox.style.display = 'block';
+
+            setTimeout(() => {
+                alertBox.style.display = 'none';
+            }, 5000);
+        }
+
+        // Export functions to global scope
+        window.calculateAge = calculateAge;
+        window.saveAndNew = saveAndNew;
+        window.resetForm = resetForm;
+        window.editRecord = editRecord;
+        window.deleteRecord = deleteRecord;
+        window.searchRecords = searchRecords;
+    </script>
+</body>
+</html>

@@ -1,0 +1,948 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ALS Admin Portal - User Management</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <link rel="stylesheet" href="../CSS/admin_styles.css">
+    <style>
+        .link-status {
+            display: inline-flex;
+            align-items: center;
+            gap: 5px;
+            padding: 4px 8px;
+            border-radius: 4px;
+            font-size: 12px;
+            font-weight: 600;
+        }
+        .link-status.linked {
+            background: #e8f5e9;
+            color: #27ae60;
+        }
+        .link-status.unlinked {
+            background: #fff3e0;
+            color: #e67e22;
+        }
+        .btn-link {
+            padding: 6px 12px;
+            font-size: 12px;
+            background: #9b59b6;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        .btn-link:hover {
+            background: #8e44ad;
+        }
+        .learner-select-group {
+            display: flex;
+            gap: 10px;
+            align-items: center;
+        }
+        .learner-select-group select {
+            flex: 1;
+        }
+        .actions-cell {
+            display: flex;
+            gap: 8px;
+            align-items: center;
+            justify-content: flex-end;
+        }
+        .actions-cell .btn-link {
+            order: 1;
+        }
+        .actions-cell .btn-icon {
+            order: 2;
+        }
+        .actions-cell .btn-icon.delete {
+            order: 3;
+        }
+    </style>
+</head>
+<body>
+    <div class="sidebar">
+        <div class="sidebar-header">
+            <div class="logo-container">
+                <div class="als-logo">
+                    <i class="fas fa-graduation-cap"></i>
+                </div>
+                <h1>ALS Admin Portal</h1>
+            </div>
+            <p id="adminName">Welcome, Administrator</p>
+        </div>
+        <div class="nav-tabs">
+            <a href="/admin_dashboard" class="nav-tab">
+                <i class="fas fa-chart-line"></i>
+                <span>Dashboard</span>
+            </a>
+            <a href="/admin_users" class="nav-tab active">
+                <i class="fas fa-users"></i>
+                <span>User Management</span>
+            </a>
+            <a href="/admin_instructors" class="nav-tab">
+                <i class="fas fa-chalkboard-teacher"></i>
+                <span>Instructors</span>
+            </a>
+            <a href="/admin_students" class="nav-tab">
+                <i class="fas fa-user-graduate"></i>
+                <span>Students</span>
+            </a>
+            <a href="/admin_registration" class="nav-tab">
+                <i class="fas fa-user-plus"></i>
+                <span>Registrations</span>
+            </a>
+            <a href="/admin_af1" class="nav-tab">
+                <i class="fas fa-map-marked-alt"></i>
+                <span>Mapped Learners</span>
+            </a>
+            <a href="/admin_certifications" class="nav-tab">
+                <i class="fas fa-certificate"></i>
+                <span>Certifications</span>
+            </a>
+            <a href="#" class="nav-tab" onclick="return confirmLogout()">
+                <i class="fas fa-sign-out-alt"></i>
+                <span>Logout</span>
+            </a>
+        </div>
+    </div>
+
+    <div class="main-content">
+        <header>
+            <h1>User Management</h1>
+            <p>Manage all system users and link learner profiles</p>
+        </header>
+
+        <div class="controls-bar">
+            <div class="search-box">
+                <i class="fas fa-search"></i>
+                <input type="text" id="searchUsers" placeholder="Search users...">
+            </div>
+            <div class="filter-group">
+                <select id="roleFilter">
+                    <option value="student">Student (Default)</option>
+                    <option value="all">All Users</option>
+                    <option value="instructor">Instructor</option>
+                </select>
+                <select id="linkageFilter">
+                    <option value="all">All Linkages</option>
+                    <option value="linked">Linked</option>
+                    <option value="unlinked">Unlinked</option>
+                </select>
+                <button class="btn-primary" onclick="openCreateUserModal()">
+                    <i class="fas fa-user-plus"></i>
+                    Create User
+                </button>
+                <button class="btn-secondary" onclick="openArchivedModal()" title="View Archived Profiles">
+                    <i class="fas fa-archive"></i>
+                    Archived Profiles
+                </button>
+            </div>
+        </div>
+
+        <div class="table-container">
+            <table>
+                <thead>
+                    <tr>
+                        <th>Username</th>
+                        <th>Full Name</th>
+                        <th>Email</th>
+                        <th>Role</th>
+                        <th>Learner Profile</th>
+                        <th>Created Date</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody id="usersTableBody">
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <!-- Create/Edit User Modal -->
+    <div id="userModal" class="modal">
+        <div class="modal-content" style="max-width: 900px; max-height: 90vh; overflow-y: auto;">
+            <div class="modal-header">
+                <h2 id="modalTitle">Create New User</h2>
+                <span class="close" onclick="closeModal()">&times;</span>
+            </div>
+            <form id="userForm">
+                <!-- ACCOUNT INFORMATION -->
+                <div style="background: #f8f9fa; padding: 15px; margin-bottom: 20px; border-radius: 4px;">
+                    <h3 style="margin-top: 0; color: #2c3e50;">Account Information</h3>
+                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px;">
+                        <div class="form-group">
+                            <label for="username">Username *</label>
+                            <input type="text" id="username" name="username" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="email">Email *</label>
+                            <input type="email" id="email" name="email" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="password">Password *</label>
+                            <input type="password" id="password" name="password" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="role">Role *</label>
+                            <select id="role" name="role" required onchange="updateFormForRole()">
+                                <option value="">Select Role</option>
+                                <option value="admin">Admin</option>
+                                <option value="instructor">Instructor</option>
+                                <option value="student">Student</option>
+                            </select>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- PERSONAL INFORMATION (for students) -->
+                <div id="enrollmentSection" style="display: none;">
+                    <div style="background: #f8f9fa; padding: 15px; margin-bottom: 20px; border-radius: 4px;">
+                        <h3 style="margin-top: 0; color: #2c3e50;">Personal Information</h3>
+                        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px;">
+                            <div class="form-group">
+                                <label for="firstName">First Name *</label>
+                                <input type="text" id="firstName" name="firstName" required>
+                            </div>
+                            <div class="form-group">
+                                <label for="middleInitial">Middle Initial</label>
+                                <input type="text" id="middleInitial" name="middleInitial" maxlength="2">
+                            </div>
+                            <div class="form-group">
+                                <label for="lastName">Last Name *</label>
+                                <input type="text" id="lastName" name="lastName" required>
+                            </div>
+                            <div class="form-group">
+                                <label for="nameExtension">Name Extension</label>
+                                <input type="text" id="nameExtension" name="nameExtension" placeholder="e.g., Jr., Sr.">
+                            </div>
+                            <div class="form-group">
+                                <label for="lrn">LRN</label>
+                                <input type="text" id="lrn" name="lrn" maxlength="12">
+                            </div>
+                            <div class="form-group">
+                                <label for="enrollmentDate">Enrollment Date</label>
+                                <input type="date" id="enrollmentDate" name="enrollmentDate">
+                            </div>
+                            <div class="form-group">
+                                <label for="birthdate">Birthdate</label>
+                                <input type="date" id="birthdate" name="birthdate">
+                            </div>
+                            <div class="form-group">
+                                <label for="placeOfBirth">Place of Birth</label>
+                                <input type="text" id="placeOfBirth" name="placeOfBirth">
+                            </div>
+                            <div class="form-group">
+                                <label for="sex">Sex</label>
+                                <select id="sex" name="sex">
+                                    <option value="">Select</option>
+                                    <option value="Male">Male</option>
+                                    <option value="Female">Female</option>
+                                </select>
+                            </div>
+                            <div class="form-group">
+                                <label for="civilStatus">Civil Status</label>
+                                <select id="civilStatus" name="civilStatus">
+                                    <option value="">Select</option>
+                                    <option value="Single">Single</option>
+                                    <option value="Married">Married</option>
+                                    <option value="Widow/er">Widow/er</option>
+                                    <option value="Separated">Separated</option>
+                                    <option value="Solo Parent">Solo Parent</option>
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- ADDRESS INFORMATION -->
+                    <div style="background: #f8f9fa; padding: 15px; margin-bottom: 20px; border-radius: 4px;">
+                        <h3 style="margin-top: 0; color: #2c3e50;">Address Information</h3>
+                        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px;">
+                            <div class="form-group">
+                                <label for="houseNo">House No./Street/Sitio</label>
+                                <input type="text" id="houseNo" name="houseNo">
+                            </div>
+                            <div class="form-group">
+                                <label for="barangay">Barangay</label>
+                                <input type="text" id="barangay" name="barangay">
+                            </div>
+                            <div class="form-group">
+                                <label for="municipalityCity">Municipality/City</label>
+                                <input type="text" id="municipalityCity" name="municipalityCity">
+                            </div>
+                            <div class="form-group">
+                                <label for="province">Province</label>
+                                <input type="text" id="province" name="province">
+                            </div>
+                            <div class="form-group">
+                                <label for="contactNumbers">Contact Numbers</label>
+                                <input type="text" id="contactNumbers" name="contactNumbers">
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- ADDITIONAL INFO -->
+                    <div style="background: #f8f9fa; padding: 15px; margin-bottom: 20px; border-radius: 4px;">
+                        <h3 style="margin-top: 0; color: #2c3e50;">Additional Information</h3>
+                        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px;">
+                            <div class="form-group">
+                                <label for="religion">Religion</label>
+                                <input type="text" id="religion" name="religion">
+                            </div>
+                            <div class="form-group">
+                                <label for="motherTongue">Mother Tongue</label>
+                                <input type="text" id="motherTongue" name="motherTongue">
+                            </div>
+                            <div class="form-group">
+                                <label for="ipEthnicGroup">IP/Ethnic Group</label>
+                                <input type="text" id="ipEthnicGroup" name="ipEthnicGroup">
+                            </div>
+                            <div class="form-group">
+                                <label>
+                                    <input type="checkbox" id="isPwd" name="isPwd"> PWD (Person with Disability)
+                                </label>
+                            </div>
+                            <div class="form-group">
+                                <label>
+                                    <input type="checkbox" id="is4ps" name="is4ps"> 4Ps Beneficiary
+                                </label>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- EDUCATION INFORMATION -->
+                    <div style="background: #f8f9fa; padding: 15px; margin-bottom: 20px; border-radius: 4px;">
+                        <h3 style="margin-top: 0; color: #2c3e50;">Education Information</h3>
+                        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px;">
+                            <div class="form-group">
+                                <label for="lastGradeLevel">Last Grade Level Completed</label>
+                                <select id="lastGradeLevel" name="lastGradeLevel">
+                                    <option value="">Select</option>
+                                    <option value="K">K</option>
+                                    <option value="G-1">G-1</option>
+                                    <option value="G-2">G-2</option>
+                                    <option value="G-3">G-3</option>
+                                    <option value="G-4">G-4</option>
+                                    <option value="G-5">G-5</option>
+                                    <option value="G-6">G-6</option>
+                                    <option value="G-7">G-7</option>
+                                    <option value="G-8">G-8</option>
+                                    <option value="G-9">G-9</option>
+                                    <option value="G-10">G-10</option>
+                                </select>
+                            </div>
+                            <div class="form-group">
+                                <label for="elementarySchool">Elementary School</label>
+                                <input type="text" id="elementarySchool" name="elementarySchool">
+                            </div>
+                            <div class="form-group">
+                                <label for="juniorHighSchool">Junior High School</label>
+                                <input type="text" id="juniorHighSchool" name="juniorHighSchool">
+                            </div>
+                            <div class="form-group">
+                                <label>
+                                    <input type="checkbox" id="attendedAlsBefore" name="attendedAlsBefore"> Attended ALS Before
+                                </label>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="form-actions">
+                    <button type="button" class="btn-secondary" onclick="closeModal()">Cancel</button>
+                    <button type="submit" class="btn-primary">
+                        <i class="fas fa-save"></i>
+                        Save User
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Link Learner Modal -->
+    <div id="linkLearnerModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2>Link Learner Profile</h2>
+                <span class="close" onclick="closeLinkModal()">&times;</span>
+            </div>
+            <div style="margin-bottom: 20px;">
+                <p style="color: #7f8c8d; font-size: 14px;">
+                    <strong>User:</strong> <span id="linkUserName"></span>
+                </p>
+            </div>
+            <div class="form-group">
+                <label for="learnerSelect">Select Learner Profile</label>
+                <div class="learner-select-group">
+                    <select id="learnerSelect" required>
+                        <option value="">-- Select a learner --</option>
+                    </select>
+                </div>
+            </div>
+            <div class="form-group">
+                <input type="text" id="learnerSearch" placeholder="Search learners by name or barangay...">
+            </div>
+            <div class="form-actions">
+                <button type="button" class="btn-secondary" onclick="closeLinkModal()">Cancel</button>
+                <button type="button" class="btn-primary" onclick="confirmLinkLearner()">
+                    <i class="fas fa-link"></i>
+                    Link Profile
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Archived Profiles Modal -->
+    <div id="archivedModal" class="modal">
+        <div class="modal-content" style="max-width: 900px;">
+            <div class="modal-header">
+                <h2>Archived User Profiles</h2>
+                <span class="close" onclick="closeArchivedModal()">&times;</span>
+            </div>
+            <div class="table-container" style="max-height: 500px; overflow-y: auto;">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Username</th>
+                            <th>Full Name</th>
+                            <th>Email</th>
+                            <th>Role</th>
+                            <th>Archived Date</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody id="archivedTableBody">
+                    </tbody>
+                </table>
+            </div>
+            <div class="form-actions">
+                <button type="button" class="btn-secondary" onclick="closeArchivedModal()">Close</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let users = [];
+        let learners = [];
+        let currentLinkingUserId = null;
+
+        function confirmLogout() {
+            if (confirm('Are you sure you want to logout?')) {
+                window.location.href = '/';
+            }
+            return false;
+        }
+
+        // ✅ HELPER: Build full name from enrollment object
+        function getLearnerFullName(enrollment) {
+            if (!enrollment) return 'N/A';
+            
+            // Use first_name and last_name from als_enrollments_approved
+            if (enrollment.first_name || enrollment.last_name) {
+                const parts = [
+                    enrollment.first_name || '',
+                    enrollment.last_name || ''
+                ].filter(p => p && p.trim());
+                return parts.join(' ').trim() || 'N/A';
+            }
+            
+            return 'N/A';
+        }
+
+        async function fetchUsers() {
+            try {
+                const response = await fetch('/api/users');
+                users = await response.json();
+                await fetchLearners();
+                // Filter to show only students by default (excluding admins)
+                const filteredUsers = users.filter(u => u.role === 'student');
+                renderUsersTable(filteredUsers);
+                // Set default filter to "student"
+                document.getElementById('roleFilter').value = 'student';
+
+            } catch (error) {
+                console.error('Error fetching users:', error);
+            }
+        }
+
+        async function fetchLearners() {
+            try {
+                const response = await fetch('/api/learners-with-accounts');
+                learners = await response.json();
+                console.log('📋 Loaded learners:', learners); // Debug log
+            } catch (error) {
+                console.error('Error fetching learners:', error);
+            }
+        }
+
+        function renderUsersTable(usersList) {
+            const tbody = document.getElementById('usersTableBody');
+            tbody.innerHTML = usersList.map(user => {
+                // Find if this user is linked to a learner
+                const linkedLearner = learners.find(l => l.user_id === user.id);
+                const hasLearner = !!linkedLearner;
+                
+                let learnerInfo = '';
+                if (hasLearner) {
+                    const learnerName = getLearnerFullName(linkedLearner);
+                    learnerInfo = `
+                        <span class="link-status linked">
+                            <i class="fas fa-check-circle"></i>
+                            ${learnerName}
+                        </span>
+                    `;
+                } else if (user.role === 'student') {
+                    learnerInfo = `
+                        <span class="link-status unlinked">
+                            <i class="fas fa-times-circle"></i>
+                            No Profile
+                        </span>
+                    `;
+                } else {
+                    learnerInfo = '<span style="color: #95a5a6; font-size: 12px;">N/A</span>';
+                }
+
+                return `
+                    <tr>
+                        <td>${user.username}</td>
+                        <td>${user.first_name} ${user.m_i ? user.m_i + '.' : ''} ${user.last_name}</td>
+                        <td>${user.email}</td>
+                        <td><span class="status-badge ${user.role}">${user.role.charAt(0).toUpperCase() + user.role.slice(1)}</span></td>
+                        <td>${learnerInfo}</td>
+                        <td>${user.created_at ? user.created_at.split('T')[0] : ''}</td>
+                        <td>
+                            <div class="actions-cell">
+                                ${user.role === 'student' ? `
+                                    <button class="btn-link" onclick="openLinkModal('${user.id}')" title="${hasLearner ? 'Change Learner Profile' : 'Link Learner Profile'}">
+                                        <i class="fas fa-${hasLearner ? 'exchange-alt' : 'link'}"></i>
+                                    </button>
+                                ` : '<span></span>'}
+                                <button class="btn-icon" onclick="editUser('${user.id}')" title="Edit User">
+                                    <i class="fas fa-edit"></i>
+                                </button>
+                                <button class="btn-icon delete" onclick="archiveUser('${user.id}')" title="Archive User">
+                                    <i class="fas fa-archive"></i>
+                                </button>
+                            </div>
+                        </td>
+                    </tr>
+                `;
+            }).join('');
+        }
+
+        function filterUsers() {
+            const searchTerm = document.getElementById('searchUsers').value.toLowerCase();
+            const roleFilter = document.getElementById('roleFilter').value;
+            const linkageFilter = document.getElementById('linkageFilter').value;
+            
+            const filtered = users.filter(user => {
+                // Always exclude admin accounts
+                if (user.role === 'admin') return false;
+                
+                const matchesSearch =
+                    user.username.toLowerCase().includes(searchTerm) ||
+                    user.first_name.toLowerCase().includes(searchTerm) ||
+                    user.last_name.toLowerCase().includes(searchTerm) ||
+                    user.email.toLowerCase().includes(searchTerm);
+                
+                const matchesRole = roleFilter === 'all' || user.role === roleFilter;
+                
+                let matchesLinkage = true;
+                if (linkageFilter !== 'all' && user.role === 'student') {
+                    const isLinked = learners.some(l => l.user_id === user.id);
+                    matchesLinkage = (linkageFilter === 'linked' && isLinked) || 
+                                    (linkageFilter === 'unlinked' && !isLinked);
+                }
+                
+                return matchesSearch && matchesRole && matchesLinkage;
+            });
+            
+            renderUsersTable(filtered);
+        }
+
+        function openCreateUserModal() {
+            document.getElementById('modalTitle').textContent = 'Create New User';
+            document.getElementById('userForm').reset();
+            document.getElementById('userForm').dataset.mode = 'create';
+            document.getElementById('userForm').dataset.userId = '';
+            document.getElementById('password').required = true;
+            document.getElementById('password').placeholder = '';
+            document.getElementById('role').value = '';
+            document.getElementById('enrollmentSection').style.display = 'none';
+            document.getElementById('userModal').classList.add('show');
+        }
+
+        function updateFormForRole() {
+            const role = document.getElementById('role').value;
+            const enrollmentSection = document.getElementById('enrollmentSection');
+            
+            if (role === 'student') {
+                enrollmentSection.style.display = 'block';
+                // Make first name and last name required for students
+                document.getElementById('firstName').required = true;
+                document.getElementById('lastName').required = true;
+            } else {
+                enrollmentSection.style.display = 'none';
+                document.getElementById('firstName').required = false;
+                document.getElementById('lastName').required = false;
+            }
+        }
+
+        function closeModal() {
+            document.getElementById('userModal').classList.remove('show');
+        }
+
+        function editUser(userId) {
+            const user = users.find(u => u.id === userId);
+            if (!user) return;
+            
+            document.getElementById('modalTitle').textContent = 'Edit User';
+            document.getElementById('username').value = user.username;
+            document.getElementById('email').value = user.email;
+            document.getElementById('firstName').value = user.first_name;
+            document.getElementById('middleInitial').value = user.m_i || '';
+            document.getElementById('lastName').value = user.last_name;
+            document.getElementById('password').value = '';
+            document.getElementById('password').placeholder = 'Leave blank to keep current password';
+            document.getElementById('password').required = false;
+            document.getElementById('role').value = user.role;
+            document.getElementById('userForm').dataset.mode = 'edit';
+            document.getElementById('userForm').dataset.userId = userId;
+            document.getElementById('userModal').classList.add('show');
+        }
+
+        async function handleFormSubmit(e) {
+            e.preventDefault();
+            
+            const role = document.getElementById('role').value;
+            const mode = e.target.dataset.mode;
+            const userId = e.target.dataset.userId;
+            
+            // Basic user data
+            const formData = {
+                username: document.getElementById('username').value,
+                email: document.getElementById('email').value,
+                first_name: document.getElementById('firstName').value,
+                m_i: document.getElementById('middleInitial').value || null,
+                last_name: document.getElementById('lastName').value,
+                password: document.getElementById('password').value,
+                role: role
+            };
+            
+            // Add enrollment data for students when creating
+            if (mode === 'create' && role === 'student') {
+                formData.lrn = document.getElementById('lrn').value || null;
+                formData.enrollment_date = document.getElementById('enrollmentDate').value || null;
+                formData.middle_name = document.getElementById('middleInitial').value || null;
+                formData.name_extension = document.getElementById('nameExtension').value || null;
+                formData.house_no_street_sitio = document.getElementById('houseNo').value || null;
+                formData.barangay = document.getElementById('barangay').value || null;
+                formData.municipality_city = document.getElementById('municipalityCity').value || null;
+                formData.province = document.getElementById('province').value || null;
+                formData.birthdate = document.getElementById('birthdate').value || null;
+                formData.place_of_birth = document.getElementById('placeOfBirth').value || null;
+                formData.sex = document.getElementById('sex').value || null;
+                formData.civil_status = document.getElementById('civilStatus').value || null;
+                formData.religion = document.getElementById('religion').value || null;
+                formData.mother_tongue = document.getElementById('motherTongue').value || null;
+                formData.ip_ethnic_group = document.getElementById('ipEthnicGroup').value || null;
+                formData.is_pwd = document.getElementById('isPwd').checked;
+                formData.contact_numbers = document.getElementById('contactNumbers').value || null;
+                formData.is_4ps = document.getElementById('is4ps').checked;
+                formData.last_grade_level_completed = document.getElementById('lastGradeLevel').value || null;
+                formData.elementary_school = document.getElementById('elementarySchool').value || null;
+                formData.junior_high_school = document.getElementById('juniorHighSchool').value || null;
+                formData.attended_als_before = document.getElementById('attendedAlsBefore').checked;
+            }
+            
+            try {
+                if (mode === 'create') {
+                    if (!formData.password) {
+                        alert('Password is required for new users');
+                        return;
+                    }
+                    
+                    // Use different endpoint for students (with enrollment) vs other roles
+                    let endpoint = '/api/users';
+                    if (role === 'student') {
+                        endpoint = '/api/admin/create-user-with-enrollment';
+                    }
+                    
+                    const response = await fetch(endpoint, {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify(formData)
+                    });
+                    
+                    if (!response.ok) {
+                        const error = await response.json();
+                        const errorMessage = error.detail || error.message || 'Failed to create user';
+                        throw new Error(errorMessage);
+                    }
+                    
+                    const result = await response.json();
+                    const message = role === 'student' 
+                        ? '✅ Student account and enrollment created successfully!' 
+                        : '✅ User created successfully!';
+                    alert(message);
+                    
+                } else if (mode === 'edit') {
+                    if (!formData.password) {
+                        delete formData.password;
+                    }
+                    
+                    const response = await fetch(`/api/users/${userId}`, {
+                        method: 'PUT',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify(formData)
+                    });
+                    
+                    if (!response.ok) {
+                        const error = await response.json();
+                        const errorMessage = error.detail || error.message || 'Failed to update user';
+                        throw new Error(errorMessage);
+                    }
+                    
+                    alert('✅ User updated successfully!');
+                }
+                
+                await fetchUsers();
+                closeModal();
+                
+                document.getElementById('password').required = true;
+                document.getElementById('password').placeholder = '';
+                
+            } catch (error) {
+                console.error('Error:', error);
+                const displayMessage = error.message || error.toString() || 'An unknown error occurred';
+                alert(`❌ Error: ${displayMessage}`);
+            }
+        }
+
+        async function archiveUser(userId) {
+            if (confirm('⚠️ Are you sure you want to archive this user? You can restore it later from the archived profiles section.')) {
+                try {
+                    const response = await fetch(`/api/users/${userId}/archive`, { 
+                        method: 'PUT',
+                        headers: { 'Content-Type': 'application/json' }
+                    });
+                    
+                    if (!response.ok) {
+                        const error = await response.json();
+                        const errorMessage = error.detail || error.message || 'Failed to archive user';
+                        throw new Error(errorMessage);
+                    }
+                    
+                    await fetchUsers();
+                    alert('✅ User archived successfully!');
+                    
+                } catch (error) {
+                    console.error('Error:', error);
+                    const displayMessage = error.message || error.toString() || 'An unknown error occurred';
+                    alert(`❌ Error: ${displayMessage}`);
+                }
+            }
+        }
+
+        // ========== LEARNER LINKING FUNCTIONS ==========
+
+        function openLinkModal(userId) {
+            const user = users.find(u => u.id === userId);
+            if (!user) return;
+
+            currentLinkingUserId = userId;
+            document.getElementById('linkUserName').textContent = 
+                `${user.first_name} ${user.last_name} (${user.username})`;
+
+            // Populate enrollment dropdown with unlinked enrollments only
+            const select = document.getElementById('learnerSelect');
+            const unlinkedEnrollments = learners.filter(e => !e.user_id || e.user_id === userId);
+            
+            select.innerHTML = '<option value="">-- Select an enrollment --</option>' +
+                unlinkedEnrollments.map(enrollment => {
+                    const enrollmentName = getLearnerFullName(enrollment);
+                    const lrn = enrollment.lrn ? ` [${enrollment.lrn}]` : '';
+                    return `
+                        <option value="${enrollment.id}">
+                            ${enrollmentName}${lrn} - ${enrollment.barangay || 'N/A'}
+                        </option>
+                    `;
+                }).join('');
+
+            // If user already has a linked enrollment, pre-select it
+            const currentEnrollment = learners.find(e => e.user_id === userId);
+            if (currentEnrollment) {
+                select.value = currentEnrollment.id;
+            }
+
+            document.getElementById('linkLearnerModal').classList.add('show');
+        }
+
+        function closeLinkModal() {
+            document.getElementById('linkLearnerModal').classList.remove('show');
+            currentLinkingUserId = null;
+            document.getElementById('learnerSearch').value = '';
+        }
+
+        async function confirmLinkLearner() {
+            const enrollmentId = document.getElementById('learnerSelect').value;
+            
+            if (!enrollmentId) {
+                alert('⚠️ Please select an enrollment profile');
+                return;
+            }
+
+            try {
+                const response = await fetch(`/api/users/${currentLinkingUserId}/link-learner`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ enrollment_id: enrollmentId })
+                });
+
+                if (!response.ok) {
+                    const error = await response.json();
+                    throw new Error(error.detail || 'Failed to link enrollment profile');
+                }
+
+                alert('✅ Enrollment profile linked successfully!');
+                await fetchUsers();
+                closeLinkModal();
+
+            } catch (error) {
+                console.error('Error linking enrollment:', error);
+                alert(`❌ Error: ${error.message}`);
+            }
+        }
+
+        // Filter learners in modal
+        document.addEventListener('DOMContentLoaded', () => {
+            fetchUsers();
+            document.getElementById('searchUsers').addEventListener('input', filterUsers);
+            document.getElementById('roleFilter').addEventListener('change', filterUsers);
+            document.getElementById('linkageFilter').addEventListener('change', filterUsers);
+            document.getElementById('userForm').addEventListener('submit', handleFormSubmit);
+
+            // Enrollment search filter
+            document.getElementById('learnerSearch').addEventListener('input', (e) => {
+                const searchTerm = e.target.value.toLowerCase();
+                const select = document.getElementById('learnerSelect');
+                const options = Array.from(select.options);
+
+                options.forEach((option, index) => {
+                    if (index === 0) return; // Skip placeholder
+                    const text = option.textContent.toLowerCase();
+                    // Search by LRN, name, or barangay
+                    option.style.display = text.includes(searchTerm) ? '' : 'none';
+                });
+            });
+        });
+
+        window.onclick = function(event) {
+            const userModal = document.getElementById('userModal');
+            const linkModal = document.getElementById('linkLearnerModal');
+            const archivedModal = document.getElementById('archivedModal');
+            
+            if (event.target === userModal) {
+                closeModal();
+            } else if (event.target === linkModal) {
+                closeLinkModal();
+            } else if (event.target === archivedModal) {
+                closeArchivedModal();
+            }
+        }
+
+        // ========== ARCHIVED PROFILES FUNCTIONS ==========
+
+        async function openArchivedModal() {
+            try {
+                const response = await fetch('/api/users?archived=true');
+                const archivedUsers = await response.json();
+                renderArchivedTable(archivedUsers);
+                document.getElementById('archivedModal').classList.add('show');
+            } catch (error) {
+                console.error('Error loading archived users:', error);
+                alert('❌ Error loading archived users');
+            }
+        }
+
+        function closeArchivedModal() {
+            document.getElementById('archivedModal').classList.remove('show');
+        }
+
+        function renderArchivedTable(archivedUsers) {
+            const tbody = document.getElementById('archivedTableBody');
+            
+            if (archivedUsers.length === 0) {
+                tbody.innerHTML = '<tr><td colspan="6" style="text-align: center; padding: 20px; color: #7f8c8d;">No archived users found</td></tr>';
+                return;
+            }
+            
+            tbody.innerHTML = archivedUsers.map(user => `
+                <tr>
+                    <td>${user.username}</td>
+                    <td>${user.first_name} ${user.m_i ? user.m_i + '.' : ''} ${user.last_name}</td>
+                    <td>${user.email}</td>
+                    <td><span class="status-badge ${user.role}">${user.role.charAt(0).toUpperCase() + user.role.slice(1)}</span></td>
+                    <td>${user.created_at ? user.created_at.split('T')[0] : ''}</td>
+                    <td>
+                        <button class="btn-icon" onclick="restoreUser('${user.id}')" title="Restore User">
+                            <i class="fas fa-redo"></i>
+                        </button>
+                        <button class="btn-icon delete" onclick="permanentlyDeleteUser('${user.id}')" title="Permanently Delete">
+                            <i class="fas fa-trash-alt"></i>
+                        </button>
+                    </td>
+                </tr>
+            `).join('');
+        }
+
+        async function restoreUser(userId) {
+            if (confirm('⚠️ Are you sure you want to restore this user?')) {
+                try {
+                    const response = await fetch(`/api/users/${userId}/unarchive`, { 
+                        method: 'PUT',
+                        headers: { 'Content-Type': 'application/json' }
+                    });
+                    
+                    if (!response.ok) {
+                        const error = await response.json();
+                        throw new Error(error.detail || 'Failed to restore user');
+                    }
+                    
+                    alert('✅ User restored successfully!');
+                    await openArchivedModal();
+                    await fetchUsers();
+                    
+                } catch (error) {
+                    console.error('Error:', error);
+                    alert(`❌ Error: ${error.message}`);
+                }
+            }
+        }
+
+        async function permanentlyDeleteUser(userId) {
+            if (confirm('⚠️ WARNING: This will permanently delete this user. This action CANNOT be undone. Are you absolutely sure?')) {
+                try {
+                    const response = await fetch(`/api/users/${userId}`, { 
+                        method: 'DELETE'
+                    });
+                    
+                    if (!response.ok) {
+                        const error = await response.json();
+                        throw new Error(error.detail || 'Failed to delete user');
+                    }
+                    
+                    alert('✅ User permanently deleted!');
+                    await openArchivedModal();
+                    
+                } catch (error) {
+                    console.error('Error:', error);
+                    alert(`❌ Error: ${error.message}`);
+                }
+            }
+        }
+    </script>
+</body>
+</html>

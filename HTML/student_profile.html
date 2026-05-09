@@ -1,0 +1,300 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Profile - ALS Student Portal</title>
+    <link rel="stylesheet" href="../CSS/student_styles.css">
+    <link rel="stylesheet" href="../CSS/student_profile.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+</head>
+<body>
+    <div id="sidebarContainer"></div>
+    
+    <div class="main-content">
+        <div id="contentContainer">
+            <div class="profile-container">
+                <h1><i class="fas fa-user-circle"></i> My Profile</h1>
+
+                <!-- Profile Header -->
+                <div class="profile-header">
+                    <div class="profile-photo">
+                        <img id="profilePhotoImg" class="profile-photo-img" style="display: none;" alt="Profile Photo">
+                        <div id="profilePhotoPlaceholder" class="profile-photo-placeholder">
+                            <i class="fas fa-user"></i>
+                            <p>Photo</p>
+                        </div>
+                    </div>
+                    <div class="profile-info">
+                        <h2 id="studentFullName">Loading...</h2>
+                        <p id="studentRoleInfo">Loading...</p>
+                        <div class="profile-details-grid">
+                            <div class="profile-detail-item">
+                                <i class="fas fa-id-card"></i>
+                                <div>
+                                    <span class="label">LRN</span>
+                                    <span class="value" id="lrnValue">-</span>
+                                </div>
+                            </div>
+                            <div class="profile-detail-item">
+                                <i class="fas fa-calendar"></i>
+                                <div>
+                                    <span class="label">Birthdate</span>
+                                    <span class="value" id="birthdateValue">-</span>
+                                </div>
+                            </div>
+                            <div class="profile-detail-item">
+                                <i class="fas fa-venus-mars"></i>
+                                <div>
+                                    <span class="label">Sex</span>
+                                    <span class="value" id="sexValue">-</span>
+                                </div>
+                            </div>
+                            <div class="profile-detail-item">
+                                <i class="fas fa-phone"></i>
+                                <div>
+                                    <span class="label">Contact</span>
+                                    <span class="value" id="contactValue">-</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Academic Details Section -->
+                <div class="profile-section">
+                    <h3 class="section-title"><i class="fas fa-book"></i> Academic Details</h3>
+                    <div class="section-content">
+                        <div class="form-group-row">
+                            <div class="form-group">
+                                <label>Enrollment Date</label>
+                                <input type="text" id="enrollmentDate" readonly>
+                            </div>
+                            <div class="form-group">
+                                <label>Last Grade Completed</label>
+                                <input type="text" id="lastGradeLevel" readonly>
+                            </div>
+                        </div>
+                        <div class="form-group-row">
+                            <div class="form-group">
+                                <label>Elementary School</label>
+                                <input type="text" id="elementarySchool" readonly>
+                            </div>
+                            <div class="form-group">
+                                <label>Junior High School</label>
+                                <input type="text" id="juniorHighSchool" readonly>
+                            </div>
+                        </div>
+                        <div class="form-group-row">
+                            <div class="form-group">
+                                <label>Previous Literacy Level</label>
+                                <input type="text" id="previousLiteracyLevel" readonly>
+                            </div>
+                            <div class="form-group">
+                                <label>ALS Program Attended Before</label>
+                                <input type="text" id="attendedAlsBefore" readonly>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Personal Information Section -->
+                <div class="profile-section">
+                    <h3 class="section-title"><i class="fas fa-user-circle"></i> Personal Information</h3>
+                    <div class="section-content">
+                        <div class="form-group-row">
+                            <div class="form-group">
+                                <label>First Name</label>
+                                <input type="text" id="firstName" readonly>
+                            </div>
+                            <div class="form-group">
+                                <label>Middle Name</label>
+                                <input type="text" id="middleName" readonly>
+                            </div>
+                            <div class="form-group">
+                                <label>Last Name</label>
+                                <input type="text" id="lastName" readonly>
+                            </div>
+                        </div>
+                        <div class="form-group-row">
+                            <div class="form-group">
+                                <label>Email</label>
+                                <input type="email" id="emailAddress" readonly>
+                            </div>
+                            <div class="form-group">
+                                <label>Civil Status</label>
+                                <input type="text" id="civilStatus" readonly>
+                            </div>
+                        </div>
+                        <div class="form-group-row">
+                            <div class="form-group">
+                                <label>Religion</label>
+                                <input type="text" id="religion" readonly>
+                            </div>
+                            <div class="form-group">
+                                <label>IP/Ethnic Group</label>
+                                <input type="text" id="ipEthnicGroup" readonly>
+                            </div>
+                        </div>
+                        <div class="form-group-row">
+                            <div class="form-group">
+                                <label>Mother Tongue</label>
+                                <input type="text" id="motherTongue" readonly>
+                            </div>
+                            <div class="form-group">
+                                <label>PWD Status</label>
+                                <input type="text" id="isPwd" readonly>
+                            </div>
+                        </div>
+                        <div class="form-group-row">
+                            <div class="form-group">
+                                <label>4Ps Beneficiary</label>
+                                <input type="text" id="is4ps" readonly>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Complete Address Section -->
+                <div class="profile-section">
+                    <h3 class="section-title"><i class="fas fa-map-marker-alt"></i> Complete Address</h3>
+                    <div class="section-content">
+                        <div class="form-group-row">
+                            <div class="form-group editable">
+                                <label>House No./Street</label>
+                                <input type="text" id="houseNoStreet" readonly>
+                            </div>
+                            <div class="form-group editable">
+                                <label>Barangay</label>
+                                <input type="text" id="barangay" readonly>
+                            </div>
+                        </div>
+                        <div class="form-group-row">
+                            <div class="form-group editable">
+                                <label>City/Municipality</label>
+                                <input type="text" id="municipalityCity" readonly>
+                            </div>
+                            <div class="form-group editable">
+                                <label>Province</label>
+                                <input type="text" id="province" readonly>
+                            </div>
+                        </div>
+                        <div class="edit-button-group-address">
+                            <button class="edit-btn" onclick="enableEditMode()">
+                                <i class="fas fa-edit"></i> Edit Address
+                            </button>
+                            <button class="save-btn" onclick="saveAddressChanges()">
+                                <i class="fas fa-check"></i> Save Changes
+                            </button>
+                            <button class="cancel-btn" onclick="cancelEditMode()">
+                                <i class="fas fa-times"></i> Cancel
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Other Information Section -->
+                <div class="profile-section">
+                    <h3 class="section-title"><i class="fas fa-info-circle"></i> Other Information</h3>
+                    <div class="section-content">
+                        <div class="form-group-row">
+                            <div class="form-group">
+                                <label>Distance to Learning Center</label>
+                                <input type="text" id="distanceLearningCenter" readonly>
+                            </div>
+                            <div class="form-group">
+                                <label>Transportation Mode</label>
+                                <input type="text" id="transportationMode" readonly>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Parent Information Section -->
+                <div class="profile-section">
+                    <h3 class="section-title"><i class="fas fa-users"></i> Parent/Guardian Information</h3>
+                    <div class="section-content">
+                        <div class="form-group-row">
+                            <div class="form-group">
+                                <label>Father's Name</label>
+                                <input type="text" id="fatherName" readonly>
+                            </div>
+                            <div class="form-group">
+                                <label>Father's Occupation</label>
+                                <input type="text" id="fatherOccupation" readonly>
+                            </div>
+                        </div>
+                        <div class="form-group-row">
+                            <div class="form-group">
+                                <label>Mother's Name</label>
+                                <input type="text" id="motherName" readonly>
+                            </div>
+                            <div class="form-group">
+                                <label>Mother's Occupation</label>
+                                <input type="text" id="motherOccupation" readonly>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="edit-button-group">
+                    <div class="success-message" id="successMessage"></div>
+                    <div class="loading-message" id="loadingMessage">Loading your profile...</div>
+                    <div class="error-message" id="errorMessage"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="../JS/student_profile.js"></script>
+    <script>
+        // Load sidebar
+        document.addEventListener('DOMContentLoaded', () => {
+            fetch('../COMPONENTS/student_sidebar.html')
+                .then(response => response.text())
+                .then(html => {
+                    document.getElementById('sidebarContainer').innerHTML = html;
+                    initializeSidebar();
+                    loadProfileData();
+                });
+        });
+
+        function initializeSidebar() {
+            const currentPage = 'profile';
+            
+            // Get all nav tabs
+            const navTabs = document.querySelectorAll('.nav-tab');
+            
+            // Ensure nav tabs exist before adding listeners
+            if (navTabs.length === 0) {
+                console.warn('No nav tabs found');
+                return;
+            }
+            
+            navTabs.forEach(tab => {
+                // Mark current page as active
+                if (tab.dataset.page === currentPage) {
+                    tab.classList.add('active');
+                }
+                
+                // Add click listener
+                tab.addEventListener('click', (e) => {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    
+                    const page = tab.dataset.page;
+                    
+                    if (page === 'logout') {
+                        if (confirm('Are you sure you want to logout?')) {
+                            localStorage.removeItem('user');
+                            window.location.href = '/';
+                        }
+                    } else if (page !== currentPage) {
+                        window.location.href = `/student_${page}`;
+                    }
+                }, false);
+            });
+        }
+    </script>
+</body>
+</html>

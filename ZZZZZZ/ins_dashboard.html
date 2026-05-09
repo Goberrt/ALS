@@ -1,0 +1,75 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>ALS Learners Tracking Portal - Santa Cruz, Laguna</title>
+    <link rel="stylesheet" href="/CSS/als_portal_css.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.7.1/leaflet.css" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" />
+</head>
+<body>
+    <nav class="navbar">
+        <div class="nav-container">
+            <div class="nav-logo">
+                <img src="https://via.placeholder.com/40x40?text=LSPU" alt="ALS Logo" class="logo" />
+                <span class="nav-title">ALS Tracking Portal</span>
+            </div>
+            <div class="nav-menu">
+                <a href="/ins_dashboard" class="nav-link active"><i class="fas fa-home"></i> Dashboard</a>
+                <a href="/ins_mapping" class="nav-link "><i class="fas fa-map"></i> Geo Mapping</a>
+                <a href="/ins_learners" class="nav-link "><i class="fas fa-users"></i> Learners</a>
+                <a href="/ins_analytics" class="nav-link "><i class="fas fa-chart-bar"></i> Analytics</a>
+                <a href="/ins_reports" class="nav-link "><i class="fas fa-file-alt"></i> Reports</a>
+            </div>
+            <div class="nav-user">
+                <span class="user-name">Admin User</span>
+                <i class="fas fa-user-circle"></i>
+            </div>
+        </div>
+    </nav>
+    <main class="main-container">
+
+<div class="page-header">
+    <h1>ALS Dashboard - Santa Cruz, Laguna</h1>
+    <p>Overview of Alternative Learning System tracking and outreach</p>
+</div>
+<div class="stats-grid">
+    <div class="stat-card">
+        <div class="stat-icon"><i class="fas fa-graduation-cap"></i></div>
+        <div class="stat-content"><h3 id="total-als-graduates">245</h3><p>ALS Graduates</p></div>
+    </div>
+    <div class="stat-card">
+        <div class="stat-icon"><i class="fas fa-user-clock"></i></div>
+        <div class="stat-content"><h3 id="at-risk-learners">67</h3><p>At-Risk Learners</p></div>
+    </div>
+    <div class="stat-card">
+        <div class="stat-icon"><i class="fas fa-map-marker-alt"></i></div>
+        <div class="stat-content"><h3 id="mapped-locations">18</h3><p>Barangays Mapped</p></div>
+    </div>
+    <div class="stat-card">
+        <div class="stat-icon"><i class="fas fa-percentage"></i></div>
+        <div class="stat-content"><h3 id="completion-rate">78%</h3><p>Completion Rate</p></div>
+    </div>
+</div>
+<div class="dashboard-grid">
+    <div class="dashboard-card">
+        <h3>Recent Activities</h3>
+        <div class="activity-list">
+            <div class="activity-item"><i class="fas fa-user-plus"></i><span>New learner registered in Brgy. San Jose</span><small>2 hours ago</small></div>
+            <div class="activity-item"><i class="fas fa-map-pin"></i><span>Location updated for 3 learners in Brgy. Poblacion</span><small>5 hours ago</small></div>
+            <div class="activity-item"><i class="fas fa-award"></i><span>5 learners completed ALS program</span><small>1 day ago</small></div>
+        </div>
+    </div>
+    <div class="dashboard-card">
+        <h3>Quick Map Overview</h3>
+        <div id="mini-map" class="mini-map-container"></div>
+    </div>
+</div>
+
+    </main>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.7.1/leaflet.js"></script>
+    <script type="module" src="/JS/als_portal_js.js"></script>
+</body>
+</html>

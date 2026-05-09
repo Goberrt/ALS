@@ -1,0 +1,27 @@
+<!-- Quick Test File for Sidebar Navigation -->
+<!-- Just navigate to student_profile.html and check browser console for any errors -->
+
+Troubleshooting Steps:
+1. Open student_profile.html in your browser
+2. Press F12 to open Developer Tools
+3. Go to Console tab
+4. Check for any JavaScript errors (they should show in red)
+5. Try clicking on different nav tabs (Dashboard, Modules, Grades, etc.)
+
+If navigation still doesn't work:
+- Clear your browser cache (Ctrl+Shift+Delete)
+- Do a hard refresh (Ctrl+F5)
+- Check the Network tab in DevTools to see if requests are being made
+- Ensure all other page files exist (student_dashboard.html, student_modules.html, etc.)
+
+The sidebar should now:
+✓ Load properly with all navigation tabs
+✓ Highlight the current page (profile)
+✓ Allow clicking on other tabs to navigate
+✓ Allow clicking on profile photo to upload image
+✓ Show camera icon overlay on profile photo hover
+
+If you still have issues, check:
+1. Console for error messages
+2. Network tab to see if files are loading
+3. That other student pages exist and are accessible

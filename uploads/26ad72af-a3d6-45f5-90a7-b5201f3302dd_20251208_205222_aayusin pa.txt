@@ -1,0 +1,17 @@
+user management ni admin | check
+
+Pano ma sisigurado na hindi mag duplicate ang data na iinput
+swap learner connect failed pa.
+
+apply yung AF forms
+
+may function sa mapping na ilipat yung data sa AF2 which is sya na yung gagamitin as learners.
+
+Di magagamit ni student kapag di pa fillout ang information tab
+
+forgot password di nag uupdate sa database
+
+analytics itatanong pa
+reports di pa alam
+better logout
+responsive na reset pass

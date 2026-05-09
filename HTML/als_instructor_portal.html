@@ -1,0 +1,1148 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ALS Instructor Portal - Santa Cruz, Laguna</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.7.1/leaflet.css" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" />
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: #f5f5f5;
+            min-height: 100vh;
+            display: flex;
+        }
+
+        .sidebar {
+            width: 250px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            padding: 30px 0;
+            position: fixed;
+            height: 100vh;
+            overflow-y: auto;
+            box-shadow: 2px 0 10px rgba(0, 0, 0, 0.1);
+            z-index: 1000;
+        }
+
+        .sidebar-header {
+            color: white;
+            padding: 0 20px;
+            margin-bottom: 30px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.2);
+            padding-bottom: 20px;
+        }
+
+        .sidebar-header .logo-container {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            margin-bottom: 10px;
+        }
+
+        .sidebar-header .logo {
+            width: 40px;
+            height: 40px;
+            border-radius: 8px;
+            background: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            color: #667eea;
+        }
+
+        .sidebar-header h1 {
+            font-size: 18px;
+            margin-bottom: 5px;
+        }
+
+        .sidebar-header p {
+            font-size: 12px;
+            opacity: 0.8;
+        }
+
+        .nav-tabs {
+            display: flex;
+            flex-direction: column;
+            gap: 0;
+        }
+
+        .nav-tab {
+            padding: 15px 20px;
+            color: rgba(255, 255, 255, 0.7);
+            cursor: pointer;
+            transition: all 0.3s ease;
+            border-left: 4px solid transparent;
+            font-weight: 500;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            text-decoration: none;
+        }
+
+        .nav-tab:hover {
+            background: rgba(255, 255, 255, 0.1);
+            color: white;
+        }
+
+        .nav-tab.active {
+            background: rgba(255, 255, 255, 0.15);
+            color: white;
+            border-left-color: white;
+        }
+
+        .nav-tab i {
+            font-size: 18px;
+            width: 20px;
+        }
+
+        .main-content {
+            margin-left: 250px;
+            flex: 1;
+            padding: 30px;
+        }
+
+        header {
+            background: white;
+            padding: 30px;
+            border-radius: 10px;
+            margin-bottom: 30px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+
+        header h1 {
+            color: #333;
+            margin-bottom: 10px;
+            font-size: 28px;
+        }
+
+        header p {
+            color: #666;
+            font-size: 14px;
+        }
+
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+
+        .stat-card {
+            background: white;
+            padding: 25px;
+            border-radius: 10px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+            display: flex;
+            align-items: center;
+            gap: 20px;
+        }
+
+        .stat-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 8px 12px rgba(0, 0, 0, 0.15);
+        }
+
+        .stat-icon {
+            font-size: 40px;
+            color: #667eea;
+            width: 60px;
+            height: 60px;
+            background: linear-gradient(135deg, rgba(102, 126, 234, 0.1), rgba(118, 75, 162, 0.1));
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .stat-content h3 {
+            font-size: 28px;
+            font-weight: bold;
+            color: #667eea;
+            margin-bottom: 5px;
+        }
+
+        .stat-content p {
+            color: #666;
+            font-size: 14px;
+        }
+
+        .dashboard-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(400px, 1fr));
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+
+        .dashboard-card {
+            background: white;
+            padding: 25px;
+            border-radius: 10px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+
+        .dashboard-card h3 {
+            color: #333;
+            margin-bottom: 20px;
+            font-size: 18px;
+            border-bottom: 2px solid #667eea;
+            padding-bottom: 10px;
+        }
+
+        .activity-list {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+        }
+
+        .activity-item {
+            display: flex;
+            align-items: flex-start;
+            gap: 15px;
+            padding: 12px;
+            background: #f9f9f9;
+            border-radius: 6px;
+            border-left: 3px solid #667eea;
+        }
+
+        .activity-item i {
+            color: #667eea;
+            font-size: 18px;
+            margin-top: 2px;
+        }
+
+        .activity-item span {
+            flex: 1;
+            color: #333;
+            font-size: 14px;
+        }
+
+        .activity-item small {
+            color: #999;
+            font-size: 12px;
+            white-space: nowrap;
+        }
+
+        .mini-map-container {
+            height: 300px;
+            background: #e0e0e0;
+            border-radius: 6px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #666;
+        }
+
+        /* Analytics specific styles */
+        .analytics-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+            gap: 20px;
+        }
+
+        .analytics-card {
+            background: white;
+            padding: 25px;
+            border-radius: 10px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+
+        .analytics-card h3 {
+            color: #333;
+            margin-bottom: 20px;
+            font-size: 18px;
+            border-bottom: 2px solid #667eea;
+            padding-bottom: 10px;
+        }
+
+        .chart-container {
+            height: 250px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: #f9f9f9;
+            border-radius: 6px;
+            color: #999;
+        }
+
+        .completion-rates {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+        }
+
+        .rate-item {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .barangay-name {
+            min-width: 120px;
+            font-weight: 500;
+            color: #333;
+            font-size: 14px;
+        }
+
+        .rate-bar {
+            flex: 1;
+            height: 10px;
+            background: #e0e0e0;
+            border-radius: 5px;
+            overflow: hidden;
+        }
+
+        .rate-fill {
+            height: 100%;
+            background: linear-gradient(90deg, #667eea, #764ba2);
+            border-radius: 5px;
+        }
+
+        .rate-percent {
+            min-width: 50px;
+            text-align: right;
+            font-weight: 600;
+            color: #667eea;
+            font-size: 14px;
+        }
+
+        .risk-indicators {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+        }
+
+        .risk-item {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            padding: 15px;
+            border-radius: 6px;
+            background: #f9f9f9;
+        }
+
+        .risk-item i {
+            font-size: 24px;
+        }
+
+        .risk-item.high {
+            border-left: 4px solid #f44336;
+        }
+
+        .risk-item.high i {
+            color: #f44336;
+        }
+
+        .risk-item.medium {
+            border-left: 4px solid #ff9800;
+        }
+
+        .risk-item.medium i {
+            color: #ff9800;
+        }
+
+        .risk-item.low {
+            border-left: 4px solid #4caf50;
+        }
+
+        .risk-item.low i {
+            color: #4caf50;
+        }
+
+        .risk-content h4 {
+            color: #333;
+            margin-bottom: 5px;
+            font-size: 14px;
+        }
+
+        .risk-content p {
+            color: #666;
+            font-size: 13px;
+        }
+
+        /* Mapping specific styles */
+        .mapping-controls {
+            background: white;
+            padding: 20px;
+            border-radius: 10px;
+            margin-bottom: 20px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+
+        .filter-controls {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            flex-wrap: wrap;
+        }
+
+        .filter-controls label {
+            color: #333;
+            font-weight: 500;
+            font-size: 14px;
+        }
+
+        .filter-controls select {
+            padding: 8px 12px;
+            border: 1px solid #ddd;
+            border-radius: 6px;
+            font-size: 14px;
+            color: #333;
+            background: white;
+        }
+
+        .btn-primary {
+            padding: 10px 20px;
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            color: white;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 14px;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .btn-primary:hover {
+            transform: scale(1.05);
+            box-shadow: 0 4px 12px rgba(102, 126, 234, 0.4);
+        }
+
+        .map-container {
+            position: relative;
+            background: white;
+            border-radius: 10px;
+            padding: 20px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+
+        .main-map {
+            height: 600px;
+            border-radius: 6px;
+            background: #e0e0e0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #666;
+        }
+
+        .map-legend {
+            position: absolute;
+            top: 40px;
+            right: 40px;
+            background: white;
+            padding: 15px;
+            border-radius: 6px;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+        }
+
+        .map-legend h4 {
+            color: #333;
+            margin-bottom: 10px;
+            font-size: 14px;
+        }
+
+        .legend-item {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-bottom: 8px;
+            font-size: 13px;
+        }
+
+        .legend-marker {
+            width: 16px;
+            height: 16px;
+            border-radius: 50%;
+            border: 2px solid white;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+        }
+
+        .legend-marker.graduate {
+            background: #4caf50;
+        }
+
+        .legend-marker.current {
+            background: #2196f3;
+        }
+
+        .legend-marker.at-risk {
+            background: #ff9800;
+        }
+
+        .legend-marker.not-enrolled {
+            background: #9e9e9e;
+        }
+
+        /* Learners specific styles */
+        .learners-controls {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+            gap: 15px;
+            flex-wrap: wrap;
+        }
+
+        .search-box {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            background: white;
+            padding: 10px 15px;
+            border-radius: 6px;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+            flex: 1;
+            max-width: 400px;
+        }
+
+        .search-box i {
+            color: #999;
+        }
+
+        .search-box input {
+            border: none;
+            outline: none;
+            flex: 1;
+            font-size: 14px;
+            color: #333;
+        }
+
+        .learners-table-container {
+            background: white;
+            border-radius: 10px;
+            padding: 20px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            overflow-x: auto;
+        }
+
+        .learners-table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        .learners-table thead {
+            background: linear-gradient(135deg, rgba(102, 126, 234, 0.1), rgba(118, 75, 162, 0.1));
+        }
+
+        .learners-table th {
+            padding: 15px;
+            text-align: left;
+            color: #333;
+            font-weight: 600;
+            font-size: 14px;
+            border-bottom: 2px solid #667eea;
+        }
+
+        .learners-table td {
+            padding: 15px;
+            border-bottom: 1px solid #f0f0f0;
+            color: #666;
+            font-size: 14px;
+        }
+
+        .learners-table tbody tr:hover {
+            background: #f9f9f9;
+        }
+
+        /* Reports specific styles */
+        .reports-controls {
+            background: white;
+            padding: 20px;
+            border-radius: 10px;
+            margin-bottom: 20px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+
+        .report-filters {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            flex-wrap: wrap;
+        }
+
+        .report-filters label {
+            color: #333;
+            font-weight: 500;
+            font-size: 14px;
+        }
+
+        .report-filters select,
+        .report-filters input[type="date"] {
+            padding: 8px 12px;
+            border: 1px solid #ddd;
+            border-radius: 6px;
+            font-size: 14px;
+            color: #333;
+            background: white;
+        }
+
+        .reports-list {
+            background: white;
+            padding: 25px;
+            border-radius: 10px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+
+        .reports-list h3 {
+            color: #333;
+            margin-bottom: 20px;
+            font-size: 18px;
+            border-bottom: 2px solid #667eea;
+            padding-bottom: 10px;
+        }
+
+        .report-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 15px;
+            background: #f9f9f9;
+            border-radius: 6px;
+            margin-bottom: 12px;
+            border-left: 4px solid #667eea;
+        }
+
+        .report-info h4 {
+            color: #333;
+            margin-bottom: 5px;
+            font-size: 15px;
+        }
+
+        .report-info p {
+            color: #999;
+            font-size: 13px;
+        }
+
+        .btn-small {
+            padding: 6px 12px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 13px;
+            font-weight: 500;
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            transition: all 0.3s ease;
+        }
+
+        .btn-download {
+            background: #667eea;
+            color: white;
+        }
+
+        .btn-download:hover {
+            background: #5568d3;
+            transform: translateY(-2px);
+        }
+
+        @media (max-width: 768px) {
+            .sidebar {
+                width: 80px;
+                padding: 15px 0;
+            }
+
+            .sidebar-header {
+                padding: 0 10px;
+                margin-bottom: 20px;
+            }
+
+            .sidebar-header h1,
+            .sidebar-header p {
+                display: none;
+            }
+
+            .sidebar-header .logo {
+                width: 35px;
+                height: 35px;
+                font-size: 12px;
+            }
+
+            .nav-tab {
+                padding: 15px 10px;
+                justify-content: center;
+            }
+
+            .nav-tab span:not(.fas):not(.fa) {
+                display: none;
+            }
+
+            .nav-tab i {
+                font-size: 24px;
+                width: auto;
+            }
+
+            .main-content {
+                margin-left: 80px;
+                padding: 15px;
+            }
+
+            header h1 {
+                font-size: 22px;
+            }
+
+            .stats-grid,
+            .dashboard-grid,
+            .analytics-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="sidebar">
+        <div class="sidebar-header">
+            <div class="logo-container">
+                <div class="logo">ALS</div>
+                <div>
+                    <h1>ALS Portal</h1>
+                    <p>Admin User</p>
+                </div>
+            </div>
+        </div>
+        <div class="nav-tabs">
+            <a href="#dashboard" class="nav-tab active" data-page="dashboard">
+                <i class="fas fa-home"></i>
+                <span>Dashboard</span>
+            </a>
+            <a href="#mapping" class="nav-tab" data-page="mapping">
+                <i class="fas fa-map"></i>
+                <span>Geo Mapping</span>
+            </a>
+            <a href="#learners" class="nav-tab" data-page="learners">
+                <i class="fas fa-users"></i>
+                <span>Learners</span>
+            </a>
+            <a href="#analytics" class="nav-tab" data-page="analytics">
+                <i class="fas fa-chart-bar"></i>
+                <span>Analytics</span>
+            </a>
+            <a href="#reports" class="nav-tab" data-page="reports">
+                <i class="fas fa-file-alt"></i>
+                <span>Reports</span>
+            </a>
+        </div>
+    </div>
+
+    <div class="main-content">
+        <!-- Dashboard Page -->
+        <div id="dashboard" class="page-content active">
+            <header>
+                <h1>ALS Dashboard - Santa Cruz, Laguna</h1>
+                <p>Overview of Alternative Learning System tracking and outreach</p>
+            </header>
+
+            <div class="stats-grid">
+                <div class="stat-card">
+                    <div class="stat-icon"><i class="fas fa-graduation-cap"></i></div>
+                    <div class="stat-content">
+                        <h3>245</h3>
+                        <p>ALS Graduates</p>
+                    </div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-icon"><i class="fas fa-user-clock"></i></div>
+                    <div class="stat-content">
+                        <h3>67</h3>
+                        <p>At-Risk Learners</p>
+                    </div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-icon"><i class="fas fa-map-marker-alt"></i></div>
+                    <div class="stat-content">
+                        <h3>18</h3>
+                        <p>Barangays Mapped</p>
+                    </div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-icon"><i class="fas fa-percentage"></i></div>
+                    <div class="stat-content">
+                        <h3>78%</h3>
+                        <p>Completion Rate</p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="dashboard-grid">
+                <div class="dashboard-card">
+                    <h3>Recent Activities</h3>
+                    <div class="activity-list">
+                        <div class="activity-item">
+                            <i class="fas fa-user-plus"></i>
+                            <span>New learner registered in Brgy. San Jose</span>
+                            <small>2 hours ago</small>
+                        </div>
+                        <div class="activity-item">
+                            <i class="fas fa-map-pin"></i>
+                            <span>Location updated for 3 learners in Brgy. Poblacion</span>
+                            <small>5 hours ago</small>
+                        </div>
+                        <div class="activity-item">
+                            <i class="fas fa-award"></i>
+                            <span>5 learners completed ALS program</span>
+                            <small>1 day ago</small>
+                        </div>
+                    </div>
+                </div>
+                <div class="dashboard-card">
+                    <h3>Quick Map Overview</h3>
+                    <div class="mini-map-container">Map preview placeholder</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Mapping Page -->
+        <div id="mapping" class="page-content">
+            <header>
+                <h1>Geo Mapping - Santa Cruz, Laguna</h1>
+                <p>Interactive mapping of ALS learners and graduates</p>
+            </header>
+
+            <div class="mapping-controls">
+                <div class="filter-controls">
+                    <label for="learner-type">Filter by Type:</label>
+                    <select id="learner-type">
+                        <option value="all">All Learners</option>
+                        <option value="graduates">ALS Graduates</option>
+                        <option value="current">Current Learners</option>
+                        <option value="at-risk">At-Risk Learners</option>
+                        <option value="not-enrolled">Not Enrolled</option>
+                    </select>
+                    <label for="barangay-filter">Barangay:</label>
+                    <select id="barangay-filter">
+                        <option value="all">All Barangays</option>
+                        <option value="poblacion">Poblacion</option>
+                        <option value="san-jose">San Jose</option>
+                        <option value="bagumbayan">Bagumbayan</option>
+                    </select>
+                    <button class="btn-primary"><i class="fas fa-sync-alt"></i> Refresh Map</button>
+                </div>
+            </div>
+
+            <div class="map-container">
+                <div class="main-map">Interactive map placeholder</div>
+                <div class="map-legend">
+                    <h4>Legend</h4>
+                    <div class="legend-item">
+                        <span class="legend-marker graduate"></span>
+                        <span>ALS Graduate</span>
+                    </div>
+                    <div class="legend-item">
+                        <span class="legend-marker current"></span>
+                        <span>Current Learner</span>
+                    </div>
+                    <div class="legend-item">
+                        <span class="legend-marker at-risk"></span>
+                        <span>At-Risk Learner</span>
+                    </div>
+                    <div class="legend-item">
+                        <span class="legend-marker not-enrolled"></span>
+                        <span>Not Enrolled</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Learners Page -->
+        <div id="learners" class="page-content">
+            <header>
+                <h1>Learners Management</h1>
+                <p>Manage and track ALS learner information</p>
+            </header>
+
+            <div class="learners-controls">
+                <button class="btn-primary"><i class="fas fa-plus"></i> Add New Learner</button>
+                <div class="search-box">
+                    <i class="fas fa-search"></i>
+                    <input type="text" placeholder="Search learners..." />
+                </div>
+            </div>
+
+            <div class="learners-table-container">
+                <table class="learners-table">
+                    <thead>
+                        <tr>
+                            <th>Name</th>
+                            <th>Status</th>
+                            <th>Barangay</th>
+                            <th>Last Contact</th>
+                            <th>Progress</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>Juan Dela Cruz</td>
+                            <td>Current Learner</td>
+                            <td>Poblacion</td>
+                            <td>Oct 20, 2025</td>
+                            <td>75%</td>
+                            <td><button class="btn-small btn-download">View</button></td>
+                        </tr>
+                        <tr>
+                            <td>Maria Santos</td>
+                            <td>Graduate</td>
+                            <td>San Jose</td>
+                            <td>Oct 15, 2025</td>
+                            <td>100%</td>
+                            <td><button class="btn-small btn-download">View</button></td>
+                        </tr>
+                        <tr>
+                            <td>Pedro Reyes</td>
+                            <td>At-Risk</td>
+                            <td>Bagumbayan</td>
+                            <td>Oct 10, 2025</td>
+                            <td>45%</td>
+                            <td><button class="btn-small btn-download">View</button></td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <!-- Analytics Page -->
+        <div id="analytics" class="page-content">
+            <header>
+                <h1>Analytics & Insights</h1>
+                <p>Data-driven insights for decision support</p>
+            </header>
+
+            <div class="analytics-grid">
+                <div class="analytics-card">
+                    <h3>Enrollment Trends</h3>
+                    <div class="chart-container">Chart placeholder</div>
+                </div>
+                <div class="analytics-card">
+                    <h3>Geographic Distribution</h3>
+                    <div class="chart-container">Chart placeholder</div>
+                </div>
+                <div class="analytics-card">
+                    <h3>Completion Rates by Barangay</h3>
+                    <div class="completion-rates">
+                        <div class="rate-item">
+                            <span class="barangay-name">Poblacion</span>
+                            <div class="rate-bar">
+                                <div class="rate-fill" style="width:85%"></div>
+                            </div>
+                            <span class="rate-percent">85%</span>
+                        </div>
+                        <div class="rate-item">
+                            <span class="barangay-name">San Jose</span>
+                            <div class="rate-bar">
+                                <div class="rate-fill" style="width:72%"></div>
+                            </div>
+                            <span class="rate-percent">72%</span>
+                        </div>
+                        <div class="rate-item">
+                            <span class="barangay-name">Bagumbayan</span>
+                            <div class="rate-bar">
+                                <div class="rate-fill" style="width:68%"></div>
+                            </div>
+                            <span class="rate-percent">68%</span>
+                        </div>
+                    </div>
+                </div>
+                <div class="analytics-card">
+                    <h3>Risk Assessment</h3>
+                    <div class="risk-indicators">
+                        <div class="risk-item high">
+                            <i class="fas fa-exclamation-triangle"></i>
+                            <div class="risk-content">
+                                <h4>High Risk Areas</h4>
+                                <p>3 barangays need immediate attention</p>
+                            </div>
+                        </div>
+                        <div class="risk-item medium">
+                            <i class="fas fa-exclamation-circle"></i>
+                            <div class="risk-content">
+                                <h4>Medium Risk</h4>
+                                <p>5 barangays require monitoring</p>
+                            </div>
+                        </div>
+                        <div class="risk-item low">
+                            <i class="fas fa-check-circle"></i>
+                            <div class="risk-content">
+                                <h4>Low Risk</h4>
+                                <p>10 barangays performing well</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Reports Page -->
+        <div id="reports" class="page-content">
+            <header>
+                <h1>Reports & Documentation</h1>
+                <p>Generate and download comprehensive reports</p>
+            </header>
+
+            <div class="reports-controls">
+                <div class="report-filters">
+                    <label for="report-type">Report Type:</label>
+                    <select id="report-type">
+                        <option value="summary">Summary Report</option>
+                        <option value="detailed">Detailed Analysis</option>
+                        <option value="geographic">Geographic Distribution</option>
+                        <option value="performance">Performance Metrics</option>
+                    </select>
+                    <label for="date-range">Date Range:</label>
+                    <input type="date" id="start-date" />
+                    <input type="date" id="end-date" />
+                    <button class="btn-primary"><i class="fas fa-file-export"></i> Generate Report</button>
+                </div>
+            </div>
+
+            <div class="reports-list">
+                <h3>Recent Reports</h3>
+                <div class="report-item">
+                    <div class="report-info">
+                        <h4>Monthly Summary - August 2024</h4>
+                        <p>Generated on August 30, 2024</p>
+                    </div>
+                    <div class="report-actions">
+                        <button class="btn-small btn-download"><i class="fas fa-download"></i> Download</button>
+                    </div>
+                </div>
+                <div class="report-item">
+                    <div class="report-info">
+                        <h4>Geographic Analysis - Q2 2024</h4>
+                        <p>Generated on July 15, 2024</p>
+                    </div>
+                    <div class="report-actions">
+                        <button class="btn-small btn-download"><i class="fas fa-download"></i> Download</button>
+                    </div>
+                </div>
+                <div class="report-item">
+                    <div class="report-info">
+                        <h4>Performance Metrics - September 2024</h4>
+                        <p>Generated on September 28, 2024</p>
+                    </div>
+                    <div class="report-actions">
+                        <button class="btn-small btn-download"><i class="fas fa-download"></i> Download</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.7.1/leaflet.js"></script>
+    <script>
+        // Page navigation
+        document.querySelectorAll('.nav-tab').forEach(tab => {
+            tab.addEventListener('click', function(e) {
+                e.preventDefault();
+                
+                // Remove active class from all tabs and pages
+                document.querySelectorAll('.nav-tab').forEach(t => t.classList.remove('active'));
+                document.querySelectorAll('.page-content').forEach(p => p.style.display = 'none');
+                
+                // Add active class to clicked tab
+                this.classList.add('active');
+                
+                // Show corresponding page
+                const page = this.getAttribute('data-page');
+                const pageElement = document.getElementById(page);
+                if (pageElement) {
+                    pageElement.style.display = 'block';
+                }
+            });
+        });
+
+        // Initialize - show dashboard by default
+        document.getElementById('dashboard').style.display = 'block';
+        document.querySelectorAll('.page-content').forEach((page, index) => {
+            if (index !== 0) page.style.display = 'none';
+        });
+
+        // Search functionality
+        const searchInput = document.querySelector('.search-box input');
+        if (searchInput) {
+            searchInput.addEventListener('input', function(e) {
+                const searchTerm = e.target.value.toLowerCase();
+                const rows = document.querySelectorAll('.learners-table tbody tr');
+                
+                rows.forEach(row => {
+                    const text = row.textContent.toLowerCase();
+                    row.style.display = text.includes(searchTerm) ? '' : 'none';
+                });
+            });
+        }
+
+        // Filter controls
+        const learnerTypeSelect = document.getElementById('learner-type');
+        const barangaySelect = document.getElementById('barangay-filter');
+        
+        if (learnerTypeSelect) {
+            learnerTypeSelect.addEventListener('change', function() {
+                console.log('Filter changed:', this.value);
+                // Add your filtering logic here
+            });
+        }
+        
+        if (barangaySelect) {
+            barangaySelect.addEventListener('change', function() {
+                console.log('Barangay filter changed:', this.value);
+                // Add your filtering logic here
+            });
+        }
+
+        // Report generation
+        const generateReportBtn = document.getElementById('generate-report');
+        if (generateReportBtn) {
+            generateReportBtn.addEventListener('click', function() {
+                const reportType = document.getElementById('report-type').value;
+                const startDate = document.getElementById('start-date').value;
+                const endDate = document.getElementById('end-date').value;
+                
+                if (!startDate || !endDate) {
+                    alert('Please select a date range');
+                    return;
+                }
+                
+                console.log('Generating report:', {reportType, startDate, endDate});
+                alert('Report generation started. This would typically trigger a download.');
+            });
+        }
+
+        // Add learner button
+        const addLearnerBtn = document.querySelector('.learners-controls .btn-primary');
+        if (addLearnerBtn) {
+            addLearnerBtn.addEventListener('click', function() {
+                alert('Add learner modal would open here');
+            });
+        }
+
+        // View buttons in learners table
+        document.querySelectorAll('.learners-table .btn-small').forEach(btn => {
+            btn.addEventListener('click', function() {
+                const row = this.closest('tr');
+                const name = row.cells[0].textContent;
+                alert('Viewing details for: ' + name);
+            });
+        });
+
+        // Download report buttons
+        document.querySelectorAll('.report-actions .btn-download').forEach(btn => {
+            btn.addEventListener('click', function() {
+                const reportName = this.closest('.report-item').querySelector('h4').textContent;
+                console.log('Downloading:', reportName);
+                alert('Downloading: ' + reportName);
+            });
+        });
+    </script>
+</body>
+</html>

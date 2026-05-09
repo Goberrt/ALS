@@ -1,0 +1,8 @@
+fastapi
+uvicorn
+supabase>=2.0.0
+python-dotenv
+bcrypt
+pyjwt
+aiosmtplib
+email-validator

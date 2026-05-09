@@ -1,0 +1,681 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>My Certifications</title>
+    <link rel="stylesheet" href="../CSS/student_styles.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
+    <style>
+        .main-content {
+            margin-left: 250px;
+            padding: 20px;
+        }
+
+        header {
+            margin-bottom: 30px;
+        }
+
+        header h1 {
+            color: #2c3e50;
+            font-size: 28px;
+            margin-bottom: 5px;
+        }
+
+        header p {
+            color: #7f8c8d;
+        }
+
+        .certifications-container {
+            padding: 20px;
+        }
+
+        .certifications-grid {
+            display: flex;
+            flex-direction: column;
+            gap: 40px;
+            margin-top: 20px;
+        }
+
+        .certificate-card {
+            background: white;
+            border-radius: 12px;
+            box-shadow: 0 2px 12px rgba(0, 0, 0, 0.1);
+            padding: 20px;
+            border-left: 4px solid #3498db;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .certificate-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+            padding-bottom: 15px;
+            border-bottom: 2px solid #ecf0f1;
+        }
+
+        .certificate-info {
+            flex: 1;
+        }
+
+        .certificate-title {
+            font-size: 20px;
+            font-weight: bold;
+            color: #2c3e50;
+            margin-bottom: 5px;
+        }
+
+        .certificate-meta {
+            font-size: 14px;
+            color: #7f8c8d;
+        }
+
+        .certificate-canvas-container {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            background: #f8f9fa;
+            border-radius: 8px;
+            padding: 20px;
+            margin-bottom: 15px;
+            min-height: 500px;
+        }
+
+        .certificate-canvas-container canvas {
+            max-width: 100%;
+            height: auto;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.15);
+        }
+
+        .certificate-card:hover {
+            box-shadow: 0 4px 16px rgba(0, 0, 0, 0.15);
+            transform: translateY(-2px);
+        }
+
+        .certificate-icon {
+            font-size: 48px;
+            color: #f39c12;
+            margin-bottom: 15px;
+        }
+
+        .certificate-program {
+            font-size: 18px;
+            font-weight: 700;
+            color: #2c3e50;
+            margin-bottom: 8px;
+        }
+
+        .certificate-date {
+            color: #7f8c8d;
+            font-size: 14px;
+            margin-bottom: 12px;
+        }
+
+        .certificate-remarks {
+            color: #34495e;
+            font-size: 13px;
+            margin-bottom: 15px;
+            font-style: italic;
+            padding: 10px;
+            background: #f8f9fa;
+            border-radius: 6px;
+            min-height: 30px;
+        }
+
+        .certificate-actions {
+            display: flex;
+            gap: 10px;
+            margin-top: auto;
+        }
+
+        .btn-cert {
+            flex: 1;
+            padding: 10px;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            font-weight: 600;
+            font-size: 13px;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 6px;
+        }
+
+        .btn-view-cert {
+            background: #3498db;
+            color: white;
+        }
+
+        .btn-view-cert:hover {
+            background: #2980b9;
+        }
+
+        .btn-download-cert {
+            background: #e8f5e9;
+            color: #388e3c;
+        }
+
+        .btn-download-cert:hover {
+            background: #c8e6c9;
+        }
+
+        .no-certificates {
+            text-align: center;
+            padding: 60px 20px;
+            color: #7f8c8d;
+        }
+
+        .no-certificates i {
+            font-size: 64px;
+            margin-bottom: 20px;
+            color: #bdc3c7;
+        }
+
+        .no-certificates h2 {
+            color: #2c3e50;
+            margin-bottom: 10px;
+        }
+
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 1000;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.5);
+        }
+
+        .pdf-viewer-modal .modal-content {
+            max-width: 900px;
+            padding: 0;
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+            margin: 5% auto;
+            max-height: 90vh;
+            border-radius: 8px;
+        }
+
+        .pdf-viewer-header {
+            padding: 20px 30px;
+            border-bottom: 1px solid #ecf0f1;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background: #f8f9fa;
+        }
+
+        .pdf-viewer-header h2 {
+            margin: 0;
+            color: #2c3e50;
+            font-size: 18px;
+        }
+
+        .close-modal {
+            background: none;
+            border: none;
+            font-size: 28px;
+            cursor: pointer;
+            color: #7f8c8d;
+            transition: color 0.3s ease;
+        }
+
+        .close-modal:hover {
+            color: #2c3e50;
+        }
+
+        .pdf-viewer-actions {
+            display: flex;
+            gap: 10px;
+        }
+
+        .pdf-viewer-container {
+            flex: 1;
+            overflow: auto;
+            padding: 20px;
+            background: #e8e8e8;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        #pdfCanvas {
+            max-width: 100%;
+            border: 1px solid #bdc3c7;
+            background: white;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+        }
+
+        .btn-download {
+            background: #27ae60;
+            color: white;
+            padding: 8px 12px;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            font-weight: 600;
+            font-size: 13px;
+            transition: all 0.3s ease;
+        }
+
+        .btn-download:hover {
+            background: #229954;
+        }
+
+        .burger-menu {
+            display: none;
+            background: none;
+            border: none;
+            font-size: 24px;
+            cursor: pointer;
+            padding: 10px;
+            color: #2c3e50;
+        }
+
+        @media (max-width: 768px) {
+            .burger-menu {
+                display: block;
+            }
+
+            .main-content {
+                margin-left: 0;
+            }
+
+            .certifications-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .certificate-actions {
+                flex-direction: column;
+            }
+
+            .pdf-viewer-modal .modal-content {
+                width: 95%;
+                margin: 20% auto;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Burger Menu Button -->
+    <button class="burger-menu" id="burgerMenu">
+        <i class="fas fa-bars"></i>
+    </button>
+
+    <!-- Sidebar Overlay -->
+    <div class="sidebar-overlay" id="sidebarOverlay"></div>
+
+    <!-- Sidebar -->
+    <div id="sidebarContainer"></div>
+
+    <div class="main-content">
+        <header>
+            <h1><i class="fas fa-certificate"></i> My Certifications</h1>
+            <p>View and download your program completion certificates</p>
+        </header>
+
+        <div class="certifications-container">
+            <div id="certificationsContent">
+                <div class="no-certificates">
+                    <i class="fas fa-file-pdf"></i>
+                    <h2>No Certificates Yet</h2>
+                    <p>You don't have any certificates yet. Complete your ALS program to receive your certificate!</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- PDF Viewer Modal -->
+    <div id="pdfViewerModal" class="modal pdf-viewer-modal">
+        <div class="modal-content">
+            <div class="pdf-viewer-header">
+                <h2 id="pdfViewerTitle">Certificate</h2>
+                <div class="pdf-viewer-actions">
+                    <button class="btn-download" onclick="downloadPDF()" title="Download Certificate">
+                        <i class="fas fa-download"></i> Download
+                    </button>
+                    <button class="close-modal" onclick="closePDFViewer()">&times;</button>
+                </div>
+            </div>
+            <div class="pdf-viewer-container">
+                <canvas id="pdfCanvas"></canvas>
+            </div>
+        </div>
+    </div>
+
+    <script src="../JS/sidebar_utils.js"></script>
+    <script>
+        let currentPdfData = null;
+        let studentId = null;
+
+        // Load sidebar
+        fetch('../COMPONENTS/student_sidebar.html')
+            .then(response => response.text())
+            .then(html => {
+                document.getElementById('sidebarContainer').innerHTML = html;
+                initializeSidebar();
+                loadSidebarProfile();
+            })
+            .catch(error => console.error('Error loading sidebar:', error));
+
+        function initializeSidebar() {
+            const currentTab = document.querySelector('[data-page="certification"]');
+            if (currentTab) {
+                currentTab.classList.add('active');
+            }
+
+            const burgerMenu = document.getElementById('burgerMenu');
+            const sidebar = document.querySelector('.sidebar');
+            const sidebarOverlay = document.getElementById('sidebarOverlay');
+
+            if (!burgerMenu || !sidebar || !sidebarOverlay) return;
+
+            // Toggle sidebar
+            burgerMenu.addEventListener('click', () => {
+                sidebar.classList.toggle('active');
+                sidebarOverlay.classList.toggle('active');
+                document.body.style.overflow = sidebar.classList.contains('active') ? 'hidden' : '';
+            });
+
+            // Close sidebar when clicking overlay
+            sidebarOverlay.addEventListener('click', () => {
+                sidebar.classList.remove('active');
+                sidebarOverlay.classList.remove('active');
+                document.body.style.overflow = '';
+            });
+
+            // Close sidebar when clicking a nav item
+            document.querySelectorAll('.nav-tab').forEach(tab => {
+                tab.addEventListener('click', () => {
+                    const page = tab.dataset.page;
+                    if (page === 'logout') {
+                        localStorage.removeItem('user');
+                        window.location.href = '/';
+                        return;
+                    }
+                    window.location.href = `/student_${page}`;
+                    
+                    sidebar.classList.remove('active');
+                    sidebarOverlay.classList.remove('active');
+                    document.body.style.overflow = '';
+                });
+            });
+        }
+
+        function getStudentId() {
+            // Get from localStorage or session
+            const user = JSON.parse(localStorage.getItem('user') || '{}');
+            return user.id || sessionStorage.getItem('user_id');
+        }
+
+        async function loadCertificates() {
+            studentId = getStudentId();
+            
+            if (!studentId) {
+                console.error('Student ID not found');
+                return;
+            }
+
+            try {
+                const response = await fetch(`/api/student/certificates?student_id=${studentId}`);
+                const result = await response.json();
+
+                if (result.success && result.total > 0) {
+                    displayCertificates(result.certificates);
+                } else {
+                    displayNoCertificates();
+                }
+            } catch (error) {
+                console.error('Error loading certificates:', error);
+                displayNoCertificates();
+            }
+        }
+
+        function displayCertificates(certificates) {
+            const content = document.getElementById('certificationsContent');
+            
+            content.innerHTML = `
+                <div class="certifications-grid">
+                    ${certificates.map((cert, index) => {
+                        // Handle hex-encoded filename
+                        let filename = cert.certificate_file;
+                        if (filename.startsWith('\\x')) {
+                            try {
+                                const hexString = filename.substring(2);
+                                filename = String.fromCharCode(...hexString.match(/.{1,2}/g).map(x => parseInt(x, 16)));
+                            } catch (e) {
+                                console.error('Could not decode filename:', e);
+                            }
+                        }
+                        // Remove .pdf extension for display
+                        const displayName = filename.replace(/\.pdf$/i, '');
+                        
+                        return `
+                        <div class="certificate-card" data-cert-id="${cert.id}">
+                            <div class="certificate-header">
+                                <div class="certificate-info">
+                                    <div class="certificate-title">${displayName}</div>
+                                    <div class="certificate-meta">Issued: ${new Date(cert.issued_date).toLocaleDateString()}</div>
+                                    ${cert.remarks ? `<div class="certificate-meta">${cert.remarks}</div>` : ''}
+                                </div>
+                                <button class="btn-cert btn-download-cert" onclick="downloadCertificateFile('${cert.id}')">
+                                    <i class="fas fa-download"></i> Download
+                                </button>
+                            </div>
+                            <div class="certificate-canvas-container" id="canvas-${index}"></div>
+                        </div>
+                    `;
+                    }).join('')}
+                </div>
+            `;
+            
+            // Load and render all PDFs
+            certificates.forEach((cert, index) => {
+                loadAndRenderPDF(cert.id, index);
+            });
+        }
+
+        async function loadAndRenderPDF(certId, index) {
+            try {
+                const response = await fetch(`/api/certificates/${certId}`);
+                
+                if (!response.ok) {
+                    console.error('Failed to load certificate');
+                    return;
+                }
+                
+                const result = await response.json();
+                
+                if (!result.file_data) {
+                    console.error('No file data');
+                    return;
+                }
+                
+                // Convert base64 to binary
+                const binaryString = atob(result.file_data);
+                const bytes = new Uint8Array(binaryString.length);
+                for (let i = 0; i < binaryString.length; i++) {
+                    bytes[i] = binaryString.charCodeAt(i);
+                }
+                
+                const pdfData = bytes.buffer;
+                const pdf = pdfjsLib.getDocument(pdfData);
+                
+                pdf.promise.then(function(pdfDoc) {
+                    pdfDoc.getPage(1).then(function(page) {
+                        const canvas = document.createElement('canvas');
+                        const context = canvas.getContext('2d');
+                        const viewport = page.getViewport({ scale: 1.5 });
+                        
+                        canvas.width = viewport.width;
+                        canvas.height = viewport.height;
+                        
+                        page.render({ canvasContext: context, viewport: viewport }).promise.then(() => {
+                            const container = document.getElementById(`canvas-${index}`);
+                            if (container) {
+                                container.innerHTML = '';
+                                container.appendChild(canvas);
+                            }
+                        });
+                    });
+                }).catch(error => {
+                    console.error('Error rendering PDF:', error);
+                });
+            } catch (error) {
+                console.error('Error loading certificate:', error);
+            }
+        }
+
+        function displayNoCertificates() {
+            const content = document.getElementById('certificationsContent');
+            content.innerHTML = `
+                <div class="no-certificates">
+                    <i class="fas fa-file-pdf"></i>
+                    <h2>No Certificates Yet</h2>
+                    <p>You don't have any certificates yet. Complete your ALS program to receive your certificate!</p>
+                </div>
+            `;
+        }
+
+        async function viewCertificate(certId) {
+            try {
+                console.log('Fetching certificate:', certId);
+                const response = await fetch(`/api/certificates/${certId}`);
+                console.log('Response status:', response.status);
+
+                if (!response.ok) {
+                    const errorText = await response.text();
+                    console.error('Error response:', errorText);
+                    
+                    let errorMessage = `Failed to retrieve certificate: ${response.status} ${response.statusText}`;
+                    try {
+                        const errorData = JSON.parse(errorText);
+                        if (errorData.detail) {
+                            errorMessage = errorData.detail;
+                        }
+                    } catch (e) {
+                        // Not JSON, use text
+                    }
+                    
+                    alert(errorMessage);
+                    return;
+                }
+
+                const result = await response.json();
+                console.log('Certificate data:', result);
+                currentPdfData = result;
+                
+                if (!result.file_data) {
+                    alert('Certificate file is empty or missing');
+                    return;
+                }
+                
+                // Display filename without .pdf extension
+                const cleanFilename = result.file_name.replace('.pdf', '').replace(/\.pdf$/i, '');
+                document.getElementById('pdfViewerTitle').textContent = cleanFilename;
+                
+                // Render PDF
+                const binaryString = atob(result.file_data);
+                const bytes = new Uint8Array(binaryString.length);
+                for (let i = 0; i < binaryString.length; i++) {
+                    bytes[i] = binaryString.charCodeAt(i);
+                }
+                
+                const pdfData = bytes.buffer;
+                const pdf = pdfjsLib.getDocument(pdfData);
+                
+                pdf.promise.then(function(pdfDoc) {
+                    pdfDoc.getPage(1).then(function(page) {
+                        const canvas = document.getElementById('pdfCanvas');
+                        const context = canvas.getContext('2d');
+                        const viewport = page.getViewport({ scale: 1.5 });
+                        
+                        canvas.width = viewport.width;
+                        canvas.height = viewport.height;
+                        
+                        page.render({ canvasContext: context, viewport: viewport });
+                    });
+                });
+                
+                document.getElementById('pdfViewerModal').style.display = 'block';
+            } catch (error) {
+                console.error('Error loading certificate:', error);
+                alert('Failed to load certificate: ' + error.message);
+            }
+        }
+
+        function closePDFViewer() {
+            document.getElementById('pdfViewerModal').style.display = 'none';
+        }
+
+        function downloadPDF() {
+            if (!currentPdfData) return;
+
+            const binaryString = atob(currentPdfData.file_data);
+            const bytes = new Uint8Array(binaryString.length);
+            for (let i = 0; i < binaryString.length; i++) {
+                bytes[i] = binaryString.charCodeAt(i);
+            }
+
+            const blob = new Blob([bytes], { type: 'application/pdf' });
+            const url = window.URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = currentPdfData.file_name;
+            document.body.appendChild(a);
+            a.click();
+            window.URL.revokeObjectURL(url);
+            document.body.removeChild(a);
+        }
+
+        async function downloadCertificateFile(certId) {
+            try {
+                const response = await fetch(`/api/certificates/${certId}`);
+
+                if (!response.ok) {
+                    alert('Failed to download certificate');
+                    return;
+                }
+
+                const result = await response.json();
+                const binaryString = atob(result.file_data);
+                const bytes = new Uint8Array(binaryString.length);
+                for (let i = 0; i < binaryString.length; i++) {
+                    bytes[i] = binaryString.charCodeAt(i);
+                }
+
+                const blob = new Blob([bytes], { type: 'application/pdf' });
+                const url = window.URL.createObjectURL(blob);
+                const a = document.createElement('a');
+                a.href = url;
+                a.download = result.file_name;
+                document.body.appendChild(a);
+                a.click();
+                window.URL.revokeObjectURL(url);
+                document.body.removeChild(a);
+            } catch (error) {
+                console.error('Error:', error);
+                alert('Failed to download certificate');
+            }
+        }
+
+        // Close modal when clicking outside
+        window.onclick = function(event) {
+            const modal = document.getElementById('pdfViewerModal');
+            if (event.target === modal) {
+                modal.style.display = 'none';
+            }
+        };
+
+        // Load certificates on page load
+        loadCertificates();
+    </script>
+</body>
+</html>

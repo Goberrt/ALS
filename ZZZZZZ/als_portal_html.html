@@ -1,0 +1,451 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ALS Learners Tracking Portal - Santa Cruz, Laguna</title>
+    <link rel="stylesheet" href="../CSS/als_portal_css.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.7.1/leaflet.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+</head>
+<body>
+    <!-- Navigation Header -->
+    <nav class="navbar">
+        <div class="nav-container">
+            <div class="nav-logo">
+                <img src="https://via.placeholder.com/40x40?text=LSPU" alt="LSPU Logo" class="logo">
+                <span class="nav-title">ALS Tracking Portal</span>
+            </div>
+            <div class="nav-menu">
+                <a href="#dashboard" class="nav-link active" data-tab="dashboard">
+                    <i class="fas fa-home"></i> Dashboard
+                </a>
+                <a href="#mapping" class="nav-link" data-tab="mapping">
+                    <i class="fas fa-map"></i> Geo Mapping
+                </a>
+                <a href="#learners" class="nav-link" data-tab="learners">
+                    <i class="fas fa-users"></i> Learners
+                </a>
+                <a href="#analytics" class="nav-link" data-tab="analytics">
+                    <i class="fas fa-chart-bar"></i> Analytics
+                </a>
+                <a href="#reports" class="nav-link" data-tab="reports">
+                    <i class="fas fa-file-alt"></i> Reports
+                </a>
+            </div>
+            <div class="nav-user">
+                <span class="user-name">Admin User</span>
+                <i class="fas fa-user-circle"></i>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Main Container -->
+    <main class="main-container">
+        <!-- Dashboard Tab -->
+        <section id="dashboard" class="tab-content active">
+            <div class="page-header">
+                <h1>ALS Dashboard - Santa Cruz, Laguna</h1>
+                <p>Overview of Alternative Learning System tracking and outreach</p>
+            </div>
+            
+            <div class="stats-grid">
+                <div class="stat-card">
+                    <div class="stat-icon">
+                        <i class="fas fa-graduation-cap"></i>
+                    </div>
+                    <div class="stat-content">
+                        <h3 id="total-als-graduates">245</h3>
+                        <p>ALS Graduates</p>
+                    </div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-icon">
+                        <i class="fas fa-user-clock"></i>
+                    </div>
+                    <div class="stat-content">
+                        <h3 id="at-risk-learners">67</h3>
+                        <p>At-Risk Learners</p>
+                    </div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-icon">
+                        <i class="fas fa-map-marker-alt"></i>
+                    </div>
+                    <div class="stat-content">
+                        <h3 id="mapped-locations">18</h3>
+                        <p>Barangays Mapped</p>
+                    </div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-icon">
+                        <i class="fas fa-percentage"></i>
+                    </div>
+                    <div class="stat-content">
+                        <h3 id="completion-rate">78%</h3>
+                        <p>Completion Rate</p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="dashboard-grid">
+                <div class="dashboard-card">
+                    <h3>Recent Activities</h3>
+                    <div class="activity-list">
+                        <div class="activity-item">
+                            <i class="fas fa-user-plus"></i>
+                            <span>New learner registered in Brgy. San Jose</span>
+                            <small>2 hours ago</small>
+                        </div>
+                        <div class="activity-item">
+                            <i class="fas fa-map-pin"></i>
+                            <span>Location updated for 3 learners in Brgy. Poblacion</span>
+                            <small>5 hours ago</small>
+                        </div>
+                        <div class="activity-item">
+                            <i class="fas fa-award"></i>
+                            <span>5 learners completed ALS program</span>
+                            <small>1 day ago</small>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="dashboard-card">
+                    <h3>Quick Map Overview</h3>
+                    <div id="mini-map" class="mini-map-container"></div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Geo Mapping Tab -->
+        <section id="mapping" class="tab-content">
+            <div class="page-header">
+                <h1>Geo Mapping - Santa Cruz, Laguna</h1>
+                <p>Interactive mapping of ALS learners and graduates</p>
+            </div>
+            
+            <div class="mapping-controls">
+                <div class="filter-controls">
+                    <label for="learner-type">Filter by Type:</label>
+                    <select id="learner-type">
+                        <option value="all">All Learners</option>
+                        <option value="graduates">ALS Graduates</option>
+                        <option value="current">Current Learners</option>
+                        <option value="at-risk">At-Risk Learners</option>
+                        <option value="not-enrolled">Not Enrolled</option>
+                    </select>
+
+                    <label for="barangay-filter">Barangay:</label>
+                    <select id="barangay-filter">
+                        <option value="all">All Barangays</option>
+                        <option value="poblacion">Poblacion</option>
+                        <option value="san-jose">San Jose</option>
+                        <option value="bagumbayan">Bagumbayan</option>
+                        <option value="jasaan">Jasaan</option>
+                        <option value="pagsawitan">Pagsawitan</option>
+                    </select>
+
+                    <button id="refresh-map" class="btn-primary">
+                        <i class="fas fa-sync-alt"></i> Refresh Map
+                    </button>
+                </div>
+            </div>
+
+            <div class="map-container">
+                <div id="main-map" class="main-map"></div>
+                <div class="map-legend">
+                    <h4>Legend</h4>
+                    <div class="legend-item">
+                        <span class="legend-marker graduate"></span>
+                        <span>ALS Graduate</span>
+                    </div>
+                    <div class="legend-item">
+                        <span class="legend-marker current"></span>
+                        <span>Current Learner</span>
+                    </div>
+                    <div class="legend-item">
+                        <span class="legend-marker at-risk"></span>
+                        <span>At-Risk Learner</span>
+                    </div>
+                    <div class="legend-item">
+                        <span class="legend-marker not-enrolled"></span>
+                        <span>Not Enrolled</span>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Learners Management Tab -->
+        <section id="learners" class="tab-content">
+            <div class="page-header">
+                <h1>Learners Management</h1>
+                <p>Manage and track ALS learner information</p>
+            </div>
+
+            <div class="learners-controls">
+                <button id="add-learner" class="btn-primary">
+                    <i class="fas fa-plus"></i> Add New Learner
+                </button>
+                <div class="search-box">
+                    <i class="fas fa-search"></i>
+                    <input type="text" id="learner-search" placeholder="Search learners...">
+                </div>
+            </div>
+
+            <div class="learners-table-container">
+                <table class="learners-table">
+                    <thead>
+                        <tr>
+                            <th>Name</th>
+                            <th>Status</th>
+                            <th>Barangay</th>
+                            <th>Last Contact</th>
+                            <th>Progress</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody id="learners-tbody">
+                        <tr>
+                            <td>Juan Dela Cruz</td>
+                            <td><span class="status-badge graduate">Graduate</span></td>
+                            <td>Poblacion</td>
+                            <td>2024-08-15</td>
+                            <td>
+                                <div class="progress-bar">
+                                    <div class="progress-fill" style="width: 100%"></div>
+                                </div>
+                            </td>
+                            <td>
+                                <button class="btn-small btn-view">
+                                    <i class="fas fa-eye"></i>
+                                </button>
+                                <button class="btn-small btn-edit">
+                                    <i class="fas fa-edit"></i>
+                                </button>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>Maria Santos</td>
+                            <td><span class="status-badge current">Current</span></td>
+                            <td>San Jose</td>
+                            <td>2024-08-28</td>
+                            <td>
+                                <div class="progress-bar">
+                                    <div class="progress-fill" style="width: 65%"></div>
+                                </div>
+                            </td>
+                            <td>
+                                <button class="btn-small btn-view">
+                                    <i class="fas fa-eye"></i>
+                                </button>
+                                <button class="btn-small btn-edit">
+                                    <i class="fas fa-edit"></i>
+                                </button>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>Pedro Rodriguez</td>
+                            <td><span class="status-badge at-risk">At-Risk</span></td>
+                            <td>Bagumbayan</td>
+                            <td>2024-07-20</td>
+                            <td>
+                                <div class="progress-bar">
+                                    <div class="progress-fill" style="width: 30%"></div>
+                                </div>
+                            </td>
+                            <td>
+                                <button class="btn-small btn-view">
+                                    <i class="fas fa-eye"></i>
+                                </button>
+                                <button class="btn-small btn-edit">
+                                    <i class="fas fa-edit"></i>
+                                </button>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </section>
+
+        <!-- Analytics Tab -->
+        <section id="analytics" class="tab-content">
+            <div class="page-header">
+                <h1>Analytics & Insights</h1>
+                <p>Data-driven insights for decision support</p>
+            </div>
+
+            <div class="analytics-grid">
+                <div class="analytics-card">
+                    <h3>Enrollment Trends</h3>
+                    <div id="enrollment-chart" class="chart-container"></div>
+                </div>
+
+                <div class="analytics-card">
+                    <h3>Geographic Distribution</h3>
+                    <div id="distribution-chart" class="chart-container"></div>
+                </div>
+
+                <div class="analytics-card">
+                    <h3>Completion Rates by Barangay</h3>
+                    <div class="completion-rates">
+                        <div class="rate-item">
+                            <span class="barangay-name">Poblacion</span>
+                            <div class="rate-bar">
+                                <div class="rate-fill" style="width: 85%"></div>
+                            </div>
+                            <span class="rate-percent">85%</span>
+                        </div>
+                        <div class="rate-item">
+                            <span class="barangay-name">San Jose</span>
+                            <div class="rate-bar">
+                                <div class="rate-fill" style="width: 72%"></div>
+                            </div>
+                            <span class="rate-percent">72%</span>
+                        </div>
+                        <div class="rate-item">
+                            <span class="barangay-name">Bagumbayan</span>
+                            <div class="rate-bar">
+                                <div class="rate-fill" style="width: 68%"></div>
+                            </div>
+                            <span class="rate-percent">68%</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="analytics-card">
+                    <h3>Risk Assessment</h3>
+                    <div class="risk-indicators">
+                        <div class="risk-item high">
+                            <i class="fas fa-exclamation-triangle"></i>
+                            <div class="risk-content">
+                                <h4>High Risk Areas</h4>
+                                <p>3 barangays need immediate attention</p>
+                            </div>
+                        </div>
+                        <div class="risk-item medium">
+                            <i class="fas fa-exclamation-circle"></i>
+                            <div class="risk-content">
+                                <h4>Medium Risk</h4>
+                                <p>5 barangays require monitoring</p>
+                            </div>
+                        </div>
+                        <div class="risk-item low">
+                            <i class="fas fa-check-circle"></i>
+                            <div class="risk-content">
+                                <h4>Low Risk</h4>
+                                <p>10 barangays performing well</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Reports Tab -->
+        <section id="reports" class="tab-content">
+            <div class="page-header">
+                <h1>Reports & Documentation</h1>
+                <p>Generate and download comprehensive reports</p>
+            </div>
+
+            <div class="reports-controls">
+                <div class="report-filters">
+                    <label for="report-type">Report Type:</label>
+                    <select id="report-type">
+                        <option value="summary">Summary Report</option>
+                        <option value="detailed">Detailed Analysis</option>
+                        <option value="geographic">Geographic Distribution</option>
+                        <option value="performance">Performance Metrics</option>
+                    </select>
+
+                    <label for="date-range">Date Range:</label>
+                    <input type="date" id="start-date">
+                    <input type="date" id="end-date">
+
+                    <button id="generate-report" class="btn-primary">
+                        <i class="fas fa-file-export"></i> Generate Report
+                    </button>
+                </div>
+            </div>
+
+            <div class="reports-list">
+                <h3>Recent Reports</h3>
+                <div class="report-item">
+                    <div class="report-info">
+                        <h4>Monthly Summary - August 2024</h4>
+                        <p>Generated on August 30, 2024</p>
+                    </div>
+                    <div class="report-actions">
+                        <button class="btn-small btn-download">
+                            <i class="fas fa-download"></i> Download
+                        </button>
+                    </div>
+                </div>
+                <div class="report-item">
+                    <div class="report-info">
+                        <h4>Geographic Analysis - Q2 2024</h4>
+                        <p>Generated on July 15, 2024</p>
+                    </div>
+                    <div class="report-actions">
+                        <button class="btn-small btn-download">
+                            <i class="fas fa-download"></i> Download
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <!-- Modal for Adding New Learner -->
+    <div id="add-learner-modal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3>Add New Learner</h3>
+                <span class="close">&times;</span>
+            </div>
+            <div class="modal-body">
+                <form id="add-learner-form">
+                    <div class="form-group">
+                        <label for="learner-name">Full Name:</label>
+                        <input type="text" id="learner-name" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="learner-status">Status:</label>
+                        <select id="learner-status" required>
+                            <option value="">Select Status</option>
+                            <option value="current">Current Learner</option>
+                            <option value="graduate">Graduate</option>
+                            <option value="at-risk">At-Risk</option>
+                            <option value="not-enrolled">Not Enrolled</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label for="learner-barangay">Barangay:</label>
+                        <select id="learner-barangay" required>
+                            <option value="">Select Barangay</option>
+                            <option value="poblacion">Poblacion</option>
+                            <option value="san-jose">San Jose</option>
+                            <option value="bagumbayan">Bagumbayan</option>
+                            <option value="jasaan">Jasaan</option>
+                            <option value="pagsawitan">Pagsawitan</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label for="learner-address">Complete Address:</label>
+                        <textarea id="learner-address" rows="3"></textarea>
+                    </div>
+                    <div class="form-actions">
+                        <button type="submit" class="btn-primary">Save Learner</button>
+                        <button type="button" class="btn-secondary" id="cancel-add">Cancel</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- Scripts -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.7.1/leaflet.js"></script>
+    <script src="../JS/als_portal_js.js"></script>
+
+</body>
+</html>

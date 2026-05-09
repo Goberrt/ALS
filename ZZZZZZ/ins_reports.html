@@ -1,0 +1,79 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>ALS Learners Tracking Portal - Santa Cruz, Laguna</title>
+    <link rel="stylesheet" href="/CSS/als_portal_css.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.7.1/leaflet.css" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" />
+</head>
+<body>
+    <nav class="navbar">
+        <div class="nav-container">
+            <div class="nav-logo">
+                <img src="https://via.placeholder.com/40x40?text=LSPU" alt="LSPU Logo" class="logo" />
+                <span class="nav-title">ALS Tracking Portal</span>
+            </div>
+            <div class="nav-menu">
+                <a href="/ins_dashboard" class="nav-link "><i class="fas fa-home"></i> Dashboard</a>
+                <a href="/ins_mapping" class="nav-link "><i class="fas fa-map"></i> Geo Mapping</a>
+                <a href="/ins_learners" class="nav-link "><i class="fas fa-users"></i> Learners</a>
+                <a href="/ins_analytics" class="nav-link "><i class="fas fa-chart-bar"></i> Analytics</a>
+                <a href="/ins_reports" class="nav-link active"><i class="fas fa-file-alt"></i> Reports</a>
+            </div>
+            <div class="nav-user">
+                <span class="user-name">Admin User</span>
+                <i class="fas fa-user-circle"></i>
+            </div>
+        </div>
+    </nav>
+    <main class="main-container">
+
+<div class="page-header">
+    <h1>Reports & Documentation</h1>
+    <p>Generate and download comprehensive reports</p>
+</div>
+<div class="reports-controls">
+    <div class="report-filters">
+        <label for="report-type">Report Type:</label>
+        <select id="report-type">
+            <option value="summary">Summary Report</option>
+            <option value="detailed">Detailed Analysis</option>
+            <option value="geographic">Geographic Distribution</option>
+            <option value="performance">Performance Metrics</option>
+        </select>
+        <label for="date-range">Date Range:</label>
+        <input type="date" id="start-date" />
+        <input type="date" id="end-date" />
+        <button id="generate-report" class="btn-primary"><i class="fas fa-file-export"></i> Generate Report</button>
+    </div>
+</div>
+<div class="reports-list">
+    <h3>Recent Reports</h3>
+    <div class="report-item">
+        <div class="report-info">
+            <h4>Monthly Summary - August 2024</h4>
+            <p>Generated on August 30, 2024</p>
+        </div>
+        <div class="report-actions">
+            <button class="btn-small btn-download"><i class="fas fa-download"></i> Download</button>
+        </div>
+    </div>
+    <div class="report-item">
+        <div class="report-info">
+            <h4>Geographic Analysis - Q2 2024</h4>
+            <p>Generated on July 15, 2024</p>
+        </div>
+        <div class="report-actions">
+            <button class="btn-small btn-download"><i class="fas fa-download"></i> Download</button>
+        </div>
+    </div>
+</div>
+
+    </main>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.7.1/leaflet.js"></script>
+    <script src="/JS/als_portal_js.js"></script>
+</body>
+</html>

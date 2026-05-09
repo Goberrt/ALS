@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ALS Student Portal - My Grades</title>
+    <link rel="stylesheet" href="../CSS/student_styles.css">
+    <link rel="stylesheet" href="../CSS/student_grades.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+</head>
+<body>
+    <!-- Burger Menu Button -->
+    <button class="burger-menu" id="burgerMenu">
+        <i class="fas fa-bars"></i>
+    </button>
+
+    <!-- Sidebar Overlay -->
+    <div class="sidebar-overlay" id="sidebarOverlay"></div>
+    
+    <!-- Sidebar -->
+    <div id="sidebarContainer"></div>
+    
+    <div class="main-content">
+        <header>
+            <h1>My Grades</h1>
+            <p>Track your academic performance across all subjects</p>
+        </header>
+
+        <div class="grades-container">
+            <!-- Overall Performance Card -->
+            <div class="overall-card">
+                <div class="overall-header">
+                    <h2><i class="fas fa-chart-line"></i> Overall Performance</h2>
+                </div>
+                <div class="overall-stats">
+                    <div class="overall-stat">
+                        <div class="overall-value" id="overallGrade">--%</div>
+                        <div class="overall-label">Overall Grade</div>
+                    </div>
+                    <div class="overall-stat">
+                        <div class="overall-value" id="totalPoints">0</div>
+                        <div class="overall-label">Points Earned</div>
+                    </div>
+                    <div class="overall-stat">
+                        <div class="overall-value" id="possiblePoints">0</div>
+                        <div class="overall-label">Total Possible</div>
+                    </div>
+                    <div class="overall-stat">
+                        <div class="overall-value" id="gradedCount">0</div>
+                        <div class="overall-label">Assignments Graded</div>
+                    </div>
+                </div>
+                <div class="progress-container">
+                    <div class="progress-bar">
+                        <div class="progress-fill" id="progressBar"></div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Grades by Subject -->
+            <section class="section">
+                <h2 class="section-title">
+                    <i class="fas fa-book"></i>
+                    Grades by Subject
+                </h2>
+                <div id="subjectsGradesContainer" class="subject-grid">
+                    <div class="loading">
+                        <i class="fas fa-spinner fa-spin"></i> Loading...
+                    </div>
+                </div>
+            </section>
+
+            <!-- Recent Graded Work -->
+            <section class="section">
+                <h2 class="section-title">
+                    <i class="fas fa-history"></i>
+                    Recent Graded Work
+                </h2>
+                <div id="recentGradesContainer" class="recent-grades-list">
+                    <div class="loading">
+                        <i class="fas fa-spinner fa-spin"></i> Loading...
+                    </div>
+                </div>
+            </section>
+        </div>
+    </div>
+
+    <script src="../JS/sidebar_utils.js"></script>
+    <script src="../JS/student_grades.js"></script>
+</body>
+</html>

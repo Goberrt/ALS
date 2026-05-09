@@ -1,0 +1,1453 @@
+/**
+ * DSS Frontend Styles
+ * Add this to your CSS directory and link in instructor_mapping.html
+ * <link rel="stylesheet" href="../CSS/dss_styles.css">
+ */
+
+/* ==================== DSS TOGGLE BUTTON ==================== */
+
+.dss-toggle-btn {
+    position: absolute;
+    bottom: 15px;
+    right: 15px;
+    width: 50px;
+    height: 50px;
+    border-radius: 50%;
+    background: linear-gradient(135deg, #3498db 0%, #2980b9 100%);
+    color: white;
+    border: none;
+    cursor: pointer;
+    font-size: 20px;
+    box-shadow: 0 4px 12px rgba(52, 152, 219, 0.4);
+    transition: all 0.3s ease;
+    z-index: 100;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.dss-toggle-btn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 16px rgba(52, 152, 219, 0.6);
+}
+
+.dss-toggle-btn.active {
+    background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+}
+
+.dss-badge {
+    position: absolute;
+    bottom: -5px;
+    right: -5px;
+    background: #ff6b6b;
+    color: white;
+    border-radius: 50%;
+    width: 24px;
+    height: 24px;
+    font-size: 10px;
+    font-weight: bold;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border: 2px solid white;
+}
+
+/* ==================== DSS PANEL ==================== */
+
+.dss-panel {
+    position: fixed;
+    right: -400px;
+    top: 0;
+    width: 400px;
+    height: 100vh;
+    background: white;
+    box-shadow: -4px 0 12px rgba(0, 0, 0, 0.15);
+    transition: right 0.3s ease;
+    z-index: 90;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+}
+
+/* In fullscreen mode, keep button inside the map container */
+.map-container:fullscreen .dss-toggle-btn,
+.map-container:-webkit-full-screen .dss-toggle-btn {
+    position: absolute;
+}
+
+/* In fullscreen mode, make panel absolute and fit the container */
+.map-container:fullscreen .dss-panel,
+.map-container:-webkit-full-screen .dss-panel {
+    position: absolute;
+    height: 100%;
+    z-index: 75;
+}
+
+.dss-panel.open {
+    right: 0;
+}
+
+/* Responsive - Mobile */
+@media (max-width: 768px) {
+    .dss-panel {
+        width: 100%;
+        right: -100%;
+    }
+
+    .dss-toggle-btn {
+        bottom: 20px;
+        right: 20px;
+    }
+}
+
+/* ==================== PANEL HEADER ==================== */
+
+.dss-panel-header {
+    padding: 20px;
+    border-bottom: 2px solid #f0f0f0;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    background: linear-gradient(135deg, #3498db 0%, #2980b9 100%);
+    color: white;
+}
+
+.dss-panel-header h3 {
+    margin: 0;
+    font-size: 18px;
+    font-weight: 600;
+}
+
+.dss-close-btn {
+    background: none;
+    border: none;
+    color: white;
+    font-size: 24px;
+    cursor: pointer;
+    padding: 0;
+    width: 30px;
+    height: 30px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 4px;
+    transition: background 0.2s;
+}
+
+.dss-close-btn:hover {
+    background: rgba(255, 255, 255, 0.2);
+}
+
+/* ==================== PANEL CONTENT ==================== */
+
+.dss-panel-content {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+}
+
+/* Tabs Navigation */
+.dss-tabs {
+    display: flex;
+    border-bottom: 1px solid #e0e0e0;
+    background: #f9f9f9;
+    overflow-x: auto;
+}
+
+.dss-tab-btn {
+    flex: 1;
+    padding: 12px 10px;
+    background: none;
+    border: none;
+    cursor: pointer;
+    font-size: 12px;
+    color: #666;
+    border-bottom: 3px solid transparent;
+    transition: all 0.2s;
+    white-space: nowrap;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 4px;
+}
+
+.dss-tab-btn:hover {
+    background: rgba(52, 152, 219, 0.05);
+    color: #3498db;
+}
+
+.dss-tab-btn.active {
+    color: #3498db;
+    border-bottom-color: #3498db;
+    font-weight: 600;
+}
+
+.dss-tab-btn i {
+    font-size: 14px;
+}
+
+/* Tab Content */
+.dss-tabs-content {
+    flex: 1;
+    overflow-y: auto;
+    padding: 20px;
+}
+
+.dss-tab-content {
+    display: none;
+}
+
+.dss-tab-content.active {
+    display: block;
+}
+
+.dss-loading {
+    text-align: center;
+    padding: 40px 20px;
+    color: #999;
+}
+
+.dss-loading i {
+    font-size: 32px;
+    margin-bottom: 10px;
+    color: #3498db;
+}
+
+.dss-message {
+    text-align: center;
+    padding: 20px;
+    color: #666;
+    background: #f5f5f5;
+    border-radius: 6px;
+}
+
+.dss-error {
+    color: #d32f2f;
+    padding: 20px;
+    background: #ffebee;
+    border-radius: 6px;
+}
+
+.dss-no-data {
+    text-align: center;
+    color: #999;
+    padding: 20px;
+}
+
+/* ==================== OVERVIEW TAB ==================== */
+
+.dss-overview {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+}
+
+.dss-overview-enhanced {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+    padding: 15px;
+    background: #fafafa;
+    border-radius: 8px;
+    max-height: 700px;
+    overflow-y: auto;
+}
+
+.dss-score-card {
+    display: flex;
+    gap: 15px;
+    align-items: center;
+    padding: 20px;
+    background: linear-gradient(135deg, #ffffff 0%, #f9f9f9 100%);
+    border-radius: 8px;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+    border-left: 4px solid #3498db;
+}
+
+.dss-score-circle {
+    width: 90px;
+    height: 90px;
+    border-radius: 50%;
+    border: 5px solid #3498db;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+    font-weight: 600;
+    background: white;
+    box-shadow: 0 2px 8px rgba(52, 152, 219, 0.2);
+}
+
+.dss-score-value {
+    font-size: 32px;
+    color: #3498db;
+    font-weight: 700;
+}
+
+.dss-score-label {
+    font-size: 10px;
+    color: #999;
+    font-weight: 600;
+}
+
+.dss-score-info {
+    flex: 1;
+}
+
+.dss-score-info h3 {
+    margin: 0 0 8px 0;
+    font-size: 18px;
+    color: #333;
+    font-weight: 600;
+}
+
+.dss-score-info p {
+    margin: 0 0 6px 0;
+    font-size: 12px;
+    color: #666;
+}
+
+.dss-priority-description {
+    color: #3498db;
+    font-weight: 500;
+}
+
+.dss-enrollment-trend {
+    color: #27ae60;
+    font-weight: 600;
+}
+
+.dss-enrollment-trend i {
+    margin-right: 4px;
+}
+
+/* Sections */
+.dss-section {
+    padding: 15px;
+    background: white;
+    border-radius: 6px;
+    box-shadow: 0 1px 4px rgba(0,0,0,0.05);
+}
+
+.dss-section h4 {
+    margin: 0 0 15px 0;
+    font-size: 14px;
+    font-weight: 600;
+    color: #333;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.dss-section h4 i {
+    color: #3498db;
+    font-size: 16px;
+}
+
+/* Composition Grid */
+.dss-composition-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 12px;
+}
+
+.dss-composition-card {
+    padding: 15px;
+    background: #f5f5f5;
+    border-radius: 6px;
+    text-align: center;
+    border: 2px solid transparent;
+    transition: all 0.3s ease;
+}
+
+.dss-composition-card.highlight {
+    background: linear-gradient(135deg, #e8f5e9 0%, #f1f8e9 100%);
+    border-color: #4CAF50;
+}
+
+.dss-composition-number {
+    font-size: 24px;
+    font-weight: 700;
+    color: #333;
+}
+
+.dss-composition-label {
+    font-size: 11px;
+    color: #666;
+    margin-top: 4px;
+}
+
+.dss-composition-pct {
+    font-size: 12px;
+    color: #4CAF50;
+    font-weight: 600;
+    margin-top: 4px;
+}
+
+/* Metrics Grid */
+.dss-metrics-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 12px;
+}
+
+.dss-metric {
+    padding: 12px;
+    background: #f5f5f5;
+    border-radius: 6px;
+    display: flex;
+    gap: 10px;
+    align-items: center;
+    border-left: 3px solid #3498db;
+}
+
+.dss-metric i {
+    font-size: 18px;
+    color: #3498db;
+    min-width: 24px;
+}
+
+.dss-metric-content {
+    flex: 1;
+}
+
+.dss-metric-value {
+    font-size: 16px;
+    font-weight: 700;
+    color: #333;
+}
+
+.dss-metric-label {
+    font-size: 11px;
+    color: #999;
+    margin-top: 2px;
+}
+
+/* Demographics */
+.dss-demographics-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 12px;
+}
+
+.dss-demographic-item {
+    padding: 12px;
+    background: #f5f5f5;
+    border-radius: 6px;
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+}
+
+.dss-demographic-label {
+    font-size: 11px;
+    color: #999;
+    font-weight: 600;
+    text-transform: uppercase;
+}
+
+.dss-demographic-value {
+    font-size: 13px;
+    color: #333;
+    font-weight: 600;
+}
+
+/* Barriers Mini */
+.dss-barriers-mini {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 12px;
+}
+
+.dss-barrier-mini {
+    padding: 12px;
+    background: #fafafa;
+    border-radius: 6px;
+    display: flex;
+    gap: 10px;
+    border: 1px solid #eee;
+    transition: all 0.3s ease;
+}
+
+.dss-barrier-mini:hover {
+    background: #fff;
+    border-color: #3498db;
+}
+
+.dss-barrier-mini-icon {
+    font-size: 24px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.dss-barrier-mini-content {
+    flex: 1;
+}
+
+.dss-barrier-mini-title {
+    font-size: 12px;
+    font-weight: 600;
+    color: #333;
+}
+
+.dss-barrier-mini-stat {
+    font-size: 11px;
+    color: #666;
+    margin-top: 2px;
+}
+
+/* Distance Distribution */
+.dss-distribution-grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 10px;
+}
+
+.dss-dist-item {
+    padding: 12px;
+    background: #f5f5f5;
+    border-radius: 6px;
+    text-align: center;
+    opacity: 0.6;
+    transition: all 0.3s ease;
+}
+
+.dss-dist-item.active {
+    opacity: 1;
+    background: #e8f5e9;
+    border: 1px solid #4CAF50;
+}
+
+.dss-dist-label {
+    font-size: 11px;
+    color: #666;
+    font-weight: 600;
+}
+
+.dss-dist-count {
+    font-size: 18px;
+    font-weight: 700;
+    color: #333;
+    margin-top: 4px;
+}
+
+/* Two Column Layout */
+.dss-two-column {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 20px;
+}
+
+.dss-column {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+.dss-subheading {
+    font-size: 12px;
+    font-weight: 600;
+    color: #333;
+    text-transform: uppercase;
+    padding-bottom: 6px;
+    border-bottom: 1px solid #eee;
+}
+
+.dss-list-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 8px;
+    background: #f9f9f9;
+    border-radius: 4px;
+    font-size: 12px;
+    color: #666;
+}
+
+.dss-badge {
+    background: #3498db;
+    color: white;
+    padding: 2px 8px;
+    border-radius: 12px;
+    font-size: 10px;
+    font-weight: 600;
+}
+
+/* Score Breakdown */
+.dss-score-breakdown {
+    padding: 12px;
+    background: #f9f9f9;
+    border-radius: 6px;
+}
+
+.dss-score-breakdown h4 {
+    margin: 0 0 10px 0;
+    font-size: 13px;
+}
+
+.dss-factor-list {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+}
+
+.dss-factor {
+    padding: 8px 10px;
+    background: white;
+    border-left: 3px solid #3498db;
+    font-size: 11px;
+    color: #666;
+    border-radius: 2px;
+}
+
+/* Indicators */
+.dss-indicators {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+.dss-indicator {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 8px;
+    background: #f5f5f5;
+    border-radius: 4px;
+    font-size: 12px;
+}
+
+.dss-indicator-label {
+    font-weight: 600;
+    color: #666;
+}
+
+.dss-indicator-value {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    font-weight: 600;
+    padding: 4px 8px;
+    border-radius: 4px;
+}
+
+.trend-increasing {
+    color: #4CAF50;
+    background: #e8f5e9;
+}
+
+.trend-decreasing {
+    color: #FF5722;
+    background: #ffebee;
+}
+
+.trend-stable {
+    color: #FFC107;
+    background: #fff8e1;
+}
+
+/* ==================== RECOMMENDATIONS TAB ==================== */
+
+.dss-recommendations {
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+}
+
+.dss-recommendation-card {
+    padding: 15px;
+    border-left: 4px solid #3498db;
+    background: #f9f9f9;
+    border-radius: 6px;
+}
+
+.dss-recommendation-card.priority-9,
+.dss-recommendation-card.priority-10 {
+    border-left-color: #4CAF50;
+    background: #e8f5e9;
+}
+
+.dss-recommendation-card.priority-7,
+.dss-recommendation-card.priority-8 {
+    border-left-color: #ff9800;
+}
+
+.dss-recommendation-card.priority-5,
+.dss-recommendation-card.priority-6 {
+    border-left-color: #ffc107;
+}
+
+.dss-rec-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    margin-bottom: 8px;
+    gap: 8px;
+}
+
+.dss-rec-title-group {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    flex: 1;
+}
+
+.dss-audience-label {
+    display: inline-block;
+    font-size: 12px;
+    font-weight: 600;
+    white-space: nowrap;
+    flex-shrink: 0;
+}
+
+.dss-rec-header h5 {
+    margin: 0;
+    font-size: 13px;
+    color: #333;
+    flex: 1;
+}
+
+.dss-priority-badge {
+    background: #3498db;
+    color: white;
+    padding: 2px 6px;
+    border-radius: 4px;
+    font-size: 10px;
+    font-weight: 600;
+    white-space: nowrap;
+}
+
+.dss-recommendation-card.priority-9 .dss-priority-badge,
+.dss-recommendation-card.priority-10 .dss-priority-badge {
+    background: #4CAF50;
+}
+
+.dss-recommendation-card.priority-7 .dss-priority-badge,
+.dss-recommendation-card.priority-8 .dss-priority-badge {
+    background: #ff9800;
+}
+
+.dss-recommendation-card.priority-5 .dss-priority-badge,
+.dss-recommendation-card.priority-6 .dss-priority-badge {
+    background: #ffc107;
+    color: #333;
+}
+
+.dss-rec-description {
+    margin: 8px 0;
+    font-size: 12px;
+    color: #666;
+}
+
+.dss-rec-details {
+    margin: 10px 0;
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+}
+
+.dss-rec-detail {
+    font-size: 11px;
+    color: #666;
+}
+
+.effort-low {
+    color: #4CAF50;
+}
+
+.effort-medium {
+    color: #FFC107;
+}
+
+.effort-high {
+    color: #FF5722;
+}
+
+.dss-rec-actions {
+    margin: 10px 0;
+}
+
+.dss-rec-actions h6 {
+    margin: 0 0 6px 0;
+    font-size: 11px;
+    font-weight: 600;
+}
+
+.dss-rec-actions ul {
+    margin: 0;
+    padding-left: 16px;
+}
+
+.dss-rec-actions li {
+    font-size: 11px;
+    color: #666;
+    margin-bottom: 4px;
+}
+
+.dss-rec-buttons {
+    display: flex;
+    gap: 8px;
+    margin-top: 10px;
+}
+
+.dss-btn-implement,
+.dss-btn-defer {
+    flex: 1;
+    padding: 6px;
+    border: none;
+    border-radius: 4px;
+    font-size: 11px;
+    cursor: pointer;
+    transition: all 0.2s;
+    font-weight: 600;
+}
+
+.dss-btn-implement {
+    background: #4CAF50;
+    color: white;
+}
+
+.dss-btn-implement:hover {
+    background: #45a049;
+}
+
+.dss-btn-defer {
+    background: #ffc107;
+    color: #333;
+}
+
+.dss-btn-defer:hover {
+    background: #e0a800;
+}
+
+/* ==================== FORECAST TAB ==================== */
+
+.dss-forecast {
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+}
+
+.dss-forecast-header {
+    padding: 12px;
+    background: #f5f5f5;
+    border-radius: 6px;
+}
+
+.dss-forecast-header h4 {
+    margin: 0 0 4px 0;
+    font-size: 14px;
+}
+
+.dss-forecast-header p {
+    margin: 2px 0;
+    font-size: 12px;
+    color: #666;
+}
+
+.dss-forecast-table {
+    overflow-x: auto;
+}
+
+.dss-forecast-table table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 12px;
+}
+
+.dss-forecast-table th,
+.dss-forecast-table td {
+    padding: 8px;
+    text-align: left;
+    border-bottom: 1px solid #e0e0e0;
+}
+
+.dss-forecast-table th {
+    background: #f5f5f5;
+    font-weight: 600;
+    color: #666;
+}
+
+.dss-forecast-value {
+    font-weight: 600;
+    color: #3498db;
+}
+
+.dss-confidence-bar {
+    width: 60px;
+    height: 4px;
+    background: #e0e0e0;
+    border-radius: 2px;
+    overflow: hidden;
+    display: inline-block;
+    margin-right: 4px;
+}
+
+.dss-confidence-fill {
+    height: 100%;
+    background: #3498db;
+    transition: width 0.3s;
+}
+
+.dss-forecast-note {
+    padding: 10px;
+    background: #e3f2fd;
+    border-radius: 4px;
+    font-size: 11px;
+    color: #1976d2;
+    margin: 0;
+}
+
+/* ==================== GAP ANALYSIS TAB ==================== */
+
+.dss-gap-analysis {
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+}
+
+.dss-gap-header {
+    padding: 12px;
+    background: #f5f5f5;
+    border-radius: 6px;
+}
+
+.dss-gap-header h4 {
+    margin: 0 0 4px 0;
+    font-size: 14px;
+}
+
+.dss-gap-header p {
+    margin: 0;
+    font-size: 12px;
+    color: #999;
+}
+
+.dss-gap-metrics {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 10px;
+}
+
+.dss-gap-item {
+    padding: 12px;
+    background: #f5f5f5;
+    border-radius: 6px;
+    display: flex;
+    gap: 10px;
+}
+
+.dss-gap-item.gap-critical {
+    grid-column: 1 / -1;
+    background: #ffebee;
+    border-left: 4px solid #d32f2f;
+}
+
+.dss-gap-item i {
+    font-size: 18px;
+    color: #3498db;
+    min-width: 24px;
+}
+
+/* ==================== LEARNER PROFILES TAB ==================== */
+
+.dss-learner-profiles {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+}
+
+.dss-profile-summary {
+    padding: 12px;
+    background: #f5f5f5;
+    border-radius: 6px;
+}
+
+.dss-profile-summary h4 {
+    margin: 0;
+    font-size: 14px;
+}
+
+.dss-learner-card {
+    padding: 12px;
+    border: 1px solid #e0e0e0;
+    border-radius: 6px;
+    background: white;
+    transition: all 0.2s ease;
+}
+
+.dss-learner-card:hover {
+    box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+}
+
+.dss-learner-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 10px;
+    padding-bottom: 8px;
+    border-bottom: 1px solid #f0f0f0;
+}
+
+.dss-learner-header h5 {
+    margin: 0;
+    font-size: 13px;
+    font-weight: 600;
+}
+
+.dss-status-badge {
+    padding: 2px 8px;
+    border-radius: 3px;
+    font-size: 10px;
+    font-weight: 600;
+    text-transform: uppercase;
+}
+
+.dss-status-badge.status-active {
+    background: #c8e6c9;
+    color: #2e7d32;
+}
+
+.dss-status-badge.status-completed {
+    background: #bbdefb;
+    color: #1565c0;
+}
+
+.dss-status-badge.status-dropout {
+    background: #ffccbc;
+    color: #d84315;
+}
+
+.dss-learner-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 8px;
+    margin-bottom: 10px;
+    font-size: 11px;
+}
+
+.dss-learner-info {
+    display: flex;
+    flex-direction: column;
+}
+
+.dss-learner-info label {
+    font-weight: 600;
+    color: #666;
+    font-size: 10px;
+    text-transform: uppercase;
+}
+
+.dss-learner-info span {
+    color: #333;
+    margin-top: 2px;
+}
+
+.dss-learner-details {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 10px;
+    margin-top: 10px;
+}
+
+.dss-detail-section {
+    padding: 8px;
+    background: #fafafa;
+    border-radius: 4px;
+}
+
+.dss-detail-section h6 {
+    margin: 0 0 6px 0;
+    font-size: 11px;
+    font-weight: 600;
+    color: #2c3e50;
+    display: flex;
+    align-items: center;
+    gap: 4px;
+}
+
+.dss-detail-section h6 i {
+    font-size: 12px;
+    color: #3498db;
+}
+
+.dss-detail-content {
+    font-size: 10px;
+    color: #666;
+}
+
+.dss-detail-content div {
+    margin-bottom: 4px;
+}
+
+.badge-pwd,
+.badge-4ps {
+    display: inline-block;
+    padding: 2px 6px;
+    margin-right: 4px;
+    border-radius: 3px;
+    font-size: 9px;
+    font-weight: 600;
+}
+
+.badge-pwd {
+    background: #e1bee7;
+    color: #6a1b9a;
+}
+
+.badge-4ps {
+    background: #fff9c4;
+    color: #f57f17;
+}
+
+/* ==================== BARRIER ANALYSIS TAB ==================== */
+
+.dss-barrier-analysis {
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+}
+
+.dss-barrier-summary {
+    padding: 12px;
+    background: #fff3e0;
+    border-left: 4px solid #ff9800;
+    border-radius: 4px;
+}
+
+.dss-barrier-summary h4 {
+    margin: 0 0 6px 0;
+    font-size: 13px;
+    font-weight: 600;
+    color: #e65100;
+}
+
+.dss-barrier-text {
+    margin: 0;
+    font-size: 11px;
+    color: #bf360c;
+}
+
+.dss-barrier-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+    gap: 10px;
+}
+
+.dss-barrier-card {
+    padding: 12px;
+    border-radius: 6px;
+    display: flex;
+    flexpython: column;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    border: 1px solid #e0e0e0;
+    transition: all 0.2s ease;
+}
+
+.dss-barrier-card:hover {
+    box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+    transform: translateY(-2px);
+}
+
+.dss-barrier-card.barrier-distance {
+    background: #ffe0b2;
+    border-color: #ff9800;
+}
+
+.dss-barrier-card.barrier-accessibility {
+    background: #f8bbd0;
+    border-color: #e91e63;
+}
+
+.dss-barrier-card.barrier-pwd {
+    background: #e1bee7;
+    border-color: #9c27b0;
+}
+
+.dss-barrier-card.barrier-4ps {
+    background: #fff9c4;
+    border-color: #fbc02d;
+}
+
+.dss-barrier-card.barrier-walking {
+    background: #c5e1a5;
+    border-color: #689f38;
+}
+
+.dss-barrier-icon {
+    font-size: 24px;
+    margin-bottom: 6px;
+}
+
+.dss-barrier-number {
+    font-size: 20px;
+    font-weight: bold;
+    margin-bottom: 4px;
+}
+
+.dss-barrier-label {
+    font-size: 11px;
+    font-weight: 600;
+    margin-bottom: 2px;
+}
+
+.dss-barrier-desc {
+    font-size: 10px;
+    opacity: 0.8;
+}
+
+.dss-barrier-learners {
+    margin-top: 8px;
+    padding-top: 8px;
+    border-top: 1px solid rgba(0,0,0,0.1);
+    max-height: 120px;
+    overflow-y: auto;
+}
+
+.dss-barrier-learner {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 4px 0;
+    font-size: 10px;
+    border-bottom: 1px dotted rgba(0,0,0,0.05);
+}
+
+.dss-barrier-learner:last-child {
+    border-bottom: none;
+}
+
+.barrier-learner-name {
+    font-weight: 600;
+    flex: 1;
+    margin-right: 4px;
+}
+
+.barrier-learner-detail {
+    background: rgba(0,0,0,0.1);
+    padding: 2px 6px;
+    border-radius: 2px;
+    font-size: 9px;
+    white-space: nowrap;
+}
+
+.dss-barrier-insights {
+    padding: 12px;
+    background: #e3f2fd;
+    border-radius: 6px;
+}
+
+.dss-barrier-insights h5 {
+    margin: 0 0 8px 0;
+    font-size: 12px;
+    font-weight: 600;
+    color: #1565c0;
+}
+
+.dss-barrier-insights ul {
+    margin: 0;
+    padding-left: 16px;
+}
+
+.dss-barrier-insights li {
+    font-size: 11px;
+    color: #0d47a1;
+    margin-bottom: 6px;
+}
+
+.barrier-limited-time {
+    background: #f3e5f5;
+    border-color: #7b1fa2;
+}
+
+.dss-gap-item.gap-critical i {
+    color: #d32f2f;
+}
+
+.dss-gap-item strong {
+    display: block;
+    font-size: 11px;
+    color: #666;
+    margin-bottom: 2px;
+}
+
+.dss-gap-item p {
+    margin: 0;
+    font-size: 14px;
+    font-weight: 600;
+    color: #333;
+}
+
+.dss-accessibility {
+    padding: 12px;
+    background: #f5f5f5;
+    border-radius: 6px;
+}
+
+.dss-accessibility h5 {
+    margin: 0 0 8px 0;
+    font-size: 13px;
+}
+
+.dss-accessibility-bar {
+    width: 100%;
+    height: 8px;
+    background: #e0e0e0;
+    border-radius: 4px;
+    overflow: hidden;
+    margin-bottom: 6px;
+}
+
+.dss-accessibility-fill {
+    height: 100%;
+    background: linear-gradient(90deg, #3498db, #2980b9);
+    transition: width 0.3s;
+}
+
+.dss-accessibility p {
+    margin: 0;
+    font-size: 11px;
+    color: #666;
+}
+
+.dss-critical-gaps {
+    padding: 12px;
+    background: #fff3e0;
+    border-radius: 6px;
+    border-left: 4px solid #ff9800;
+}
+
+.dss-critical-gaps h5 {
+    margin: 0 0 8px 0;
+    font-size: 13px;
+    color: #e65100;
+}
+
+.dss-critical-gaps ul {
+    margin: 0;
+    padding-left: 20px;
+}
+
+.dss-critical-gaps li {
+    font-size: 12px;
+    color: #666;
+    margin-bottom: 4px;
+}
+
+/* ==================== PANEL FOOTER ==================== */
+
+.dss-panel-footer {
+    padding: 15px;
+    border-top: 1px solid #e0e0e0;
+    display: flex;
+    gap: 10px;
+    background: #f9f9f9;
+}
+
+.dss-export-btn,
+.dss-refresh-btn {
+    flex: 1;
+    padding: 10px;
+    border: 1px solid #ddd;
+    background: white;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 12px;
+    font-weight: 600;
+    color: #3498db;
+    transition: all 0.2s;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+}
+
+.dss-export-btn:hover,
+.dss-refresh-btn:hover {
+    background: #3498db;
+    color: white;
+    border-color: #3498db;
+}
+
+/* ==================== SCROLLBAR STYLING ==================== */
+
+.dss-tabs-content::-webkit-scrollbar {
+    width: 6px;
+}
+
+.dss-tabs-content::-webkit-scrollbar-track {
+    background: #f5f5f5;
+}
+
+.dss-tabs-content::-webkit-scrollbar-thumb {
+    background: #ccc;
+    border-radius: 3px;
+}
+
+.dss-tabs-content::-webkit-scrollbar-thumb:hover {
+    background: #999;
+}
+
+/* ==================== ANIMATIONS ==================== */
+
+@keyframes slideIn {
+    from {
+        right: -400px;
+        opacity: 0;
+    }
+    to {
+        right: 0;
+        opacity: 1;
+    }
+}
+
+@keyframes pulse {
+    0%, 100% {
+        opacity: 1;
+    }
+    50% {
+        opacity: 0.7;
+    }
+}
+
+.dss-panel.open {
+    animation: slideIn 0.3s ease-out;
+}
+
+.dss-toggle-btn:hover {
+    animation: pulse 0.6s infinite;
+}
+
+/* ==================== RESPONSIVE ==================== */
+
+@media (max-width: 600px) {
+    .dss-metrics-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .dss-gap-metrics {
+        grid-template-columns: 1fr;
+    }
+
+    .dss-gap-item.gap-critical {
+        grid-column: 1;
+    }
+
+    .dss-rec-buttons {
+        flex-direction: column;
+    }
+
+    .dss-tabs {
+        gap: 0;
+    }
+
+    .dss-tab-btn {
+        padding: 8px 5px;
+        font-size: 10px;
+    }
+}

@@ -1,0 +1,645 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ALS Admin Portal - Mapped Learners (AF1)</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <link rel="stylesheet" href="../CSS/admin_af1.css">
+    <script src="https://cdn.jsdelivr.net/npm/tesseract.js@5/dist/tesseract.min.js"></script>
+</head>
+<body>
+    <div class="sidebar">
+        <div class="sidebar-header">
+            <div class="logo-container">
+                <div class="als-logo">
+                    <i class="fas fa-graduation-cap"></i>
+                </div>
+                <h1>ALS Admin Portal</h1>
+            </div>
+            <p id="adminName">Welcome, Administrator</p>
+        </div>
+        <div class="nav-tabs">
+            <a href="/admin_dashboard" class="nav-tab">
+                <i class="fas fa-chart-line"></i>
+                <span>Dashboard</span>
+            </a>
+            <a href="/admin_users" class="nav-tab">
+                <i class="fas fa-users"></i>
+                <span>User Management</span>
+            </a>
+            <a href="/admin_instructors" class="nav-tab">
+                <i class="fas fa-chalkboard-teacher"></i>
+                <span>Instructors</span>
+            </a>
+            <a href="/admin_students" class="nav-tab">
+                <i class="fas fa-user-graduate"></i>
+                <span>Students</span>
+            </a>
+            <a href="/admin_registration" class="nav-tab">
+                <i class="fas fa-user-plus"></i>
+                <span>Registrations</span>
+            </a>
+            <a href="/admin_af1" class="nav-tab active">
+                <i class="fas fa-map-marked-alt"></i>
+                <span>Mapped Learners</span>
+            </a>
+            <a href="/admin_certifications" class="nav-tab">
+                <i class="fas fa-certificate"></i>
+                <span>Certifications</span>
+            </a>
+            <a href="#" class="nav-tab" onclick="return confirmLogout()">
+                <i class="fas fa-sign-out-alt"></i>
+                <span>Logout</span>
+            </a>
+        </div>
+    </div>
+
+    <div class="main-content">
+        <header>
+            <h1>Mapped Learners (AF1)</h1>
+            <p>View and manage Alternative Learning System Form 1 data</p>
+        </header>
+
+        <!-- Statistics -->
+        <div class="stats-grid">
+            <div class="stat-card">
+                <div class="stat-card-header">
+                    <div class="stat-icon purple">
+                        <i class="fas fa-users"></i>
+                    </div>
+                    <div class="stat-content">
+                        <h3>Total Learners</h3>
+                        <div class="stat-value" id="statTotal">0</div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="stat-card">
+                <div class="stat-card-header">
+                    <div class="stat-icon blue">
+                        <i class="fas fa-user-check"></i>
+                    </div>
+                    <div class="stat-content">
+                        <h3>Interested in ALS</h3>
+                        <div class="stat-value" id="statInterested">0</div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="stat-card">
+                <div class="stat-card-header">
+                    <div class="stat-icon green">
+                        <i class="fas fa-map-marker-alt"></i>
+                    </div>
+                    <div class="stat-content">
+                        <h3>Geocoded</h3>
+                        <div class="stat-value" id="statGeocoded">0</div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="stat-card">
+                <div class="stat-card-header">
+                    <div class="stat-icon orange">
+                        <i class="fas fa-calendar-alt"></i>
+                    </div>
+                    <div class="stat-content">
+                        <h3>This Year</h3>
+                        <div class="stat-value" id="statThisYear">0</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Controls -->
+        <div class="controls-bar">
+            <div class="search-box">
+                <i class="fas fa-search"></i>
+                <input type="text" id="searchInput" placeholder="Search by name, barangay, or contact...">
+            </div>
+            <div class="filter-group">
+                <select id="sexFilter">
+                    <option value="all">All Gender</option>
+                    <option value="Male">Male</option>
+                    <option value="Female">Female</option>
+                </select>
+                <select id="barangayFilter">
+                    <option value="all">All Barangays</option>
+                </select>
+                <select id="learnerTypeFilter">
+                    <option value="all">All Learner Types</option>
+                </select>
+                <select id="interestedFilter">
+                    <option value="all">All Interest</option>
+                    <option value="yes">Interested in ALS</option>
+                    <option value="no">Not Interested</option>
+                </select>
+                <button class="btn-primary" onclick="openAddLearnerModal()">
+                    <i class="fas fa-plus"></i>
+                    Add Learner
+                </button>
+                <button class="btn-primary" onclick="openImageRecognitionModal()" style="display: none;">
+                    <i class="fas fa-image"></i>
+                    Image Recognition
+                </button>
+                <button class="btn-primary" onclick="openImportCSVModal()">
+                    <i class="fas fa-upload"></i>
+                    Import CSV
+                </button>
+                <button class="btn-primary" onclick="exportToCSV()">
+                    <i class="fas fa-download"></i>
+                    Export CSV
+                </button>
+                <button class="btn-primary" onclick="openArchivedLearnersModal()">
+                    <i class="fas fa-archive"></i>
+                    Archived Learners
+                </button>
+
+        <!-- Learners Table -->
+        <div class="table-container">
+            <table id="learnersTable">
+                <thead>
+                    <tr>
+                        <th>Full Name</th>
+                        <th>Sex</th>
+                        <th>Age</th>
+                        <th>Barangay</th>
+                        <th>Contact</th>
+                        <th>Last Grade</th>
+                        <th>ALS Interest</th>
+                        <th>Geocoded</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody id="learnersTableBody">
+                    <tr>
+                        <td colspan="10" style="text-align: center; padding: 40px;">
+                            <i class="fas fa-spinner fa-spin" style="font-size: 32px; color: #3498db;"></i>
+                            <p style="margin-top: 10px; color: #7f8c8d;">Loading learners data...</p>
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <!-- View Learner Modal -->
+    <div id="viewModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2><i class="fas fa-user-circle"></i> Learner Details</h2>
+                <span class="close" onclick="closeModal()">&times;</span>
+            </div>
+
+            <div class="detail-grid" id="modalDetailsGrid">
+                <!-- Details will be populated dynamically -->
+            </div>
+
+            <div class="modal-actions">
+                <button class="btn-secondary" onclick="closeModal()">Close</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Archived Learners Modal -->
+    <div id="archivedModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2><i class="fas fa-archive"></i> Archived Learners</h2>
+                <span class="close" onclick="closeArchivedModal()">&times;</span>
+            </div>
+
+            <div style="padding: 20px;">
+                <div class="search-box" style="margin-bottom: 20px;">
+                    <i class="fas fa-search"></i>
+                    <input type="text" id="archivedSearchInput" placeholder="Search archived learners..." onkeyup="filterArchivedLearners()">
+                </div>
+                
+                <div class="table-container">
+                    <table id="archivedLearnersTable">
+                        <thead>
+                            <tr>
+                                <th>Full Name</th>
+                                <th>Sex</th>
+                                <th>Age</th>
+                                <th>Barangay</th>
+                                <th>Contact</th>
+                                <th>Learner Type</th>
+                                <th>Last Grade</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody id="archivedLearnersTableBody">
+                            <tr>
+                                <td colspan="8" style="text-align: center; padding: 40px;">
+                                    <i class="fas fa-spinner fa-spin" style="font-size: 32px; color: #3498db;"></i>
+                                    <p style="margin-top: 10px; color: #7f8c8d;">Loading archived learners...</p>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <div class="modal-actions">
+                <button class="btn-secondary" onclick="closeArchivedModal()">Close</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Add Learner Modal -->
+    <div id="addLearnerModal" class="modal">
+        <div class="modal-content" style="max-width: 900px; max-height: 90vh; overflow-y: auto;">
+            <div class="modal-header">
+                <h2><i class="fas fa-user-plus"></i> Add New Learner</h2>
+                <span class="close" onclick="closeAddLearnerModal()">&times;</span>
+            </div>
+
+            <form id="addLearnerForm" onsubmit="submitAddLearner(event)" style="display: flex; flex-direction: column; gap: 16px;">
+                <!-- Personal Information -->
+                <div style="border-bottom: 1px solid #e0e0e0; padding-bottom: 16px;">
+                    <h4 style="margin: 0 0 12px 0; color: #333; font-size: 14px; font-weight: 600;">Personal Information</h4>
+                    <div style="display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px;">
+                        <div>
+                            <label style="display: block; font-size: 12px; color: #666; margin-bottom: 6px; font-weight: 600;">Last Name *</label>
+                            <input type="text" id="lastName" name="last_name" placeholder="Santos" required style="width: 100%; padding: 8px; border: 1px solid #ddd; border-radius: 4px; font-size: 13px;">
+                        </div>
+                        <div>
+                            <label style="display: block; font-size: 12px; color: #666; margin-bottom: 6px; font-weight: 600;">First Name *</label>
+                            <input type="text" id="firstName" name="first_name" placeholder="Maria" required style="width: 100%; padding: 8px; border: 1px solid #ddd; border-radius: 4px; font-size: 13px;">
+                        </div>
+                        <div>
+                            <label style="display: block; font-size: 12px; color: #666; margin-bottom: 6px; font-weight: 600;">Middle Name</label>
+                            <input type="text" id="middleName" name="middle_name" placeholder="Garcia" style="width: 100%; padding: 8px; border: 1px solid #ddd; border-radius: 4px; font-size: 13px;">
+                        </div>
+                        <div>
+                            <label style="display: block; font-size: 12px; color: #666; margin-bottom: 6px; font-weight: 600;">Name Extension</label>
+                            <input type="text" id="nameExtension" name="name_extension" placeholder="Jr., Sr., III, etc." style="width: 100%; padding: 8px; border: 1px solid #ddd; border-radius: 4px; font-size: 13px;">
+                        </div>
+                    </div>
+                    <div style="display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px; margin-top: 12px;">
+                        <div>
+                            <label style="display: block; font-size: 12px; color: #666; margin-bottom: 6px; font-weight: 600;">Sex</label>
+                            <select id="sex" name="sex" style="width: 100%; padding: 8px; border: 1px solid #ddd; border-radius: 4px; font-size: 13px;">
+                                <option value="">Select Gender</option>
+                                <option value="Male">Male</option>
+                                <option value="Female">Female</option>
+                            </select>
+                        </div>
+                        <div>
+                            <label style="display: block; font-size: 12px; color: #666; margin-bottom: 6px; font-weight: 600;">Date of Birth</label>
+                            <input type="date" id="dob" name="date_of_birth" style="width: 100%; padding: 8px; border: 1px solid #ddd; border-radius: 4px; font-size: 13px;">
+                        </div>
+                        <div>
+                            <label style="display: block; font-size: 12px; color: #666; margin-bottom: 6px; font-weight: 600;">Age</label>
+                            <input type="number" id="age" name="age" min="0" max="120" placeholder="25" style="width: 100%; padding: 8px; border: 1px solid #ddd; border-radius: 4px; font-size: 13px;">
+                        </div>
+                    </div>
+                    <div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 12px; margin-top: 12px;">
+                        <div>
+                            <label style="display: block; font-size: 12px; color: #666; margin-bottom: 6px; font-weight: 600;">IP (Indigenous People)</label>
+                            <select id="ip" name="ip" style="width: 100%; padding: 8px; border: 1px solid #ddd; border-radius: 4px; font-size: 13px;">
+                                <option value="">Select</option>
+                                <option value="Yes">Yes</option>
+                                <option value="No">No</option>
+                            </select>
+                        </div>
+                        <div>
+                            <label style="display: block; font-size: 12px; color: #666; margin-bottom: 6px; font-weight: 600;">Religion</label>
+                            <input type="text" id="religion" name="religion" placeholder="Aglipayan" style="width: 100%; padding: 8px; border: 1px solid #ddd; border-radius: 4px; font-size: 13px;">
+                        </div>
+                    </div>
+                    <div style="margin-top: 12px;">
+                        <label style="display: block; font-size: 12px; color: #666; margin-bottom: 6px; font-weight: 600;">Mother Tongue</label>
+                        <input type="text" id="motherTongue" name="mother_tongue" placeholder="Tagalog" style="width: 100%; padding: 8px; border: 1px solid #ddd; border-radius: 4px; font-size: 13px;">
+                    </div>
+                </div>
+
+                <!-- Address Information -->
+                <div style="border-bottom: 1px solid #e0e0e0; padding-bottom: 16px;">
+                    <h4 style="margin: 0 0 12px 0; color: #333; font-size: 14px; font-weight: 600;">Address Information</h4>
+                    <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px;">
+                        <div>
+                            <label style="display: block; font-size: 12px; color: #666; margin-bottom: 6px; font-weight: 600;">House Number</label>
+                            <input type="text" id="houseNumber" name="house_number" placeholder="123" style="width: 100%; padding: 8px; border: 1px solid #ddd; border-radius: 4px; font-size: 13px;">
+                        </div>
+                        <div>
+                            <label style="display: block; font-size: 12px; color: #666; margin-bottom: 6px; font-weight: 600;">Street</label>
+                            <input type="text" id="street" name="street" placeholder="Bonifacio St." style="width: 100%; padding: 8px; border: 1px solid #ddd; border-radius: 4px; font-size: 13px;">
+                        </div>
+                        <div>
+                            <label style="display: block; font-size: 12px; color: #666; margin-bottom: 6px; font-weight: 600;">Sitio/Purok</label>
+                            <input type="text" id="sitioPurok" name="sitio_purok" placeholder="Bayside" style="width: 100%; padding: 8px; border: 1px solid #ddd; border-radius: 4px; font-size: 13px;">
+                        </div>
+                    </div>
+                    <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; margin-top: 12px;">
+                        <div>
+                            <label style="display: block; font-size: 12px; color: #666; margin-bottom: 6px; font-weight: 600;">Barangay *</label>
+                            <input type="text" id="barangay" name="barangay" placeholder="Gatid" required style="width: 100%; padding: 8px; border: 1px solid #ddd; border-radius: 4px; font-size: 13px;">
+                        </div>
+                        <div>
+                            <label style="display: block; font-size: 12px; color: #666; margin-bottom: 6px; font-weight: 600;">Municipality/City</label>
+                            <input type="text" id="municipalityCity" name="municipality_city" placeholder="Santa Cruz" style="width: 100%; padding: 8px; border: 1px solid #ddd; border-radius: 4px; font-size: 13px;">
+                        </div>
+                        <div>
+                            <label style="display: block; font-size: 12px; color: #666; margin-bottom: 6px; font-weight: 600;">Province</label>
+                            <input type="text" id="province" name="province" placeholder="Laguna" style="width: 100%; padding: 8px; border: 1px solid #ddd; border-radius: 4px; font-size: 13px;">
+                        </div>
+                    </div>
+                    <div style="margin-top: 12px;">
+                        <label style="display: block; font-size: 12px; color: #666; margin-bottom: 6px; font-weight: 600;">Contact Number <span style="color: #999; font-weight: 400;">(Optional)</span></label>
+                        <input type="tel" id="contactNumber" name="contact_number" placeholder="09123456789" style="width: 100%; padding: 8px; border: 1px solid #ddd; border-radius: 4px; font-size: 13px;">
+                    </div>
+                </div>
+
+                <!-- Family Information -->
+                <div style="border-bottom: 1px solid #e0e0e0; padding-bottom: 16px;">
+                    <h4 style="margin: 0 0 12px 0; color: #333; font-size: 14px; font-weight: 600;">Family Information</h4>
+                    <div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 12px;">
+                        <div>
+                            <label style="display: block; font-size: 12px; color: #666; margin-bottom: 6px; font-weight: 600;">Father's Name</label>
+                            <input type="text" id="fatherName" name="father_name" placeholder="Last Name, First Name, Middle Name (e.g. Santos, Juan, Carlos)" style="width: 100%; padding: 8px; border: 1px solid #ddd; border-radius: 4px; font-size: 13px;">
+                        </div>
+                        <div>
+                            <label style="display: block; font-size: 12px; color: #666; margin-bottom: 6px; font-weight: 600;">Mother's Name</label>
+                            <input type="text" id="motherName" name="mother_name" placeholder="Last Name, First Name, Middle Name (e.g. Cruz, Maria, Santos)" style="width: 100%; padding: 8px; border: 1px solid #ddd; border-radius: 4px; font-size: 13px;">
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Education Information -->
+                <div style="border-bottom: 1px solid #e0e0e0; padding-bottom: 16px;">
+                    <h4 style="margin: 0 0 12px 0; color: #333; font-size: 14px; font-weight: 600;">Education Information</h4>
+                    <div style="display: grid; grid-template-columns: repeat(1, 1fr); gap: 12px;">
+                        <div>
+                            <label style="display: block; font-size: 12px; color: #666; margin-bottom: 6px; font-weight: 600;">Last Grade Completed</label>
+                            <select id="lastGrade" name="last_grade_completed" style="width: 100%; padding: 8px; border: 1px solid #ddd; border-radius: 4px; font-size: 13px;">
+                                <option value="">Select Grade</option>
+                                <option value="Kinder">Kinder</option>
+                                <option value="Grade 1">Grade 1</option>
+                                <option value="Grade 2">Grade 2</option>
+                                <option value="Grade 3">Grade 3</option>
+                                <option value="Grade 4">Grade 4</option>
+                                <option value="Grade 5">Grade 5</option>
+                                <option value="Grade 6">Grade 6</option>
+                                <option value="Grade 7">Grade 7</option>
+                                <option value="Grade 8">Grade 8</option>
+                                <option value="Grade 9">Grade 9</option>
+                                <option value="Grade 10">Grade 10</option>
+                                <option value="Grade 11">Grade 11</option>
+                            </select>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- ALS Information -->
+                <div style="border-bottom: 1px solid #e0e0e0; padding-bottom: 16px;">
+                    <h4 style="margin: 0 0 12px 0; color: #333; font-size: 14px; font-weight: 600;">ALS Information</h4>
+                    <div style="display: grid; grid-template-columns: repeat(1, 1fr); gap: 12px;">
+                        <div>
+                            <label style="display: block; font-size: 12px; color: #666; margin-bottom: 6px; font-weight: 600;">Interested in ALS</label>
+                            <select id="interestedInAls" name="interested_in_als" style="width: 100%; padding: 8px; border: 1px solid #ddd; border-radius: 4px; font-size: 13px;">
+                                <option value="">Select</option>
+                                <option value="true">Yes</option>
+                                <option value="false">No</option>
+                            </select>
+                        </div>
+                    </div>
+                    
+                    <!-- Conditional ALS Fields (shown only when Interested in ALS = Yes) -->
+                    <div id="alsConditionalFields" style="display: none; margin-top: 12px;">
+                        <div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 12px;">
+                            <div>
+                                <label style="display: block; font-size: 12px; color: #666; margin-bottom: 6px; font-weight: 600;">ALS Status</label>
+                                <select id="alsStatus" name="als_status" style="width: 100%; padding: 8px; border: 1px solid #ddd; border-radius: 4px; font-size: 13px;">
+                                    <option value="">Select Status</option>
+                                    <option value="Enrolled">Enrolled</option>
+                                    <option value="Not Enrolled">Not Enrolled</option>
+                                </select>
+                            </div>
+                            <div>
+                                <label style="display: block; font-size: 12px; color: #666; margin-bottom: 6px; font-weight: 600;">Preferred Program</label>
+                                <select id="preferredProgram" name="preferred_program" style="width: 100%; padding: 8px; border: 1px solid #ddd; border-radius: 4px; font-size: 13px;">
+                                    <option value="">Select Program</option>
+                                    <option value="Basic Literacy Program (BLP)">Basic Literacy Program (BLP)</option>
+                                    <option value="Accreditation & Equivalency (A&E)">Accreditation & Equivalency (A&E)</option>
+                                    <option value="ALS-EST (Education & Skills Training)">ALS-EST (Education & Skills Training)</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div style="margin-top: 12px;">
+                            <label style="display: block; font-size: 12px; color: #666; margin-bottom: 6px; font-weight: 600;">Learner Type Class</label>
+                            <select id="learnerTypeClass" name="learner_type_class" style="width: 100%; padding: 8px; border: 1px solid #ddd; border-radius: 4px; font-size: 13px;">
+                                <option value="">Select Type</option>
+                                <option value="Adults">Adults</option>
+                                <option value="Out-of-school children in special cases">Out-of-school children in special cases</option>
+                                <option value="Marginalized sectors">Marginalized sectors</option>
+                                <option value="Basic Literacy Learners">Basic Literacy Learners</option>
+                                <option value="Accreditation and Equivalency (A&E) Learners">Accreditation and Equivalency (A&E) Learners</option>
+                            </select>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Administrative Information -->
+                <div style="padding-bottom: 16px;">
+                    <h4 style="margin: 0 0 12px 0; color: #333; font-size: 14px; font-weight: 600;">Administrative Information</h4>
+                    <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px;">
+                        <div>
+                            <label style="display: block; font-size: 12px; color: #666; margin-bottom: 6px; font-weight: 600;">Region</label>
+                            <input type="text" id="region" name="region" value="4-A" placeholder="4-A" style="width: 100%; padding: 8px; border: 1px solid #ddd; border-radius: 4px; font-size: 13px;">
+                        </div>
+                        <div>
+                            <label style="display: block; font-size: 12px; color: #666; margin-bottom: 6px; font-weight: 600;">Division</label>
+                            <input type="text" id="division" name="division" value="Laguna" placeholder="Laguna" style="width: 100%; padding: 8px; border: 1px solid #ddd; border-radius: 4px; font-size: 13px;">
+                        </div>
+                        <div>
+                            <label style="display: block; font-size: 12px; color: #666; margin-bottom: 6px; font-weight: 600;">District</label>
+                            <input type="text" id="district" name="district" value="Santa Cruz" placeholder="Santa Cruz" style="width: 100%; padding: 8px; border: 1px solid #ddd; border-radius: 4px; font-size: 13px;">
+                        </div>
+                    </div>
+                    <div style="margin-top: 12px;">
+                        <label style="display: block; font-size: 12px; color: #666; margin-bottom: 6px; font-weight: 600;">Calendar Year</label>
+                        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px;">
+                            <div>
+                                <label style="display: block; font-size: 11px; color: #999; margin-bottom: 4px;">Start Year</label>
+                                <input type="number" id="calendarYearStart" name="calendar_year_start" min="2000" max="2100" placeholder="2025" style="width: 100%; padding: 8px; border: 1px solid #ddd; border-radius: 4px; font-size: 13px;">
+                            </div>
+                            <div>
+                                <label style="display: block; font-size: 11px; color: #999; margin-bottom: 4px;">End Year</label>
+                                <input type="number" id="calendarYearEnd" name="calendar_year_end" min="2000" max="2100" placeholder="2026" style="width: 100%; padding: 8px; border: 1px solid #ddd; border-radius: 4px; font-size: 13px;">
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Form Actions -->
+                <div style="display: flex; gap: 10px; justify-content: flex-end; border-top: 1px solid #e0e0e0; padding-top: 16px;">
+                    <button type="button" onclick="closeAddLearnerModal()" style="padding: 10px 16px; border: 1px solid #ddd; background: white; color: #333; border-radius: 4px; cursor: pointer; font-weight: 600; font-size: 13px; transition: all 0.2s;">Cancel</button>
+                    <button type="submit" style="padding: 10px 16px; background: linear-gradient(135deg, #667eea, #764ba2); color: white; border: none; border-radius: 4px; cursor: pointer; font-weight: 600; font-size: 13px; transition: all 0.2s; display: flex; align-items: center; gap: 6px;">
+                        <i class="fas fa-save"></i> Save Learner
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Import CSV Modal -->
+    <div id="importCSVModal" class="modal">
+        <div class="modal-content" style="max-width: 1000px;">
+            <div class="modal-header">
+                <h2><i class="fas fa-upload"></i> Import Learners from CSV</h2>
+                <span class="close" onclick="closeImportCSVModal()">&times;</span>
+            </div>
+
+            <div id="csvImportStep1" class="import-step">
+                <h3 style="margin-bottom: 20px;">Step 1: Upload CSV File</h3>
+                <div style="border: 2px dashed #3498db; border-radius: 8px; padding: 40px; text-align: center; cursor: pointer;" onclick="document.getElementById('csvFile').click()">
+                    <i class="fas fa-cloud-upload-alt" style="font-size: 48px; color: #3498db; margin-bottom: 15px; display: block;"></i>
+                    <p style="font-size: 16px; margin-bottom: 5px;">Click to upload CSV file or drag and drop</p>
+                    <p style="color: #7f8c8d; font-size: 14px;">Supported format: CSV (Comma-Separated Values)</p>
+                </div>
+                <input type="file" id="csvFile" accept=".csv" style="display: none;" onchange="handleCSVUpload(event)">
+                <div id="csvFileName" style="margin-top: 15px; display: none;">
+                    <p style="color: #27ae60;"><i class="fas fa-check-circle"></i> <span id="csvNameDisplay"></span></p>
+                </div>
+            </div>
+
+            <div id="csvImportStep2" class="import-step" style="display: none;">
+                <h3 style="margin-bottom: 20px;">Step 2: Map CSV Columns</h3>
+                <p style="color: #7f8c8d; margin-bottom: 20px;">Select which CSV column corresponds to each field:</p>
+                
+                <div id="columnMappingContainer" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 15px;">
+                    <!-- Mapping dropdowns will be generated here -->
+                </div>
+            </div>
+
+            <div id="csvImportStep3" class="import-step" style="display: none;">
+                <h3 style="margin-bottom: 20px;">Step 3: Preview Data</h3>
+                <p style="color: #7f8c8d; margin-bottom: 15px;">Preview of learners to be imported:</p>
+                
+                <div style="overflow-x: auto; max-height: 400px; border: 1px solid #ddd; border-radius: 6px;">
+                    <table style="width: 100%; border-collapse: collapse;">
+                        <thead>
+                            <tr style="background: #f5f7fa; border-bottom: 2px solid #ddd;">
+                                <th style="padding: 12px; text-align: left; font-weight: 600;">Last Name</th>
+                                <th style="padding: 12px; text-align: left; font-weight: 600;">First Name</th>
+                                <th style="padding: 12px; text-align: left; font-weight: 600;">Middle Name</th>
+                                <th style="padding: 12px; text-align: left; font-weight: 600;">Sex</th>
+                                <th style="padding: 12px; text-align: left; font-weight: 600;">Barangay</th>
+                                <th style="padding: 12px; text-align: left; font-weight: 600;">Contact</th>
+                            </tr>
+                        </thead>
+                        <tbody id="csvPreviewTable">
+                            <!-- Preview rows will be generated here -->
+                        </tbody>
+                    </table>
+                </div>
+                <p style="margin-top: 15px; font-size: 14px; color: #7f8c8d;">
+                    Total learners to import: <strong id="csvTotalCount">0</strong>
+                </p>
+            </div>
+
+            <div class="modal-actions" style="margin-top: 30px;">
+                <button type="button" class="btn-secondary" onclick="closeImportCSVModal()">Cancel</button>
+                <button type="button" class="btn-secondary" id="csvPrevBtn" onclick="previousCSVStep()" style="display: none;">
+                    <i class="fas fa-arrow-left"></i> Previous
+                </button>
+                <button type="button" class="btn-primary" id="csvNextBtn" onclick="nextCSVStep()">
+                    Next: Configure Settings <i class="fas fa-arrow-right"></i>
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Image Recognition Modal -->
+    <div id="imageRecognitionModal" class="modal">
+        <div class="modal-content" style="max-width: 1200px;">
+            <div class="modal-header">
+                <h2><i class="fas fa-image"></i> Image Recognition (OCR)</h2>
+                <span class="close" onclick="closeImageRecognitionModal()">&times;</span>
+            </div>
+
+            <div id="imageUploadStep" class="import-step">
+                <h3 style="margin-bottom: 20px;">Upload AF1 Form Image(s)</h3>
+                <p style="color: #7f8c8d; margin-bottom: 20px;">Upload clear images of AF1 forms. The system will extract data automatically.</p>
+                
+                <div style="border: 2px dashed #3498db; border-radius: 8px; padding: 40px; text-align: center; cursor: pointer;" onclick="document.getElementById('imageFiles').click()">
+                    <i class="fas fa-cloud-upload-alt" style="font-size: 48px; color: #3498db; margin-bottom: 15px; display: block;"></i>
+                    <p style="font-size: 16px; margin-bottom: 5px;">Click to upload images or drag and drop</p>
+                    <p style="color: #7f8c8d; font-size: 14px;">Supported formats: JPG, PNG, GIF, PDF</p>
+                </div>
+                <input type="file" id="imageFiles" accept="image/*,.pdf" multiple style="display: none;" onchange="handleImageUpload(event)">
+                
+                <div id="imageFilesList" style="margin-top: 20px; display: none;">
+                    <p style="font-weight: 500; margin-bottom: 10px;">Selected files:</p>
+                    <ul id="filesUL" style="list-style: none; padding: 0;">
+                    </ul>
+                </div>
+
+                <div style="margin-top: 30px;">
+                    <button type="button" class="btn-secondary" onclick="closeImageRecognitionModal()">Cancel</button>
+                    <button type="button" class="btn-primary" id="startOCRBtn" onclick="startOCRProcessing()" style="display: none;">
+                        <i class="fas fa-magic"></i> Extract Data
+                    </button>
+                </div>
+            </div>
+
+            <div id="imageProcessingStep" class="import-step" style="display: none;">
+                <h3 style="margin-bottom: 20px;">Processing Images...</h3>
+                <div style="text-align: center;">
+                    <div style="display: inline-block; margin-bottom: 20px;">
+                        <i class="fas fa-spinner fa-spin" style="font-size: 48px; color: #3498db;"></i>
+                    </div>
+                    <p id="processingStatus" style="color: #7f8c8d; font-size: 14px;">Processing image 1 of 1...</p>
+                    <div style="width: 100%; height: 8px; background: #e0e0e0; border-radius: 4px; margin-top: 20px; overflow: hidden;">
+                        <div id="processingProgress" style="width: 0%; height: 100%; background: #3498db; transition: width 0.3s ease;"></div>
+                    </div>
+                </div>
+            </div>
+
+            <div id="imageResultsStep" class="import-step" style="display: none;">
+                <h3 style="margin-bottom: 20px;">Review & Edit Extracted Data</h3>
+                <p style="color: #7f8c8d; margin-bottom: 15px;">Verify and correct the extracted data before importing:</p>
+                
+                <div style="overflow-x: auto; max-height: 500px; border: 1px solid #ddd; border-radius: 6px; margin-bottom: 20px;">
+                    <table style="width: 100%; border-collapse: collapse; font-size: 13px;">
+                        <thead>
+                            <tr style="background: #f5f7fa; border-bottom: 2px solid #ddd; position: sticky; top: 0;">
+                                <th style="padding: 12px; text-align: left; font-weight: 600; border-right: 1px solid #ddd; width: 120px;">Last Name</th>
+                                <th style="padding: 12px; text-align: left; font-weight: 600; border-right: 1px solid #ddd; width: 120px;">First Name</th>
+                                <th style="padding: 12px; text-align: left; font-weight: 600; border-right: 1px solid #ddd; width: 100px;">Middle Name</th>
+                                <th style="padding: 12px; text-align: left; font-weight: 600; border-right: 1px solid #ddd; width: 80px;">Sex</th>
+                                <th style="padding: 12px; text-align: left; font-weight: 600; border-right: 1px solid #ddd; width: 120px;">Age</th>
+                                <th style="padding: 12px; text-align: left; font-weight: 600; border-right: 1px solid #ddd; width: 130px;">Barangay</th>
+                                <th style="padding: 12px; text-align: left; font-weight: 600; border-right: 1px solid #ddd; width: 120px;">Contact</th>
+                                <th style="padding: 12px; text-align: center; font-weight: 600; width: 60px;">Conf.</th>
+                            </tr>
+                        </thead>
+                        <tbody id="ocrResultsTable" style="max-height: 400px; overflow-y: auto;">
+                            <!-- Results will be populated here -->
+                        </tbody>
+                    </table>
+                </div>
+
+                <p style="margin-bottom: 15px; font-size: 14px; color: #7f8c8d;">
+                    Total learners extracted: <strong id="ocrTotalCount">0</strong>
+                </p>
+
+                <div style="margin-top: 30px;">
+                    <button type="button" class="btn-secondary" onclick="closeImageRecognitionModal()">Cancel</button>
+                    <button type="button" class="btn-secondary" onclick="uploadMoreImages()">
+                        <i class="fas fa-plus"></i> Upload More
+                    </button>
+                    <button type="button" class="btn-primary" onclick="submitOCRImport()">
+                        <i class="fas fa-check"></i> Import Learners
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="../JS/admin_af1.js"></script>
+</body>
+</html>
