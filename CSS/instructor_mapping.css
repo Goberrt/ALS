@@ -1637,6 +1637,36 @@ header p {
         padding: 70px 8px 8px 8px;
         width: 100%;
     }
+
+    /* Mobile-optimized barangay modal */
+    .barangay-modal.active {
+        align-items: flex-end;
+        justify-content: stretch;
+    }
+
+    .barangay-modal-content {
+        width: 100%;
+        max-width: 100%;
+        max-height: 90vh;
+        border-radius: 16px 16px 0 0;
+        animation: slideUpMobile 0.3s ease;
+    }
+
+    .barangay-modal-body {
+        max-height: calc(90vh - 80px);
+        overflow-y: auto;
+    }
+
+    @keyframes slideUpMobile {
+        from {
+            opacity: 0;
+            transform: translateY(100%);
+        }
+        to {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    }
     
     header {
         padding: 12px;
@@ -1692,6 +1722,35 @@ header p {
         gap: 8px;
         flex-wrap: wrap;
         padding: 8px 0;
+    }
+
+    /* Mobile-optimized priority modal */
+    .priority-modal.active {
+        align-items: flex-end;
+        justify-content: stretch;
+    }
+
+    .priority-modal-content {
+        width: 100%;
+        max-width: 100%;
+        max-height: 90vh;
+        border-radius: 16px 16px 0 0;
+        animation: slideUpMobileModal 0.3s ease;
+    }
+
+    .priority-modal-body {
+        max-height: calc(90vh - 80px);
+    }
+
+    @keyframes slideUpMobileModal {
+        from {
+            opacity: 0;
+            transform: translateY(100%);
+        }
+        to {
+            opacity: 1;
+            transform: translateY(0);
+        }
     }
 
     .toggle-schools-btn,
@@ -1801,10 +1860,16 @@ header p {
     }
 
     .route-info-box {
-        bottom: 15px;
+        position: fixed;
+        bottom: 70px;
         left: 8px;
-        max-width: calc(100vw - 16px);
+        right: 8px;
+        width: calc(100% - 16px);
+        max-width: none;
+        max-height: 30vh;
+        overflow-y: auto;
         font-size: 12px;
+        z-index: 200;
     }
 
     .priority-areas-btn {
@@ -1847,6 +1912,40 @@ header p {
 
     header p {
         font-size: 10px;
+    }
+    
+    /* Extra small mobile modal optimization */
+    .barangay-modal.active {
+        align-items: flex-start;
+    }
+
+    .barangay-modal-content {
+        width: 100%;
+        max-width: 100%;
+        max-height: 100vh;
+        border-radius: 8px 8px 0 0;
+        margin-top: 50px;
+    }
+
+    .barangay-modal-header {
+        padding: 15px;
+        border-radius: 8px 8px 0 0;
+    }
+
+    .barangay-modal-header h3 {
+        font-size: 16px;
+        gap: 6px;
+    }
+
+    .barangay-modal-close {
+        width: 35px;
+        height: 35px;
+        font-size: 20px;
+    }
+
+    .barangay-modal-body {
+        padding: 15px;
+        max-height: calc(100vh - 110px);
     }
     
     .analytics-controls {
@@ -1958,9 +2057,38 @@ header p {
     }
 
     .route-info-box {
-        bottom: 10px;
+        position: fixed;
+        bottom: 65px;
         left: 6px;
-        max-width: calc(100vw - 12px);
+        right: 6px;
+        width: calc(100% - 12px);
+        max-width: none;
+        max-height: 35vh;
+        overflow-y: auto;
+        z-index: 200;
+    }
+
+    /* Mobile route info content optimization */
+    .route-info-box > div {
+        padding: 12px !important;
+    }
+
+    .route-info-box button {
+        font-size: 11px !important;
+    }
+
+    @media (max-width: 360px) {
+        .route-info-box {
+            bottom: 8px;
+            left: 4px;
+            right: 4px;
+            width: calc(100% - 8px);
+            max-height: 35vh;
+        }
+
+        .route-info-box > div {
+            padding: 10px !important;
+        }
     }
 
     .priority-areas-btn {
@@ -1984,6 +2112,141 @@ header p {
 
     .priority-modal-body {
         padding: 12px;
+    }
+}
+
+/* Extra small phones (320px - 375px) */
+@media (max-width: 375px) {
+    .main-content {
+        padding: 55px 6px 6px 6px;
+    }
+
+    header {
+        padding: 8px;
+    }
+
+    header h1 {
+        font-size: 16px;
+    }
+
+    header p {
+        font-size: 10px;
+    }
+
+    .analytics-controls {
+        padding: 6px;
+        gap: 4px;
+    }
+
+    .metric-btn {
+        min-width: calc(50% - 1px);
+        font-size: 9px;
+        padding: 5px 6px;
+    }
+
+    .viz-btn {
+        padding: 5px 4px;
+        font-size: 8px;
+    }
+
+    .viz-btn i {
+        font-size: 11px;
+        margin-bottom: 1px;
+    }
+
+    #map {
+        height: 220px;
+        min-height: 200px;
+    }
+
+    .maplibre-search-input {
+        font-size: 10px;
+        padding: 6px;
+        width: 100% !important;
+    }
+
+    .maplibre-search-input:focus {
+        width: 100% !important;
+    }
+
+    .barangay-modal-content {
+        margin-top: 45px;
+    }
+
+    .barangay-modal-header {
+        padding: 12px;
+    }
+
+    .barangay-modal-header h3 {
+        font-size: 15px;
+    }
+
+    .barangay-modal-body {
+        padding: 12px;
+        max-height: calc(100vh - 100px);
+    }
+
+    .priority-modal-content {
+        margin-top: 45px;
+    }
+
+    .priority-modal-header {
+        padding: 12px;
+    }
+
+    .priority-modal-header h3 {
+        font-size: 15px;
+    }
+
+    .priority-modal-body {
+        padding: 12px;
+    }
+
+    .toggle-schools-btn,
+    .toggle-route-btn {
+        padding: 4px 6px;
+        font-size: 8px;
+        gap: 2px;
+    }
+
+    .legend-gradient {
+        font-size: 8px;
+        gap: 4px;
+    }
+position: fixed;
+        bottom: 60px;
+        left: 6px;
+        right: 6px;
+        width: calc(100% - 12px);
+        max-width: none;
+        max-height: 35vh;
+        overflow-y: auto;
+        font-size: 11px;
+        z-index: 200o;
+        width: calc(100% - 12px);
+        font-size: 11px;
+    }
+
+    /* Extra small phone route info optimization */
+    .route-info-box > div {
+        padding: 10px !important;
+        font-size: 11px;
+    }
+
+    .route-info-box button {
+        font-size: 10px !important;
+        padding: 6px 8px !important;
+    }
+
+    .priority-areas-btn {
+        bottom: 8px;
+        right: 8px;
+        padding: 6px 10px;
+        font-size: 9px;
+    }
+
+    .coordinate-input-section {
+        display: none;
     }
 }
 

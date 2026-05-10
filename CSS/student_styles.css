@@ -274,7 +274,6 @@ header p {
     font-weight: 500;
     margin: 0;
 }
-}
 
 .content-section {
     display: none;
@@ -683,5 +682,57 @@ button {
     .section {
         padding: 15px;
         border-radius: 0;
+    }
+}
+
+/* Extra small phones (320px - 375px) */
+@media (max-width: 375px) {
+    .main-content {
+        padding: 65px 8px 8px;
+    }
+
+    header {
+        padding: 12px;
+        margin-bottom: 15px;
+    }
+
+    header h1 {
+        font-size: 18px;
+    }
+
+    header p {
+        font-size: 12px;
+    }
+
+    .card {
+        padding: 12px;
+        margin-bottom: 10px;
+    }
+
+    .section {
+        padding: 12px;
+    }
+
+    .section h2 {
+        font-size: 16px;
+    }
+
+    .modules-grid {
+        grid-template-columns: 1fr;
+        gap: 8px;
+        padding: 8px;
+    }
+
+    .card h3 {
+        font-size: 14px;
+    }
+
+    .card p {
+        font-size: 12px;
+    }
+
+    button {
+        padding: 8px 12px;
+        font-size: 12px;
     }
 }

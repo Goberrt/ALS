@@ -1067,3 +1067,87 @@ header p {
         width: 100%;
     }
 }
+
+/* Extra small phones (320px - 375px) */
+@media (max-width: 375px) {
+    header h1 {
+        font-size: 15px;
+    }
+
+    header p {
+        font-size: 9px;
+    }
+
+    .stat-content h3 {
+        font-size: 15px;
+    }
+
+    .stat-content p {
+        font-size: 8px;
+    }
+
+    .stat-card {
+        padding: 8px;
+        gap: 6px;
+    }
+
+    .stat-icon {
+        min-width: 32px;
+        width: 32px;
+        height: 32px;
+        font-size: 14px;
+    }
+
+    .dashboard-card h3 {
+        font-size: 14px;
+    }
+
+    .metric-value {
+        font-size: 18px;
+    }
+
+    .metric-label {
+        font-size: 11px;
+    }
+
+    .chart-label {
+        min-width: 70px;
+        font-size: 11px;
+    }
+
+    .chart-progress {
+        height: 20px;
+    }
+
+    .priority-item {
+        padding: 10px;
+        gap: 8px;
+    }
+
+    .priority-score {
+        font-size: 16px;
+        min-width: 40px;
+    }
+
+    .contact-btn {
+        padding: 8px 10px;
+        font-size: 11px;
+    }
+
+    .nav-tab {
+        padding: 12px 15px;
+        gap: 8px;
+    }
+
+    .nav-tab span {
+        font-size: 12px;
+    }
+
+    .nav-tab i {
+        font-size: 14px;
+    }
+
+    .mini-map-container {
+        height: 200px;
+    }
+}

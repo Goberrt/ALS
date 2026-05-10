@@ -1062,7 +1062,7 @@ function updateRouteInfoDisplay(trafficLevel, routeData) {
     `;
 
     routeInfo.innerHTML = `
-        <div style="padding: 16px; background: linear-gradient(135deg, #2563eb 0%, #1e40af 100%); color: white; border-radius: 12px; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; box-shadow: 0 8px 24px rgba(0,0,0,0.3); border: 1px solid rgba(255,255,255,0.15); backdrop-filter: blur(10px); min-width: 300px;">
+        <div style="padding: 16px; background: linear-gradient(135deg, #2563eb 0%, #1e40af 100%); color: white; border-radius: 12px; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; box-shadow: 0 8px 24px rgba(0,0,0,0.3); border: 1px solid rgba(255,255,255,0.15); backdrop-filter: blur(10px);">
             <div style="display: flex; justify-content: space-between; align-items: flex-start; gap: 12px; margin-bottom: 12px;">
                 <div>
                     <div style="font-size: 12px; opacity: 0.85; font-weight: 700; letter-spacing: 0.5px; text-transform: uppercase; margin-bottom: 4px;">📍 Route Information</div>
@@ -1368,7 +1368,7 @@ function updateManualRouteDisplay(trafficLevel, routeData) {
     `;
 
     routeInfo.innerHTML = `
-        <div style="padding: 16px; background: linear-gradient(135deg, #059669 0%, #047857 100%); color: white; border-radius: 12px; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; box-shadow: 0 8px 24px rgba(0,0,0,0.3); border: 1px solid rgba(255,255,255,0.15); backdrop-filter: blur(10px); min-width: 300px;">
+        <div style="padding: 16px; background: linear-gradient(135deg, #059669 0%, #047857 100%); color: white; border-radius: 12px; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; box-shadow: 0 8px 24px rgba(0,0,0,0.3); border: 1px solid rgba(255,255,255,0.15); backdrop-filter: blur(10px);">
             <div style="display: flex; justify-content: space-between; align-items: flex-start; gap: 12px; margin-bottom: 12px;">
                 <div>
                     <div style="font-size: 12px; opacity: 0.85; font-weight: 700; letter-spacing: 0.5px; text-transform: uppercase; margin-bottom: 4px;">📍 Route Information</div>

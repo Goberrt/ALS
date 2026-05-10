@@ -1192,9 +1192,6 @@ class ALSDSSPanel {
                 <button class="export-option-btn" style="width: 100%; padding: 12px; margin-bottom: 10px; background: #16a34a; color: white; border: none; border-radius: 4px; cursor: pointer; font-size: 14px; font-weight: bold;">
                     <i class="fas fa-file-pdf"></i> PDF (Full Report)
                 </button>
-                <button class="export-option-btn" style="width: 100%; padding: 12px; margin-bottom: 10px; background: #ea580c; color: white; border: none; border-radius: 4px; cursor: pointer; font-size: 14px; font-weight: bold;">
-                    <i class="fas fa-image"></i> PDF (Visual Snapshot)
-                </button>
             </div>
             <button id="cancel-export" style="width: 100%; padding: 10px; background: #e5e7eb; color: #333; border: none; border-radius: 4px; cursor: pointer;">Cancel</button>
         `;
@@ -1209,10 +1206,6 @@ class ALSDSSPanel {
         buttons[1].addEventListener('click', () => {
             document.body.removeChild(dialog);
             this.exportAsPDF();
-        });
-        buttons[2].addEventListener('click', () => {
-            document.body.removeChild(dialog);
-            this.exportAsPDFVisual();
         });
 
         document.getElementById('cancel-export').addEventListener('click', () => {
@@ -1229,114 +1222,139 @@ class ALSDSSPanel {
         
         let csvContent = '';
         
-        // Title and metadata
-        csvContent += '"DSS ANALYSIS REPORT - STRUCTURED DATA EXPORT"\n';
-        csvContent += `"Barangay: ${data.barangay_name}"\n`;
-        csvContent += `"Generated: ${new Date().toLocaleString()}"\n\n`;
+        // Add BOM for UTF-8 encoding (helps with special characters in Excel)
+        csvContent = '\ufeff';
+        
+        // Header with metadata
+        csvContent += '═══════════════════════════════════════════════════════════════\n';
+        csvContent += 'DSS ANALYSIS REPORT - STRUCTURED DATA EXPORT\n';
+        csvContent += '═══════════════════════════════════════════════════════════════\n\n';
+        csvContent += `Barangay:,${data.barangay_name}\n`;
+        csvContent += `Report Date:,${new Date().toLocaleString()}\n`;
+        csvContent += `Priority Tier:,${data.priority_tier.toUpperCase()}\n`;
+        csvContent += `Priority Score:,${data.priority_score.toFixed(2)}/100\n\n`;
 
-        // EXECUTIVE SUMMARY
-        csvContent += '"EXECUTIVE SUMMARY"\n';
-        csvContent += '"Metric","Value","Unit"\n';
-        csvContent += `"Total Learners","${data.total_learners}","learners"\n`;
-        csvContent += `"Active Learners","${data.active_learners}","learners"\n`;
-        csvContent += `"Completed Learners","${data.completed_learners}","learners"\n`;
-        csvContent += `"At-Risk Learners","${data.at_risk_learners}","learners"\n`;
-        csvContent += `"Priority Tier","${data.priority_tier}","categorical"\n`;
-        csvContent += `"Priority Score","${data.priority_score.toFixed(2)}","score"\n`;
-        csvContent += `"Dropout Rate","${(data.dropout_rate * 100).toFixed(2)}","%"\n`;
-        csvContent += `"Enrollment Trend","${data.enrollment_trend}","categorical"\n\n`;
+        // QUICK STATS - Most important metrics
+        csvContent += '───────────────────────────────────────────────────────────────\n';
+        csvContent += 'QUICK STATISTICS\n';
+        csvContent += '───────────────────────────────────────────────────────────────\n';
+        csvContent += 'Metric,Value,Status\n';
+        csvContent += `Total Learners,${data.total_learners},\n`;
+        csvContent += `Active Learners,${data.active_learners},${((data.active_learners / data.total_learners) * 100).toFixed(1)}%\n`;
+        csvContent += `Completed,${data.completed_learners},${((data.completed_learners / data.total_learners) * 100).toFixed(1)}%\n`;
+        csvContent += `At-Risk Learners,${data.at_risk_learners},${((data.at_risk_learners / data.total_learners) * 100).toFixed(1)}%\n`;
+        csvContent += `Dropout Rate,${(data.dropout_rate * 100).toFixed(2)}%,\n`;
+        csvContent += `Enrollment Trend,${data.enrollment_trend},\n\n`;
 
         // LEARNER COMPOSITION
         const composition = data.detailed_statistics?.learner_composition || {};
-        csvContent += '"LEARNER COMPOSITION"\n';
-        csvContent += '"Category","Count","Percentage"\n';
-        csvContent += `"From AF1 Records","${composition.from_af1 || 0}","${composition.af1_percentage || 0}%"\n`;
-        csvContent += `"From Enrollment Form","${composition.from_enrollments_approved || 0}","${composition.enrollment_percentage || 0}%"\n\n`;
+        csvContent += '───────────────────────────────────────────────────────────────\n';
+        csvContent += 'LEARNER COMPOSITION\n';
+        csvContent += '───────────────────────────────────────────────────────────────\n';
+        csvContent += 'Source,Count,Percentage\n';
+        csvContent += `AF1 Records,${composition.from_af1 || 0},${composition.af1_percentage || 0}%\n`;
+        csvContent += `Enrollment Forms,${composition.from_enrollments_approved || 0},${composition.enrollment_percentage || 0}%\n\n`;
 
         // DEMOGRAPHICS
         const demographics = data.detailed_statistics?.demographics || {};
-        csvContent += '"DEMOGRAPHICS"\n';
-        csvContent += '"Category","Value"\n';
-        csvContent += `"Average Age","${demographics.average_age || 'N/A'} years"\n`;
-        csvContent += `"Age Range","${demographics.age_range || 'N/A'}"\n`;
-        csvContent += `"Most Common Grade Level","Grade ${demographics.most_common_grade || 'N/A'}"\n\n`;
+        csvContent += '───────────────────────────────────────────────────────────────\n';
+        csvContent += 'DEMOGRAPHICS\n';
+        csvContent += '───────────────────────────────────────────────────────────────\n';
+        csvContent += 'Demographic Factor,Value\n';
+        csvContent += `Average Age,${demographics.average_age || 'N/A'} years\n`;
+        csvContent += `Age Range,${demographics.age_range || 'N/A'}\n`;
+        csvContent += `Most Common Grade,Grade ${demographics.most_common_grade || 'N/A'}\n\n`;
 
         // DISTANCE DISTRIBUTION
         const distances = data.detailed_statistics?.distance_distribution || {};
-        csvContent += '"DISTANCE DISTRIBUTION"\n';
-        csvContent += '"Distance Range","Count"\n';
-        csvContent += `"Within 3km","${distances['Within 3km'] || 0}"\n`;
-        csvContent += `"3-10km","${distances['3-10km'] || 0}"\n`;
-        csvContent += `"Over 10km","${distances['Over 10km'] || 0}"\n`;
-        csvContent += `"Unknown","${distances['Unknown'] || 0}"\n\n`;
+        csvContent += '───────────────────────────────────────────────────────────────\n';
+        csvContent += 'DISTANCE DISTRIBUTION\n';
+        csvContent += '───────────────────────────────────────────────────────────────\n';
+        csvContent += 'Distance Range,Number of Learners,Percentage\n';
+        const totalDist = (distances['Within 3km'] || 0) + (distances['3-10km'] || 0) + (distances['Over 10km'] || 0) + (distances['Unknown'] || 0);
+        csvContent += `Within 3km,${distances['Within 3km'] || 0},${totalDist > 0 ? ((distances['Within 3km'] || 0) / totalDist * 100).toFixed(1) : 0}%\n`;
+        csvContent += `3-10km,${distances['3-10km'] || 0},${totalDist > 0 ? ((distances['3-10km'] || 0) / totalDist * 100).toFixed(1) : 0}%\n`;
+        csvContent += `Over 10km,${distances['Over 10km'] || 0},${totalDist > 0 ? ((distances['Over 10km'] || 0) / totalDist * 100).toFixed(1) : 0}%\n`;
+        csvContent += `Unknown,${distances['Unknown'] || 0},${totalDist > 0 ? ((distances['Unknown'] || 0) / totalDist * 100).toFixed(1) : 0}%\n\n`;
 
-        // ACCESSIBILITY & BARRIERS
+        // SPECIAL NEEDS & ACCESSIBILITY
         const accessibility = data.detailed_statistics?.accessibility || {};
-        csvContent += '"ACCESSIBILITY & SPECIAL NEEDS"\n';
-        csvContent += '"Category","Count","Percentage"\n';
-        csvContent += `"PWD (Persons with Disability)","${accessibility.pwd_count || 0}","${accessibility.pwd_percentage || '0'}%"\n`;
-        csvContent += `"4PS Beneficiaries","${accessibility.four_ps_count || 0}","${accessibility.four_ps_percentage || '0'}%"\n`;
-        csvContent += `"Walking Only (No Transport)","${accessibility.walking_only_count || 0}","${accessibility.walking_only_percentage || '0'}%"\n\n`;
+        csvContent += '───────────────────────────────────────────────────────────────\n';
+        csvContent += 'SPECIAL NEEDS & ACCESSIBILITY\n';
+        csvContent += '───────────────────────────────────────────────────────────────\n';
+        csvContent += 'Category,Number of Learners,Percentage of Total\n';
+        csvContent += `Persons with Disability (PWD),${accessibility.pwd_count || 0},${accessibility.pwd_percentage || 0}%\n`;
+        csvContent += `4PS Program Beneficiaries,${accessibility.four_ps_count || 0},${accessibility.four_ps_percentage || 0}%\n`;
+        csvContent += `Walking Only (No Transportation),${accessibility.walking_only_count || 0},${accessibility.walking_only_percentage || 0}%\n\n`;
 
         // TRANSPORTATION MODES
         const transport = data.detailed_statistics?.transportation_modes || {};
-        csvContent += '"TRANSPORTATION MODES"\n';
-        csvContent += '"Mode","Count"\n';
-        csvContent += `"Walking","${transport.walking || 0}"\n`;
-        csvContent += `"Motorcycle","${transport.motorcycle || 0}"\n`;
-        csvContent += `"Tricycle","${transport.tricycle || 0}"\n`;
-        csvContent += `"Other","${transport.other || 0}"\n\n`;
+        csvContent += '───────────────────────────────────────────────────────────────\n';
+        csvContent += 'TRANSPORTATION MODES\n';
+        csvContent += '───────────────────────────────────────────────────────────────\n';
+        csvContent += 'Transportation Mode,Number of Learners\n';
+        csvContent += `Walking,${transport.walking || 0}\n`;
+        csvContent += `Motorcycle,${transport.motorcycle || 0}\n`;
+        csvContent += `Tricycle,${transport.tricycle || 0}\n`;
+        csvContent += `Other,${transport.other || 0}\n\n`;
 
-        // KEY BARRIERS SUMMARY
+        // BARRIERS ANALYSIS
         const barriers = data.barrier_analysis || {};
-        csvContent += '"KEY BARRIERS IDENTIFIED"\n';
-        csvContent += '"Barrier Type","Affected Learners","Percentage"\n';
-        csvContent += `"Distance Barrier","${barriers.distance_barriers || 0}","${((barriers.distance_barriers / (data.total_learners || 1)) * 100).toFixed(1)}%"\n`;
-        csvContent += `"Accessibility Barriers","${barriers.accessibility_barriers || 0}","${((barriers.accessibility_barriers / (data.total_learners || 1)) * 100).toFixed(1)}%"\n`;
-        csvContent += `"Schedule Conflicts","${barriers.schedule_conflicts || 0}","${((barriers.schedule_conflicts / (data.total_learners || 1)) * 100).toFixed(1)}%"\n\n`;
+        csvContent += '───────────────────────────────────────────────────────────────\n';
+        csvContent += 'BARRIERS TO ENROLLMENT\n';
+        csvContent += '───────────────────────────────────────────────────────────────\n';
+        csvContent += 'Barrier Type,Affected Learners,Percentage of Total\n';
+        const totalBarriers = data.total_learners || 1;
+        csvContent += `Distance-Related,${barriers.distance_barriers || 0},${((barriers.distance_barriers || 0) / totalBarriers * 100).toFixed(1)}%\n`;
+        csvContent += `Accessibility Issues,${barriers.accessibility_barriers || 0},${((barriers.accessibility_barriers || 0) / totalBarriers * 100).toFixed(1)}%\n`;
+        csvContent += `Schedule Conflicts,${barriers.schedule_conflicts || 0},${((barriers.schedule_conflicts || 0) / totalBarriers * 100).toFixed(1)}%\n\n`;
 
         // RECOMMENDATIONS
-        csvContent += '"RECOMMENDATIONS FOR ACTION"\n';
-        csvContent += '"Priority","Title","Category","Description","Expected Impact","Estimated Effort","Timeline"\n';
-        if (data.recommendations && Array.isArray(data.recommendations)) {
-            data.recommendations.forEach(rec => {
+        csvContent += '───────────────────────────────────────────────────────────────\n';
+        csvContent += 'STRATEGIC RECOMMENDATIONS\n';
+        csvContent += '───────────────────────────────────────────────────────────────\n';
+        csvContent += 'Priority,Title,Description,Timeline,Effort Level,Expected Impact\n';
+        if (this.recommendations && Array.isArray(this.recommendations)) {
+            this.recommendations.forEach(rec => {
                 const priority = rec.priority || '';
                 const title = (rec.title || '').replace(/"/g, '""');
-                const category = rec.category || '';
                 const description = (rec.description || '').replace(/"/g, '""');
-                const impact = rec.expected_impact || '';
-                const effort = rec.estimated_effort || '';
                 const timeline = rec.timeline || '';
-                csvContent += `"P${priority}","${title}","${category}","${description}","${impact}","${effort}","${timeline}"\n`;
+                const effort = rec.estimated_effort || '';
+                const impact = rec.expected_impact || '';
+                csvContent += `P${priority},"${title}","${description}",${timeline},${effort},${impact}\n`;
                 
-                // Add action items as sub-rows if available
+                // Add action items as indented sub-rows
                 if (rec.action_items && Array.isArray(rec.action_items)) {
                     rec.action_items.forEach((item, idx) => {
                         const actionItem = (item || '').replace(/"/g, '""');
-                        csvContent += `"","→ Action ${idx + 1}: ${actionItem}","","","","",""\n`;
+                        csvContent += `,"└─ Action ${idx + 1}","${actionItem}",,\n`;
                     });
                 }
+                csvContent += '\n';
             });
+        } else {
+            csvContent += 'No recommendations available\n\n';
         }
-        csvContent += '\n';
 
-        // RESOURCES NEEDED
-        csvContent += '"RESOURCES REQUIRED"\n';
-        csvContent += '"Resource","Quantity"\n';
-        if (data.resources_needed) {
-            Object.entries(data.resources_needed).forEach(([key, value]) => {
-                csvContent += `"${key}","${value}"\n`;
-            });
+        // FORECAST SUMMARY (if available from last known data)
+        if (data.forecast_summary) {
+            csvContent += '───────────────────────────────────────────────────────────────\n';
+            csvContent += 'FORECAST SUMMARY\n';
+            csvContent += '───────────────────────────────────────────────────────────────\n';
+            csvContent += `Realistic Scenario,${data.forecast_summary.realistic}\n`;
+            csvContent += `Optimistic Scenario,${data.forecast_summary.optimistic}\n`;
+            csvContent += `Pessimistic Scenario,${data.forecast_summary.pessimistic}\n\n`;
         }
-        csvContent += '\n';
 
-        // KEY FACTORS
-        csvContent += '"KEY SUCCESS FACTORS"\n';
-        if (data.key_factors && Array.isArray(data.key_factors)) {
-            data.key_factors.forEach((factor, idx) => {
-                csvContent += `"Factor ${idx + 1}","${(factor || '').replace(/"/g, '""')}"\n`;
-            });
-        }
+        // NOTES
+        csvContent += '───────────────────────────────────────────────────────────────\n';
+        csvContent += 'EXPORT INFORMATION\n';
+        csvContent += '───────────────────────────────────────────────────────────────\n';
+        csvContent += `Export Date:,${new Date().toLocaleString()}\n`;
+        csvContent += `Data Version:,1.0\n`;
+        csvContent += `Rows:,"Each section is separated by dashed lines for clarity"\n`;
+        csvContent += `Notes:,"Percentages may not add up to 100% due to overlapping categories"\n`;
 
         // Create and download CSV file
         const csvBlob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
@@ -1370,6 +1388,25 @@ class ALSDSSPanel {
             const transport = data.detailed_statistics?.transportation_modes || {};
             const barriers = data.barrier_analysis || {};
             
+            // Build recommendations HTML
+            let recommendationsHTML = '<h2>RECOMMENDATIONS</h2>';
+            if (this.recommendations && this.recommendations.length > 0) {
+                recommendationsHTML += '<table><tr><th>Priority</th><th>Title</th><th>Description</th><th>Timeline</th><th>Effort</th><th>Impact</th></tr>';
+                this.recommendations.forEach(rec => {
+                    recommendationsHTML += `<tr>
+                        <td>P${rec.priority}</td>
+                        <td>${rec.title}</td>
+                        <td>${rec.description}</td>
+                        <td>${rec.timeline}</td>
+                        <td>${rec.estimated_effort}</td>
+                        <td>${rec.expected_impact}</td>
+                    </tr>`;
+                });
+                recommendationsHTML += '</table>';
+            } else {
+                recommendationsHTML += '<p>No recommendations available.</p>';
+            }
+            
             let html = `<!DOCTYPE html>
 <html>
 <head>
@@ -1378,10 +1415,12 @@ class ALSDSSPanel {
 body { font-family: Arial, sans-serif; color: #333; margin: 20px; line-height: 1.6; }
 h1 { color: #2563eb; text-align: center; }
 h2 { background: #2563eb; color: white; padding: 10px; margin-top: 20px; }
-table { width: 100%; border-collapse: collapse; margin: 15px 0; }
+table { width: 100%; border-collapse: collapse; margin: 15px 0; font-size: 12px; }
 th { background: #e0e7ff; padding: 8px; text-align: left; border: 1px solid #2563eb; }
 td { padding: 8px; border: 1px solid #ddd; }
 .stat { display: inline-block; width: 30%; margin: 10px 1.5%; padding: 10px; background: #f9fafb; border: 1px solid #ddd; }
+.forecast-scenario { margin: 15px 0; padding: 12px; border-left: 4px solid #2563eb; background: #f0f6ff; }
+.scenario-title { font-weight: bold; color: #2563eb; }
 </style>
 </head>
 <body>
@@ -1441,89 +1480,128 @@ td { padding: 8px; border: 1px solid #ddd; }
 <tr><td>Accessibility</td><td>${barriers.accessibility_barriers || 0}</td><td>${((barriers.accessibility_barriers || 0) / (data.total_learners || 1) * 100).toFixed(1)}%</td></tr>
 <tr><td>Schedule</td><td>${barriers.schedule_conflicts || 0}</td><td>${((barriers.schedule_conflicts || 0) / (data.total_learners || 1) * 100).toFixed(1)}%</td></tr>
 </table>
-</body>
-</html>`;
 
-            const options = {
-                margin: 10,
-                filename: `DSS_Report_${data.barangay_name}_${timestamp}.pdf`,
-                image: { type: 'jpeg', quality: 0.95 },
-                html2canvas: { scale: 2 },
-                jsPDF: { orientation: 'portrait', unit: 'mm', format: 'a4' }
-            };
-            
-            html2pdf().set(options).from(html).save();
-            console.log('✅ PDF exported:', `DSS_Report_${data.barangay_name}_${timestamp}.pdf`);
+${recommendationsHTML}`;
+
+            // Fetch forecast data
+            fetch(`/api/dss/forecast/${data.barangay_name}`)
+                .then(response => response.json())
+                .then(forecast => {
+                    let forecastHTML = '<h2>FORECAST</h2>';
+                    
+                    if (forecast && forecast.current) {
+                        forecastHTML += `
+                        <p><strong>School Year:</strong> ${forecast.school_year} | <strong>Forecast Month:</strong> ${forecast.forecast_month}</p>
+                        
+                        <h3>Current Status</h3>
+                        <table>
+                        <tr><th>Metric</th><th>Value</th></tr>
+                        <tr><td>Total Enrollment</td><td>${forecast.current.enrollment}</td></tr>
+                        <tr><td>Completed</td><td>${forecast.current.completed}</td></tr>
+                        <tr><td>At-Risk</td><td>${forecast.current.at_risk}</td></tr>
+                        <tr><td>Completion Rate</td><td>${forecast.current.completion_rate}%</td></tr>
+                        <tr><td>Dropout Rate</td><td>${forecast.current.dropout_rate}%</td></tr>
+                        </table>
+                        
+                        <h3>Scenarios</h3>
+                        <div class="forecast-scenario">
+                            <div class="scenario-title">→ Realistic Scenario (Confidence: ${forecast.realistic.confidence})</div>
+                            <table style="margin-top: 10px;">
+                            <tr><th>Metric</th><th>Value</th></tr>
+                            <tr><td>Projected Enrollment</td><td>${forecast.realistic.projected_enrollment} (+${forecast.realistic.new_enrollments})</td></tr>
+                            <tr><td>Projected Completed</td><td>${forecast.realistic.projected_completed}</td></tr>
+                            <tr><td>Projected At-Risk</td><td>${forecast.realistic.projected_at_risk}</td></tr>
+                            <tr><td>Completion Rate</td><td>${forecast.realistic.completion_rate}%</td></tr>
+                            <tr><td>Dropout Rate</td><td>${forecast.realistic.dropout_rate}%</td></tr>
+                            </table>
+                        </div>
+                        
+                        <div class="forecast-scenario">
+                            <div class="scenario-title">↑ Optimistic Scenario (Confidence: ${forecast.optimistic.confidence})</div>
+                            <p>${forecast.optimistic.scenario_description}</p>
+                            <table style="margin-top: 10px;">
+                            <tr><th>Metric</th><th>Value</th></tr>
+                            <tr><td>Projected Enrollment</td><td>${forecast.optimistic.projected_enrollment} (+${forecast.optimistic.new_enrollments})</td></tr>
+                            <tr><td>Projected Completed</td><td>${forecast.optimistic.projected_completed}</td></tr>
+                            <tr><td>Projected At-Risk</td><td>${forecast.optimistic.projected_at_risk}</td></tr>
+                            <tr><td>Completion Rate</td><td>${forecast.optimistic.completion_rate}%</td></tr>
+                            <tr><td>Dropout Rate</td><td>${forecast.optimistic.dropout_rate}%</td></tr>
+                            </table>
+                        </div>
+                        
+                        <div class="forecast-scenario">
+                            <div class="scenario-title">↓ Pessimistic Scenario (Confidence: ${forecast.pessimistic.confidence})</div>
+                            <p>${forecast.pessimistic.scenario_description}</p>
+                            <table style="margin-top: 10px;">
+                            <tr><th>Metric</th><th>Value</th></tr>
+                            <tr><td>Projected Enrollment</td><td>${forecast.pessimistic.projected_enrollment} (+${forecast.pessimistic.new_enrollments})</td></tr>
+                            <tr><td>Projected Completed</td><td>${forecast.pessimistic.projected_completed}</td></tr>
+                            <tr><td>Projected At-Risk</td><td>${forecast.pessimistic.projected_at_risk}</td></tr>
+                            <tr><td>Completion Rate</td><td>${forecast.pessimistic.completion_rate}%</td></tr>
+                            <tr><td>Dropout Rate</td><td>${forecast.pessimistic.dropout_rate}%</td></tr>
+                            </table>
+                        </div>
+                        
+                        <h3>Forecast Recommendations</h3>
+                        <ul>
+                            <li><strong>Primary Action:</strong> ${forecast.recommendation.primary}</li>
+                            <li><strong>Barrier-Focused:</strong> ${forecast.recommendation.barrier_focused}</li>
+                            <li><strong>Monitoring:</strong> ${forecast.recommendation.monitoring}</li>
+                        </ul>`;
+                        
+                        if (forecast.risk_factors && forecast.risk_factors.length > 0) {
+                            forecastHTML += '<h3>Risk Factors</h3><ul>';
+                            forecast.risk_factors.forEach(risk => {
+                                forecastHTML += `<li>${risk}</li>`;
+                            });
+                            forecastHTML += '</ul>';
+                        }
+                        
+                        if (forecast.opportunities && forecast.opportunities.length > 0) {
+                            forecastHTML += '<h3>Opportunities</h3><ul>';
+                            forecast.opportunities.forEach(opp => {
+                                forecastHTML += `<li>${opp}</li>`;
+                            });
+                            forecastHTML += '</ul>';
+                        }
+                    } else {
+                        forecastHTML += '<p>Forecast data not available.</p>';
+                    }
+                    
+                    html += forecastHTML + '</body></html>';
+                    
+                    const options = {
+                        margin: 10,
+                        filename: `DSS_Report_${data.barangay_name}_${timestamp}.pdf`,
+                        image: { type: 'jpeg', quality: 0.95 },
+                        html2canvas: { scale: 2 },
+                        jsPDF: { orientation: 'portrait', unit: 'mm', format: 'a4' }
+                    };
+                    
+                    html2pdf().set(options).from(html).save();
+                    console.log('✅ PDF exported:', `DSS_Report_${data.barangay_name}_${timestamp}.pdf`);
+                })
+                .catch(err => {
+                    console.warn('Forecast not available, generating PDF without forecast:', err);
+                    html += '</body></html>';
+                    
+                    const options = {
+                        margin: 10,
+                        filename: `DSS_Report_${data.barangay_name}_${timestamp}.pdf`,
+                        image: { type: 'jpeg', quality: 0.95 },
+                        html2canvas: { scale: 2 },
+                        jsPDF: { orientation: 'portrait', unit: 'mm', format: 'a4' }
+                    };
+                    
+                    html2pdf().set(options).from(html).save();
+                    console.log('✅ PDF exported without forecast:', `DSS_Report_${data.barangay_name}_${timestamp}.pdf`);
+                });
         } catch (err) {
             console.error('PDF export error:', err);
             alert('Error: ' + err.message);
         }
     }
 
-    /**
-     * Export analysis as visual PDF (using html2canvas for visual snapshot)
-     */
-    exportAsPDFVisual() {
-        const data = this.currentAnalysis;
-        const timestamp = new Date().toISOString().slice(0,10);
-        
-        console.log('📸 Generating visual PDF snapshot...');
-        
-        // Create a snapshot of the DSS panel
-        const panel = document.getElementById('dss-panel');
-        if (!panel) {
-            alert('DSS panel not found. Please open the DSS panel first.');
-            return;
-        }
-
-        try {
-            // Check if html2pdf is available
-            if (typeof html2pdf === 'undefined') {
-                alert('PDF export library not available.');
-                return;
-            }
-            
-            // Clone the panel to avoid modifying the original
-            const panelClone = panel.cloneNode(true);
-            panelClone.style.cssText = `
-                position: absolute;
-                top: 0;
-                left: 0;
-                width: 100%;
-                background: white;
-                z-index: 10001;
-                margin: 0;
-            `;
-            document.body.appendChild(panelClone);
-            
-            // Wait a moment for styling to apply
-            setTimeout(() => {
-                // Configure html2pdf options for visual capture
-                const options = {
-                    margin: [10, 10, 10, 10],
-                    filename: `DSS_Report_Visual_${data.barangay_name}_${timestamp}.pdf`,
-                    image: { type: 'jpeg', quality: 0.95 },
-                    html2canvas: { scale: 2, useCORS: true, allowTaint: true, backgroundColor: '#ffffff' },
-                    jsPDF: { orientation: 'portrait', unit: 'mm', format: 'a4', compress: true }
-                };
-                
-                // Generate PDF using html2pdf
-                html2pdf().set(options).from(panelClone).save().then(() => {
-                    document.body.removeChild(panelClone);
-                    console.log('✅ Visual PDF snapshot exported:', `DSS_Report_Visual_${data.barangay_name}_${timestamp}.pdf`);
-                }).catch(err => {
-                    if (document.body.contains(panelClone)) {
-                        document.body.removeChild(panelClone);
-                    }
-                    console.error('Error creating visual PDF:', err);
-                    alert('Error creating visual PDF: ' + err.message);
-                });
-            }, 300);
-        } catch (err) {
-            console.error('Error in visual PDF export:', err);
-            alert('Error exporting visual PDF: ' + err.message);
-        }
-    }
 
     /**
      * Refresh analysis
